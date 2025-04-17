@@ -1,6 +1,6 @@
 # Privacy Policy
 
-<p>At spatiomic, accessible from <a href="https://spatiomic.complextissue.com">https://spatiomic.complextissue.com</a>, one of our main priorities is the privacy of our visitors. This Privacy Policy document contains types of information that is collected and recorded by spatiomic and how we use it.</p>
+<p>At spatiomic, accessible from <a href="https://spatiomic.org">https://spatiomic.org</a>, one of our main priorities is the privacy of our visitors. This Privacy Policy document contains types of information that is collected and recorded by spatiomic and how we use it.</p>
 
 <p>If you have additional questions or require more information about our Privacy Policy, do not hesitate to contact us. Our Privacy Policy was generated with the help of <a href="https://www.gdprprivacypolicy.net/">GDPR Privacy Policy Generator from GDPRPrivacyPolicy.net</a></p>
 
