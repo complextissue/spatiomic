@@ -1,0 +1,58 @@
+{
+    "editor.rulers": [
+        {
+            "column": 120,
+            "color": "#ddd"
+        }
+    ],
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true,
+    "editor.detectIndentation": false,
+    "editor.formatOnSave": true,
+    "python.languageServer": "Pylance",
+    "python.analysis.typeCheckingMode": "off",
+    "[python]": {
+        "editor.formatOnPaste": false,
+        "editor.formatOnSaveMode": "file",
+        "editor.defaultFormatter": "charliermarsh.ruff",
+    },
+    "python.analysis.extraPaths": [
+        "spatiomic",
+        "test",
+        "examples"
+    ],
+    "python.analysis.exclude": [
+        "**/.venv/**",
+        "**/__pycache__/**",
+    ],
+    "python.defaultInterpreterPath": ".venv/bin/python",
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true,
+    "python.testing.pytestArgs": [
+        "test"
+    ],
+    "files.exclude": {
+        "**/.git": true,
+        "**/.DS_Store": true,
+        "**/.mypy_cache": true,
+        "**/.pytest_cache": true,
+        "**/__pycache__": true,
+    },
+    "files.insertFinalNewline": true,
+    "esbonio.sphinx.confDir": "${workspaceFolder}/docs/source",
+    "trailing-spaces.trimOnSave": true,
+    "notebook.formatOnSave.enabled": true,
+    "notebook.cellFocusIndicator": "gutter",
+    "notebook.lineNumbers": "on",
+    "files.watcherExclude": {
+        "**/.venv/**": true
+    },
+    "githubPullRequests.ignoredPullRequestBranches": [
+        "main"
+    ],
+    "editor.inlineSuggest.enabled": false,
+    "github.copilot.enable": {
+        "*": false,
+        "python": true
+    },
+}

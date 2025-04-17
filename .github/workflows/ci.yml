@@ -1,0 +1,71 @@
+name: Test Package
+
+on:
+  schedule:
+    # run every Tuesday at 17:00 UTC
+    - cron: "0 17 * * 2"
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+            -   os: ubuntu-24.04
+                python: "3.10"
+            -   os: ubuntu-24.04
+                python: "3.11"
+            -   os: ubuntu-24.04
+                python: "3.12"
+
+    name: Python ${{ matrix.python }}
+
+    env:
+        OS: ${{ matrix.os }}
+        PYTHON: ${{ matrix.python }}
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python-version }}
+      - uses: actions/cache@v3
+        with:
+          path: ${{ env.pythonLocation }}
+          key: ${{ env.pythonLocation }}-${{ hashFiles('pyproject.toml') }}
+      - name: Install dependencies
+        run: |
+          export FLIT_ROOT_INSTALL=1
+          python -m pip install --upgrade pip
+          python -m pip install flit
+          python -m flit install --deps production
+          python -m pip install git+https://github.com/complextissue/xpysom.git
+          python -m pip install bandit mypy ruff==0.9.10
+          python -m pip install aicspylibczi certifi coverage flit mypy opencv-python-headless pandas-stubs pandoc \
+            pre-commit pytest pytest-datafiles readlif
+      - name: Lint with ruff
+        run: |
+          ruff check --fix --exit-non-zero-on-fix spatiomic
+      - name: Format with ruff
+        run: |
+          ruff format --check spatiomic
+      - name: Type check with mypy
+        run: |
+          python -m mypy -p spatiomic
+      - name: Check security with bandit
+        run: |
+          python -m bandit --verbose --ini .bandit.ini -ll --recursive spatiomic
+      - name: Test with pytest
+        run: |
+          coverage run -m pytest --maxfail=10 -m "not gpu" -m "not no_github_ci"
+          coverage xml
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}

@@ -1,0 +1,4 @@
+{
+    "key": "cmd+[h]",
+    "command": "editor.action.inlineSuggest.trigger"
+}

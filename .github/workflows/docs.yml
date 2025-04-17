@@ -1,0 +1,65 @@
+name: Publish Documentation
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        python-version: [3.12.6]
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python-version }}
+      - uses: actions/cache@v3
+        with:
+          path: ${{ env.pythonLocation }}
+          key: ${{ env.pythonLocation }}-${{ hashFiles('pyproject.toml') }}
+      - name: Install dependencies
+        run: |
+          export FLIT_ROOT_INSTALL=1
+          python -m pip install --upgrade pip
+          python -m pip install flit
+          python -m flit install --deps production
+          python -m pip install git+https://github.com/complextissue/xpysom.git
+          python -m pip install aicspylibczi certifi coverage flit furo ipykernel ipywidgets jupyter-client \
+            jupyter-core mypy myst-parser nbsphinx opencv-python-headless pandas-stubs pandoc pre-commit pygments \
+            pytest pytest-datafiles readlif session-info2 sphinx sphinx-autoapi sphinx-autodoc-typehints \
+            sphinx-copybutton sphinx-design sphinx-rtd-theme
+          sudo apt-get update
+          sudo apt-get install -y pandoc
+      - name: Build documentation
+        run: |
+          sphinx-build -M html "./docs/source" "./docs/build"
+          mv ./docs/build/html/index.html ./docs/build/html/overview.html
+          cp ./docs/build/html/introduction.html ./docs/build/html/index.html
+      - name: Upload static files as artifact
+        id: deployment
+        uses: actions/upload-pages-artifact@v3
+        with:
+            path: ./docs/build/html
+
+  deploy:
+    needs: build
+
+    permissions:
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

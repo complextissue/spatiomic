@@ -1,0 +1,75 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Package setup
+*.egg-info
+/build
+/dist
+
+# Sphinx documentation
+docs/build/*
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# MacOS
+.DS_Store
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Ignore visual code settings
+# /.vscode
+
+# Ignore TODO list
+TODO.md
+CHANGELOG.md
+/.trash
+.DS_Store
+
+# Ignore testing cache
+.pytest_cache
+.coverage
+docs/coverage_report/*
+
+# Ignore test jupyter notebooks
+spatiomic/*.ipynb
+
+# Keep folders indicated by .gitkeep
+!/**/.gitkeep
+!/**/.gitignore
+
+# Don't include example data
+example
+
+# Ignore data directories
+docs/source/tutorials/data/advanced_dkd/
+docs/source/tutorials/data/mouse_cgn/
+
+# local github actions testing
+test/data/multi-channel.ome.tiff
+test/data/test.ipynb
+docs/source/tutorials/benchmark_small.py
+docs/source/tutorials/benchmark.ipynb
