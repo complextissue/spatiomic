@@ -24,8 +24,6 @@ pip install spatiomic
 
 For the best GPU-accelerated experience (optional), a CUDA-compatible GPU and installation of the `cupy`, `cuml`, `cuGraph` and `cuCIM` packages is necessary. Please consult the [RAPIDS.AI installation guide](https://docs.rapids.ai/install) for further information.
 
-Please note that this is a preview version. Local installation can be done in a virtual environment by first running `make create-venv`, followed by `source .venv/bin/activate` to switch to the new virtual environemnt and `make install` or `make install-dev` (if packages for code quality checks, unittesting and documentation building are desired) at the root of this repository.
-
 Installation time should not exceed 5 minutes on a standard desktop computer with an average network connection.
 
 ## Documentation
