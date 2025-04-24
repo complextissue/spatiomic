@@ -41,6 +41,7 @@ extensions = [
     "matplotlib.sphinxext.plot_directive",
     "sphinx_autodoc_typehints",
     "sphinx.ext.inheritance_diagram",
+    "sphinxcontrib.mermaid",
     "nbsphinx",
     "myst_parser",
 ]
