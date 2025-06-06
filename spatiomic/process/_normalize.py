@@ -196,7 +196,7 @@ class Normalize(Processer):
         with open(load_path, "rb") as f:
             config = load(f)  # nosec
 
-        normalizer = cls(*config["init"])
+        normalizer = cls(**config["init"])
 
         for key, value in config["attributes"].items():
             normalizer.__setattr__(key, value)

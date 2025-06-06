@@ -165,7 +165,7 @@ class ZScore(Processer):
         with open(save_path, "rb") as file:
             config: dict = load(file)  # nosec
 
-        zscorer = cls(*config["init"])
+        zscorer = cls(**config["init"])
 
         for key, value in config["attributes"].items():
             zscorer.__setattr__(key, value)

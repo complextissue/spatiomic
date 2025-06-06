@@ -288,7 +288,7 @@ class Clip(Processer):
         with open(save_path, "rb") as file:
             config = load(file)  # nosec
 
-        clipper = cls(*config["init"])
+        clipper = cls(**config["init"])
 
         for key, value in config["attributes"].items():
             clipper.__setattr__(key, value)
