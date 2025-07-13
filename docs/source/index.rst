@@ -8,6 +8,7 @@ Welcome to the spatiomic documentation!
 
    introduction
    installation
+   overview
 
 .. toctree::
    :caption: Tutorials
