@@ -68,7 +68,6 @@ simplejson==3.20.1
 six==1.17.0
 soupsieve==2.6
 spaghetti==1.7.6
-spatiomic @ file:///Users/au734063/Documents/code/spatiomic
 spglm==1.1.0
 spint==1.0.7
 splot==1.1.7
