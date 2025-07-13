@@ -73,6 +73,7 @@ dev = [
     "sphinx",
     "sphinx-autoapi",
     "sphinx-autodoc-typehints",
+    "sphinxcontrib-mermaid",
     "sphinx-copybutton",
     "sphinx-design",
     "sphinx-rtd-theme",
