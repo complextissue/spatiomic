@@ -16,18 +16,18 @@ jobs:
       fail-fast: true
       matrix:
         include:
-            -   os: ubuntu-24.04
-                python: "3.10"
-            -   os: ubuntu-24.04
-                python: "3.11"
-            -   os: ubuntu-24.04
-                python: "3.12"
+          - os: ubuntu-24.04
+            python: "3.10"
+          - os: ubuntu-24.04
+            python: "3.11"
+          - os: ubuntu-24.04
+            python: "3.12"
 
     name: Python ${{ matrix.python }}
 
     env:
-        OS: ${{ matrix.os }}
-        PYTHON: ${{ matrix.python }}
+      OS: ${{ matrix.os }}
+      PYTHON: ${{ matrix.python }}
 
     steps:
       - uses: actions/checkout@v3
@@ -46,7 +46,7 @@ jobs:
           python -m pip install flit
           python -m flit install --deps production
           python -m pip install git+https://github.com/complextissue/xpysom.git
-          python -m pip install bandit mypy ruff==0.9.10
+          python -m pip install bandit mypy==1.17.0 ruff==0.9.10
           python -m pip install aicspylibczi certifi coverage flit mypy opencv-python-headless pandas-stubs pandoc \
             pre-commit pytest pytest-datafiles readlif
       - name: Lint with ruff
