@@ -197,4 +197,4 @@ class KnnGraph:
         # only keep unique pairs
         edgelist = np.unique(edgelist, axis=0)
 
-        return edgelist
+        return edgelist  # type: ignore[no-any-return]
