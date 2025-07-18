@@ -1,15 +1,160 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
+type: article
+title: "Pathology-Oriented Multiplexing Enables Integrative Disease Mapping"
 authors:
-  - family-names: "Kuehl"
-    given-names: "Malte"
-  - family-names: "Kaiser"
-    given-names: "Nico"
-  - family-names: "Zimmermann"
-    given-names: "Marina"
-  - family-names: "Bonn"
-    given-names: "Stefan"
-  - family-names: "Puelles"
-    given-names: "Victor"
-title: "spatiomic - Scalable spatial proteomics analyses for pathology"
-url: "https://github.com/complextissue/spatiomic"
+  - family-names: Kuehl
+    given-names: Malte
+  - family-names: Okabayashi
+    given-names: Yusuke
+  - family-names: Wong
+    given-names: Milagros N.
+  - family-names: Gernhold
+    given-names: Lukas
+  - family-names: Gut
+    given-names: Gabriele
+  - family-names: Kaiser
+    given-names: Nico
+  - family-names: Schwerk
+    given-names: Maria
+  - family-names: Gräfe
+    given-names: Stefanie K.
+  - family-names: Ma
+    given-names: Frank Y.
+  - family-names: Tanevski
+    given-names: Jovan
+  - family-names: Schäfer
+    given-names: Philipp S. L.
+  - family-names: Mezher
+    given-names: Sam
+  - family-names: Sarabia del Castillo
+    given-names: Jacobo
+  - family-names: Goldbeck-Strieder
+    given-names: Thiago
+  - family-names: Zolotareva
+    given-names: Olga
+  - family-names: Hartung
+    given-names: Michael
+  - family-names: Delgado Chaves
+    given-names: Fernando M.
+  - family-names: Klinkert
+    given-names: Lukas
+  - family-names: Gnirck
+    given-names: Ann-Christin
+  - family-names: Spehr
+    given-names: Marc
+  - family-names: Fleck
+    given-names: David
+  - family-names: Joodaki
+    given-names: Mehdi
+  - family-names: Parra
+    given-names: Victor
+  - family-names: Shaigan
+    given-names: Mina
+  - family-names: Diebold
+    given-names: Martin
+  - family-names: Prinz
+    given-names: Marco
+  - family-names: Kranz
+    given-names: Jennifer
+  - family-names: Kux
+    given-names: Johan M.
+  - family-names: Braun
+    given-names: Fabian
+  - family-names: Kretz
+    given-names: Oliver
+  - family-names: Wu
+    given-names: Hui
+  - family-names: Grahammer
+    given-names: Florian
+  - family-names: Heins
+    given-names: Sven
+  - family-names: Zimmermann
+    given-names: Marina
+  - family-names: Haas
+    given-names: Fabian
+  - family-names: Kylies
+    given-names: Dominik
+  - family-names: Wanner
+    given-names: Nicola
+  - family-names: Czogalla
+    given-names: Jan
+  - family-names: Dumoulin
+    given-names: Bernhard
+  - family-names: Zolotarev
+    given-names: Nikolay
+  - family-names: Lindenmeyer
+    given-names: Maja
+  - family-names: Karlson
+    given-names: Pall
+  - family-names: Nyengaard
+    given-names: Jens R.
+  - family-names: Sebode
+    given-names: Marcial
+  - family-names: Weidemann
+    given-names: Sören
+  - family-names: Wiech
+    given-names: Thorsten
+  - family-names: Groene
+    given-names: Hermann-Josef
+  - family-names: Tomas
+    given-names: Nicola M.
+  - family-names: Meyer-Schwesinger
+    given-names: Catherine
+  - family-names: Kuppe
+    given-names: Christoph
+  - family-names: Kramann
+    given-names: Rafael
+  - family-names: Karras
+    given-names: Alexandre
+  - family-names: Bruneval
+    given-names: Patrick
+  - family-names: Tharaux
+    given-names: Pierre-Louis
+  - family-names: Pastene
+    given-names: Diego
+  - family-names: Yard
+    given-names: Benito
+  - family-names: Schaub
+    given-names: Jennifer A.
+  - family-names: McCown
+    given-names: Phillip J.
+  - family-names: Pyle
+    given-names: Laura
+  - family-names: Choi
+    given-names: Ye Ji
+  - family-names: Yokoo
+    given-names: Takashi
+  - family-names: Baumbach
+    given-names: Jan
+  - family-names: Sáez
+    given-names: Pablo J.
+  - family-names: Costa
+    given-names: Ivan
+  - family-names: Turner
+    given-names: Jan-Eric
+  - family-names: Hodgin
+    given-names: Jeffrey B.
+  - family-names: Saez-Rodriguez
+    given-names: Julio
+  - family-names: Huber
+    given-names: Tobias B.
+  - family-names: Bjornstad
+    given-names: Petter
+  - family-names: Kretzler
+    given-names: Matthias
+  - family-names: Lenoir
+    given-names: Olivia
+  - family-names: Nikolic-Paterson
+    given-names: David J.
+  - family-names: Pelkmans
+    given-names: Lucas
+  - family-names: Bonn
+    given-names: Stefan
+  - family-names: Puelles
+    given-names: Victor G.
+journal: Nature
+year: 2025
+month: 7
+doi: 10.1038/s41586-025-09225-2
+issn: 1476-4687
