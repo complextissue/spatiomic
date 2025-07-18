@@ -27,12 +27,8 @@ jobs:
           export FLIT_ROOT_INSTALL=1
           python -m pip install --upgrade pip
           python -m pip install flit
-          python -m flit install --deps production
+          python -m flit install --deps develop
           python -m pip install git+https://github.com/complextissue/xpysom.git
-          python -m pip install aicspylibczi certifi coverage flit furo ipykernel ipywidgets jupyter-client \
-            jupyter-core mypy myst-parser nbsphinx opencv-python-headless pandas-stubs pandoc pre-commit pygments \
-            pytest pytest-datafiles readlif session-info2 sphinx sphinx-autoapi sphinx-autodoc-typehints \
-            sphinx-copybutton sphinx-design sphinx-rtd-theme
           sudo apt-get update
           sudo apt-get install -y pandoc
       - name: Build documentation
@@ -44,7 +40,7 @@ jobs:
         id: deployment
         uses: actions/upload-pages-artifact@v3
         with:
-            path: ./docs/build/html
+          path: ./docs/build/html
 
   deploy:
     needs: build
