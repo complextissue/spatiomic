@@ -6,7 +6,6 @@
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 [![GitHub CI](https://github.com/complextissue/spatiomic/actions/workflows/ci.yml/badge.svg)](https://github.com/complextissue/spatiomic/actions/workflows/ci.yml)
-[![GitHub Pages](https://github.com/complextissue/spatiomic/actions/workflows/docs.yml/badge.svg)](https://spatiomic.org)
 [![codecov](https://codecov.io/gh/complextissue/spatiomic/branch/main/graph/badge.svg?token=TLXB333GQV)](https://codecov.io/gh/complextissue/spatiomic)
 ![PyPi Downloads](https://img.shields.io/pepy/dt/spatiomic?label=PyPi%20downloads)
 
