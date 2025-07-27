@@ -11,6 +11,7 @@
 ![PyPi Downloads](https://img.shields.io/pepy/dt/spatiomic?label=PyPi%20downloads)
 
 `spatiomic` is a computational library for the analysis of *spati*al prote*omic*s (with some functions also being useful for other _-omics_).
+It contains functions for pixel-level clustering, differential cluster abundance analysis, spatial statistics and much more.
 
 The main goal of this package is to organize different packages and methods that are commonly used when dealing with high-dimensional imaging data behind a single API that allows for scalable high-performance computing applications, whenever possible on the GPU.
 
@@ -21,7 +22,7 @@ The main goal of this package is to organize different packages and methods that
 `spatiomic` is available through PyPi:
 
 ```bash
-uv pip install spatiomic
+uv add spatiomic
 ```
 
 or
@@ -30,7 +31,19 @@ or
 pip install spatiomic
 ```
 
-For the best GPU-accelerated experience (optional), a CUDA-compatible GPU and installation of the `cupy`, `cuml`, `cuGraph` and `cuCIM` packages is necessary. Please consult the [RAPIDS.AI installation guide](https://docs.rapids.ai/install) for further information.
+For the best GPU-accelerated experience (optional), a CUDA-compatible GPU and installation of the `cupy`, `cuml`, `cuGraph` and `cuCIM` packages is necessary. You can install them using the `cuda-11` or `cuda-12` extras.
+
+```bash
+uv add spatiomic --optional cuda-12
+```
+
+or
+
+```bash
+pip install "spatiomic[cuda-12]"
+```
+
+Alternatively, you may want to install a RAPIDS.AI-enabled Docker container for GPU support, please refer to the [installation guide](https://docs.rapids.ai/install/).
 
 Installation time should not exceed 5 minutes on a standard desktop computer with an average network connection.
 
