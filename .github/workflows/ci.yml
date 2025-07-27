@@ -46,10 +46,10 @@ jobs:
           uv sync
       - name: Lint with ruff
         run: |
-          uv run ruff check --fix --exit-non-zero-on-fix src
+          uv run ruff check --fix --exit-non-zero-on-fix spatiomic
       - name: Format with ruff
         run: |
-          uv run ruff format --check src
+          uv run ruff format --check spatiomic
       - name: Type check with mypy
         run: |
           uv run mypy -p spatiomic
