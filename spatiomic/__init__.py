@@ -1,11 +1,12 @@
 """Library for spatial omics analysis. Lazy-loads submodules for faster import times."""
 
+from importlib.metadata import version
 from importlib.util import find_spec
 from typing import List
 
 import lazy_loader as lazy
 
-from ._version import __version__ as __version__
+__version__ = version("spatiomic")
 
 __getattr__, __lazy_dir__, _ = lazy.attach_stub(__name__, __file__)
 

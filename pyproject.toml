@@ -1,11 +1,15 @@
 [build-system]
-requires = ["flit_core >=3.4,<4"]
-build-backend = "flit_core.buildapi"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["spatiomic"]
 
 [project]
 name = "spatiomic"
+version = "0.4.3"
 description = "A python toolbox for spatial omics analysis."
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 license = { file = "LICENSE" }
 authors = [{ name = "Malte Kuehl", email = "malte.kuehl@clin.au.dk" }]
 readme = { file = "README.md", content-type = "text/markdown" }
@@ -17,15 +21,13 @@ classifiers = [
     "Natural Language :: English",
     "Typing :: Typed",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Operating System :: OS Independent",
 ]
-dynamic = ["version"]
 dependencies = [
     "adjustText",
-    "anndata",
+    "anndata>=0.12.0",
     "colorcet",
     "esda>=2.7.0",
     "joblib",
@@ -38,46 +40,12 @@ dependencies = [
     "python-igraph",
     "scikit-image",
     "scikit-learn",
-    "scipy>=1.15.0",
+    "scipy>=0.16.1",
     "seaborn",
     "statsmodels",
-    "umap-learn",
+    "umap-learn>=0.5.0",
+    "llvmlite>=0.39.0",
     "xpysom==1.0.7",
-]
-
-[project.optional-dependencies]
-dev = [
-    "aicspylibczi",
-    "certifi",
-    "coverage",
-    "flit",
-    "furo",
-    "ipykernel",
-    "ipywidgets",
-    "jupyter-client",
-    "jupyter-core",
-    "mypy==1.17.0",
-    "myst-parser",
-    "nbsphinx",
-    "opencv-python-headless",
-    "openpyxl",
-    "pandas-stubs",
-    "pandoc",
-    "pre-commit",
-    "pygments",
-    "pytest",
-    "pytest-datafiles",
-    "readlif",
-    "ruff==0.9.10",
-    "session-info2",
-    "sphinx",
-    "sphinx-autoapi",
-    "sphinx-autodoc-typehints",
-    "sphinxcontrib-mermaid",
-    "sphinx-copybutton",
-    "sphinx-design",
-    "sphinx-rtd-theme",
-    "virtualenv",
 ]
 
 [project.urls]
@@ -200,3 +168,37 @@ ignore_errors = true
 
 [tool.coverage.html]
 directory = "docs/coverage_report"
+
+[dependency-groups]
+dev = [
+    "aicspylibczi",
+    "bandit>=1.8.6",
+    "certifi",
+    "coverage",
+    "furo",
+    "ipykernel",
+    "ipywidgets",
+    "jupyter-client",
+    "jupyter-core",
+    "mypy==1.17.0",
+    "myst-parser",
+    "nbsphinx",
+    "opencv-python-headless",
+    "openpyxl",
+    "pandas-stubs",
+    "pandoc",
+    "pre-commit",
+    "pygments",
+    "pytest",
+    "pytest-datafiles",
+    "readlif",
+    "ruff==0.9.10",
+    "session-info2",
+    "sphinx",
+    "sphinx-autoapi",
+    "sphinx-autodoc-typehints",
+    "sphinxcontrib-mermaid",
+    "sphinx-copybutton",
+    "sphinx-design",
+    "sphinx-rtd-theme",
+]
