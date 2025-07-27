@@ -7,7 +7,7 @@ packages = ["spatiomic"]
 
 [project]
 name = "spatiomic"
-version = "0.5.0"
+version = "0.5.1"
 description = "A python toolbox for spatial omics analysis."
 requires-python = ">=3.11"
 license = { file = "LICENSE" }
