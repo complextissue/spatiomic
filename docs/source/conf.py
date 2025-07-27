@@ -4,7 +4,7 @@
 import os
 import sys
 from datetime import datetime
-from importlib.metadata import version
+from importlib.metadata import metadata
 from pathlib import Path
 from typing import Any, Dict, List
 
@@ -14,10 +14,12 @@ sys.path.insert(0, os.path.abspath("../../spatiomic"))
 
 # -- Project information -----------------------------------------------------
 
+info = metadata("spatiomic")
 project = "spatiomic"
 author = "Malte Kuehl"
 copyright = f"{datetime.now():%Y}, {author}."  # noqa: A001
-release = version("spatiomic")
+version = info["Version"]
+release = info["Version"]
 
 # -- General configuration ---------------------------------------------------
 
