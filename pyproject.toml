@@ -9,7 +9,7 @@ packages = ["spatiomic"]
 name = "spatiomic"
 version = "0.4.3"
 description = "A python toolbox for spatial omics analysis."
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 license = { file = "LICENSE" }
 authors = [{ name = "Malte Kuehl", email = "malte.kuehl@clin.au.dk" }]
 readme = { file = "README.md", content-type = "text/markdown" }
@@ -21,14 +21,13 @@ classifiers = [
     "Natural Language :: English",
     "Typing :: Typed",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Operating System :: OS Independent",
 ]
 dependencies = [
     "adjustText",
-    "anndata",
+    "anndata>=0.12.0",
     "colorcet",
     "esda>=2.7.0",
     "joblib",
@@ -41,7 +40,7 @@ dependencies = [
     "python-igraph",
     "scikit-image",
     "scikit-learn",
-    "scipy",
+    "scipy>=0.16.1",
     "seaborn",
     "statsmodels",
     "umap-learn>=0.5.0",
