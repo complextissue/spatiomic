@@ -1,5 +1,6 @@
 """Library for spatial omics analysis. Lazy-loads submodules for faster import times."""
 
+import os
 from importlib.metadata import version
 from importlib.util import find_spec
 from typing import List
@@ -8,7 +9,14 @@ import lazy_loader as lazy
 
 __version__ = version("spatiomic")
 
-__getattr__, __lazy_dir__, _ = lazy.attach_stub(__name__, __file__)
+# Explicitly load all submodules on RTD
+if os.environ.get("READTHEDOCS", None) == "True":
+    from . import cluster, data, dimension, neighbor, plot, process, spatial, tool  # noqa: F401
+else:
+    # Use lazy loading for normal package usage.
+    import lazy_loader as lazy
+
+    __getattr__, __lazy_dir__, _ = lazy.attach_stub(__name__, __file__)
 
 
 def __dir__() -> List[str]:
