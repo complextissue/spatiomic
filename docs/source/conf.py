@@ -9,8 +9,8 @@ from pathlib import Path
 from typing import Any, Dict, List
 
 DOCS_DIR = Path(__file__).parent
-sys.path.insert(0, os.path.abspath("../../spatiomic"))
-
+PROJECT_ROOT = DOCS_DIR.parent.parent
+sys.path.insert(0, os.fspath(PROJECT_ROOT))
 
 # -- Project information -----------------------------------------------------
 
@@ -71,7 +71,7 @@ nbsphinx_execute = "never"
 autoapi_type = "python"
 autoapi_add_toctree_entry = False
 autoapi_ignore: List[str] = ["_*.py"]
-autoapi_dirs = ["spatiomic"]
+autoapi_dirs = [os.path.join(PROJECT_ROOT, "spatiomic")]
 autoapi_options = [
     "members",
     "undoc-members",
