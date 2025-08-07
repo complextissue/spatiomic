@@ -46,6 +46,7 @@ dependencies = [
     "umap-learn>=0.5.0",
     "llvmlite>=0.39.0",
     "xpysom==1.0.7",
+    "astroid==3.3.11",
 ]
 
 [project.urls]
