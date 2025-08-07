@@ -29,12 +29,13 @@ Welcome to the spatiomic documentation!
    autoapi/spatiomic/index
 
 .. toctree::
-   :caption: Other packages
+   :caption: Other projects
    :maxdepth: 4
    :glob:
 
    pytximport <https://pytximport.complextissue.com>
    pyclustree <https://pyclustree.complextissue.com>
+   BioContextAI <https://biocontext.ai>
 
 .. toctree::
    :caption: Additional Information

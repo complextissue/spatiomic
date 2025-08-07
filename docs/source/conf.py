@@ -71,6 +71,7 @@ nbsphinx_execute = "never"
 autoapi_type = "python"
 autoapi_add_toctree_entry = False
 autoapi_ignore: List[str] = ["_*.py"]
+autoapi_dirs = ["../../spatiomic"]
 autoapi_options = [
     "members",
     "undoc-members",
@@ -78,10 +79,7 @@ autoapi_options = [
     "show-module-summary",
     "special-members",
     "imported-members",
-    # "private-members",
 ]
-autoapi_dirs = ["../../spatiomic"]
-autoapi_keep_files = False
 autoapi_member_order = "alphabetical"
 autoapi_python_class_content = "init"  # ensures that the __init__ method is also displayed
 
