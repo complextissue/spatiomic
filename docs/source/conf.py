@@ -71,7 +71,7 @@ nbsphinx_execute = "never"
 autoapi_type = "python"
 autoapi_add_toctree_entry = False
 autoapi_ignore: List[str] = ["_*.py"]
-autoapi_dirs = ["../../spatiomic"]
+autoapi_dirs = ["spatiomic"]
 autoapi_options = [
     "members",
     "undoc-members",
