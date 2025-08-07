@@ -10,17 +10,32 @@ import lazy_loader as lazy
 __version__ = version("spatiomic")
 
 # Explicitly load all submodules on RTD
-if os.environ.get("READTHEDOCS", None) == "True":
-    from . import cluster, data, dimension, neighbor, plot, process, spatial, tool  # noqa: F401
+on_rtd = os.environ.get("READTHEDOCS", None) == "True"
+if on_rtd:
+    from . import cluster, data, dimension, neighbor, plot, process, spatial, tool
 else:
     # Use lazy loading for normal package usage.
     import lazy_loader as lazy
 
     __getattr__, __lazy_dir__, _ = lazy.attach_stub(__name__, __file__)
 
+__all__ = [
+    "cluster",
+    "data",
+    "dimension",
+    "neighbor",
+    "plot",
+    "process",
+    "spatial",
+    "tool",
+]
+
 
 def __dir__() -> List[str]:
     """List the available submodules."""
+    if on_rtd:
+        # Return a static list of submodule names for the RTD build.
+        return [*__all__, "__version__"]
     return [*__lazy_dir__(), "__version__"]
 
 
