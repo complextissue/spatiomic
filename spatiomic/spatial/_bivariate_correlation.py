@@ -83,7 +83,8 @@ class BivariateCorrelation:
         if permutation_count > 0:
             columns.extend(["p_value", "z_score"])
 
-        df_clusters = pd.DataFrame(columns=columns)
+        # Collect all results in a list to avoid repeated concatenation
+        results_list = []
 
         if method == "moran":
             autocorrelation_function = Moran_BV
@@ -108,21 +109,18 @@ class BivariateCorrelation:
                     permutations=permutation_count,
                 )
 
-                df_correlation = pd.DataFrame(
-                    [
-                        [
-                            cluster,
-                            (channel if channel_names is None else channel_names[channel]),
-                            get_correlation(result),
-                        ]
-                    ],
-                    columns=base_columns,
-                )
+                row_data = [
+                    cluster,
+                    (channel if channel_names is None else channel_names[channel]),
+                    get_correlation(result),
+                ]
 
                 if permutation_count > 0 and method == "moran":
-                    df_correlation["p_value"] = result.p_sim
-                    df_correlation["z_score"] = result.z_sim
+                    row_data.extend([result.p_sim, result.z_sim])
 
-                df_clusters = pd.concat([df_clusters, df_correlation], ignore_index=True)
+                results_list.append(row_data)
+
+        # Create DataFrame from all results at once
+        df_clusters = pd.DataFrame(results_list, columns=columns)
 
         return df_clusters

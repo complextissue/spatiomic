@@ -5021,7 +5021,7 @@ requires-dist = [
     { name = "scipy", specifier = ">=0.16.1" },
     { name = "seaborn" },
     { name = "statsmodels" },
-    { name = "umap-learn", specifier = ">=0.5.0" },
+    { name = "umap-learn" },
     { name = "xpysom", specifier = "==1.0.7" },
 ]
 provides-extras = ["cuda-12", "cuda-11"]
