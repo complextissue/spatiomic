@@ -1,6 +1,8 @@
 """Spatiomic: Spatial omics analyses in Python."""
 
-from ._version import __version__
+from importlib.metadata import version
+
+__version__ = version("spatiomic")
 
 submodules = [
     "cluster",
@@ -13,6 +15,6 @@ submodules = [
     "tool",
 ]
 
-__all__ = submodules + ["__version__"]
+__all__ = [*submodules, "__version__"]
 
 from . import cluster, data, dimension, neighbor, plot, process, spatial, tool  # noqa: F401

@@ -43,7 +43,7 @@ dependencies = [
     "scipy>=0.16.1",
     "seaborn",
     "statsmodels",
-    "umap-learn>=0.5.0",
+    "umap-learn",
     "llvmlite>=0.39.0",
     "xpysom==1.0.7",
     "astroid==3.3.11",
