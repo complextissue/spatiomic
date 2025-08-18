@@ -31,18 +31,13 @@ class Cellpose:
         cellpose = so.segment.cellpose(use_gpu=True)
 
         # Perform segmentation on 2D grayscale image
-        masks_2d = cellpose.predict(image_2d, diameter=30)
+        masks_2d = cellpose.predict(image_2d)
 
         # Perform segmentation on 3D RGB image (first 3 channels used automatically)
-        masks_3d = cellpose.predict(image_3d, diameter=30)
+        masks_3d = cellpose.predict(image_3d)
 
         # masks contains the segmented cell masks with unique integer labels
         ```
-
-    Note:
-        - Cellpose v4.0.1+ automatically handles channel selection for RGB images
-        - Only the first 3 channels are used for multi-channel images
-        - The 'channels' parameter is no longer needed and has been deprecated
     """
 
     def __init__(
@@ -114,10 +109,6 @@ class Cellpose:
             msg = f"Input image must be 2D or 3D, got {pixels.ndim}D"
             raise ValueError(msg)
 
-        masks, flows, styles = self.model.eval(
-            pixels,
-            diameter=diameter,
-            **kwargs,
-        )
+        masks, flows, styles = self.model.eval(pixels, diameter=diameter, **kwargs)
 
         return masks, flows, styles  # type: ignore[no-any-return]

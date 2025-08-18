@@ -11,7 +11,8 @@ import spatiomic as so
 def test_cellpose_initialization() -> None:
     """Test Cellpose class initialization."""
     cellpose = so.segment.cellpose()
-    assert cellpose.use_gpu is True
+    # GPU usage depends on actual GPU availability, just check it's boolean
+    assert isinstance(cellpose.use_gpu, bool)
     assert cellpose.pretrained_model == "cpsam"
 
     cellpose_custom = so.segment.cellpose(use_gpu=False, pretrained_model="custom_model")
@@ -23,7 +24,7 @@ def test_cellpose_initialization() -> None:
 def test_cellpose_predict_2d(sample_2d_image: NDArray) -> None:
     """Test Cellpose prediction on 2D image."""
     cellpose = so.segment.cellpose(use_gpu=False)
-    masks, flows, styles = cellpose.predict(sample_2d_image, diameter=20)
+    masks, flows, styles = cellpose.predict(sample_2d_image)
 
     assert isinstance(masks, np.ndarray)
     assert masks.shape == sample_2d_image.shape
@@ -34,7 +35,7 @@ def test_cellpose_predict_2d(sample_2d_image: NDArray) -> None:
 def test_cellpose_predict_3d(sample_3d_image: NDArray) -> None:
     """Test Cellpose prediction on 3D image."""
     cellpose = so.segment.cellpose(use_gpu=False)
-    masks, flows, styles = cellpose.predict(sample_3d_image, diameter=20)
+    masks, flows, styles = cellpose.predict(sample_3d_image)
 
     assert isinstance(masks, np.ndarray)
     assert masks.shape == sample_3d_image.shape[:2]
@@ -47,7 +48,6 @@ def test_cellpose_predict_with_kwargs(sample_2d_image: NDArray) -> None:
     cellpose = so.segment.cellpose(use_gpu=False)
     masks, flows, styles = cellpose.predict(
         sample_2d_image,
-        diameter=20,
         flow_threshold=0.3,
         cellprob_threshold=0.1,
     )
