@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Tuple, Union
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -13,63 +13,96 @@ from ._colormap import colormap as create_colormap
 def cluster_image(
     image: NDArray,
     colormap: Optional[ListedColormap] = None,
-) -> plt.Figure:
-    """Plot the image with the clusters shown in colors and a colorbar.
+    ax: Optional[plt.Axes] = None,
+    figsize: Optional[Tuple[Union[int, float], Union[int, float]]] = None,
+    show_colorbar: bool = True,
+    title: Optional[str] = None,
+) -> Union[plt.Figure, plt.Axes]:
+    """Display cluster/mask image with automatic colormap and optional colorbar.
 
     Args:
-        image (NDArray): The image of the clusters.
-        colormap (ListedColormap, optional): The colormap to use. Defaults to None.
+        image: Cluster/mask image where each region has a unique positive integer ID.
+            Background should be 0.
+        colormap: Custom colormap for displaying clusters. If None, uses default colormap
+            with black background. Defaults to None.
+        ax: Existing axes to plot on. If None, creates new figure. Defaults to None.
+        figsize: Figure size as (width, height). Only used if ax is None. Defaults to None.
+        show_colorbar: Whether to show a colorbar with cluster/mask IDs. Defaults to True.
+        title: Title for the plot. Defaults to None.
 
     Returns:
-        plt.Figure: The figure.
+        plt.Figure if ax is None, otherwise the provided plt.Axes.
+
+    Example:
+        >>> import numpy as np
+        >>> clusters = np.zeros((100, 100), dtype=int)
+        >>> clusters[25:75, 25:75] = 1
+        >>> clusters[40:60, 40:60] = 2
+        >>> fig = cluster_image(clusters, title="Cluster Image")
     """
+    # Calculate cluster count and create colormap if needed
     cluster_count = np.max(image) + 1
+    if colormap is None:
+        colormap = create_colormap(color_count=cluster_count, color_override={0: "#000000"})
 
-    colormap = create_colormap(color_count=cluster_count, seed=0) if colormap is None else colormap
+    # Setup plotting
+    if ax is None:
+        sns.set_theme(style="white", font="Arial")
+        sns.set_context("paper")
+        fig, ax = plt.subplots(figsize=figsize)
+        return_fig = True
+    else:
+        return_fig = False
 
-    sns.set_theme(style="white", font="Arial")
-    sns.set_context("paper")
+    # Display image
+    ax.imshow(image, cmap=colormap)
+    ax.set_xticks([])
+    ax.set_yticks([])
 
-    fig = plt.figure()
+    if title is not None:
+        ax.set_title(title)
 
-    ax1 = fig.add_subplot()
-    ax1.set_xticks([])
-    ax1.set_yticks([])
-    ax1.imshow(image, cmap=colormap)
+    # Add colorbar if requested and we're creating a new figure
+    if show_colorbar and return_fig:
+        divider = make_axes_locatable(ax)
+        cax = divider.append_axes("right", size="5%", pad=0.05)
+        cax.imshow(np.expand_dims(np.arange(0, cluster_count), axis=1), cmap=colormap)
+        cax.set_yticks(np.arange(0, cluster_count))
+        cax.set_yticklabels(np.arange(0, cluster_count))
+        cax.yaxis.tick_right()
+        cax.yaxis.set_label_position("right")
+        cax.set_xticks([])
+        sns.despine(ax=cax, left=True, bottom=True)
 
-    # draw the colorbar as an image
-    divider = make_axes_locatable(ax1)
+    # Clean up main axes
+    sns.despine(ax=ax, left=True, bottom=True)
 
-    ax2 = divider.append_axes("right", size="5%", pad=0.05)
-    ax2.imshow(np.expand_dims(np.arange(0, cluster_count), axis=1), cmap=colormap)
-
-    ax2.set_yticks(np.arange(0, cluster_count))
-    ax2.set_yticklabels(np.arange(0, cluster_count))
-    ax2.yaxis.tick_right()
-    ax2.yaxis.set_label_position("right")
-
-    ax2.set_xticks([])
-
-    sns.despine(left=True, bottom=True)
-    plt.tight_layout(pad=0.5)
-
-    return fig
+    if return_fig:
+        plt.tight_layout(pad=0.5)
+        return fig
+    else:
+        return ax
 
 
 def save_cluster_image(
     image: NDArray,
     save_path: str,
     colormap: Optional[ListedColormap] = None,
+    dpi: int = 300,
 ) -> None:
-    """Save the cluster image to a file.
+    """Save cluster/mask image to file without borders.
 
     Args:
-        image (NDArray): The image of the clusters to save.
-        save_path (str): The path to save the image to.
-        colormap (ListedColormap, optional): The colormap to use. Defaults to None.
+        image: Cluster/mask image where each region has a unique positive integer ID.
+        save_path: Path where to save the image.
+        colormap: Custom colormap for clusters. If None, uses default colormap with
+            black background. Defaults to None.
+        dpi: Resolution for saved image. Defaults to 300.
     """
-    plt.imsave(
-        save_path,
-        image,
-        cmap=(create_colormap(color_count=np.max(image) + 1) if colormap is None else colormap),
-    )
+    # Create colormap if needed
+    cluster_count = np.max(image) + 1
+    if colormap is None:
+        colormap = create_colormap(color_count=cluster_count, color_override={0: "#000000"})
+
+    # Save using matplotlib's imsave
+    plt.imsave(save_path, image, cmap=colormap, dpi=dpi)

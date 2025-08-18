@@ -26,7 +26,8 @@ def volcano(
     fontsize: int = 8,
     figsize: Tuple[Union[int, float], Union[int, float]] = (10, 5),
     title: Optional[str] = None,
-) -> plt.Figure:
+    ax: Optional[plt.Axes] = None,
+) -> Union[plt.Figure, plt.Axes]:
     """Create a volcano plot of the data.
 
     Args:
@@ -50,13 +51,11 @@ def volcano(
         fontsize (int, optional): The font size for the annotations. Defaults to 8.
         figsize (Tuple[Union[int, float], Union[int, float]], optional): The size of the figure. Defaults to (10, 5).
         title (Optional[str], optional): The title of the plot. Defaults to None.
+        ax: Existing axes to plot on. If None, creates new figure. Defaults to None.
 
     Returns:
-        plt.Figure: The figure.
+        plt.Figure if ax is None, otherwise the provided plt.Axes.
     """
-    sns.set_theme(style="white", font="Arial")
-    sns.set_context("paper")
-
     # copy the data and check the columns
     df_volcano = data.copy()
 
@@ -112,7 +111,13 @@ def volcano(
         df_volcano["log2_fold_change"] = df_volcano["log2_fold_change"].fillna(0)
 
     # create the plot
-    fig, ax = plt.subplots(figsize=figsize, dpi=300)
+    if ax is None:
+        sns.set_theme(style="white", font="Arial")
+        sns.set_context("paper")
+        fig, ax = plt.subplots(figsize=figsize, dpi=300)
+        return_fig = True
+    else:
+        return_fig = False
 
     ax.grid(True, which="both", linestyle=":", linewidth=0.5, zorder=0)
 
@@ -210,4 +215,7 @@ def volcano(
     if title is not None:
         ax.set_title(title)
 
-    return fig
+    if return_fig:
+        return fig
+    else:
+        return ax

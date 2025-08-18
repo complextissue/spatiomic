@@ -7,10 +7,11 @@ submodules = [
     "neighbor",
     "plot",
     "process",
+    "segment",
     "spatial",
     "tool",
 ]
 
 __all__ = [*submodules]
 
-from . import cluster, data, dimension, neighbor, plot, process, spatial, tool  # noqa: F401
+from . import cluster, data, dimension, neighbor, plot, process, segment, spatial, tool  # noqa: F401

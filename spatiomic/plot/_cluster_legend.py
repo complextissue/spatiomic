@@ -13,7 +13,8 @@ def cluster_legend(
     cluster_labels: Optional[List[str]] = None,
     colormap: Optional[ListedColormap] = None,
     figsize: Optional[Union[Tuple[Union[int, float], Union[int, float]]]] = None,
-) -> plt.Figure:
+    ax: Optional[plt.Axes] = None,
+) -> Union[plt.Figure, plt.Axes]:
     """Plot a legend for the clusters.
 
     Args:
@@ -22,17 +23,22 @@ def cluster_legend(
         colormap (ListedColormap, optional): The colormap to use. Defaults to None.
         figsize (Optional[Union[int, float, Tuple[Union[int, float], Union[int, float]]], optional): The figure size.
             Defaults to None.
+        ax: Existing axes to plot on. If None, creates new figure. Defaults to None.
 
     Returns:
-        plt.Figure: The figure.
+        plt.Figure if ax is None, otherwise the provided plt.Axes.
     """
     colormap = create_colormap(color_count=cluster_count, seed=0) if colormap is None else colormap
 
-    sns.set_theme(style="white", font="Arial")
-    sns.set_context("paper")
-
-    fig = plt.figure(figsize=figsize if figsize is not None else (cluster_count, 1), dpi=300)
-    ax = fig.add_subplot()
+    # Setup plotting
+    if ax is None:
+        sns.set_theme(style="white", font="Arial")
+        sns.set_context("paper")
+        fig = plt.figure(figsize=figsize if figsize is not None else (cluster_count, 1), dpi=300)
+        ax = fig.add_subplot()
+        return_fig = True
+    else:
+        return_fig = False
 
     ax.imshow(np.expand_dims(np.arange(0, cluster_count), axis=0), cmap=colormap)
 
@@ -50,6 +56,9 @@ def cluster_legend(
     ax.set_yticks([])
 
     sns.despine(left=True, bottom=True)
-    plt.tight_layout(pad=0.5)
 
-    return fig
+    if return_fig:
+        plt.tight_layout(pad=0.5)
+        return fig
+    else:
+        return ax

@@ -14,7 +14,8 @@ def cluster_selection(
     image: NDArray,
     clusters: Union[NDArray, List[int]],
     colormap: Optional[ListedColormap] = None,
-) -> plt.Figure:
+    ax: Optional[plt.Axes] = None,
+) -> Union[plt.Figure, plt.Axes]:
     """Plot the image with the clusters shown in colors and a colorbar.
 
     Args:
@@ -22,9 +23,10 @@ def cluster_selection(
         clusters (Union[NDArray, List[int]]): Which clusters to show. All others will be collapsed into a single black
             background cluster.
         colormap (Optional[ListedColormap], optional): The colormap to use. Defaults to None.
+        ax: Existing axes to plot on. If None, creates new figure. Defaults to None.
 
     Returns:
-        plt.Figure: The figure.
+        plt.Figure if ax is None, otherwise the provided plt.Axes.
     """
     img_shape = image.shape
     image = image.ravel()
@@ -53,35 +55,46 @@ def cluster_selection(
 
     cmap = ListedColormap(colors)
 
-    sns.set_theme(style="white", font="Arial")
-    sns.set_context("paper")
+    # Setup plotting
+    if ax is None:
+        sns.set_theme(style="white", font="Arial")
+        sns.set_context("paper")
+        fig = plt.figure()
+        ax1 = fig.add_subplot()
+        return_fig = True
+        show_colorbar = True
+    else:
+        ax1 = ax
+        return_fig = False
+        show_colorbar = False
 
-    fig = plt.figure()
-
-    ax1 = fig.add_subplot()
     ax1.set_xticks([])
     ax1.set_yticks([])
     ax1.imshow(image_combined.reshape(img_shape), cmap=cmap)
 
-    # draw the colorbar as an image
-    divider = make_axes_locatable(ax1)
+    # draw the colorbar as an image only when creating new figure
+    if show_colorbar:
+        divider = make_axes_locatable(ax1)
 
-    ax2 = divider.append_axes("right", size="5%", pad=0.05)
-    ax2.imshow(np.expand_dims(np.arange(0, cluster_count_included + 1), axis=1), cmap=cmap)
+        ax2 = divider.append_axes("right", size="5%", pad=0.05)
+        ax2.imshow(np.expand_dims(np.arange(0, cluster_count_included + 1), axis=1), cmap=cmap)
 
-    ax2.set_yticks(np.arange(0, cluster_count_included + 1))
-    ax2.set_yticklabels(["BG", *clusters.tolist()])
-    ax2.yaxis.tick_right()
-    ax2.yaxis.set_label_position("right")
+        ax2.set_yticks(np.arange(0, cluster_count_included + 1))
+        ax2.set_yticklabels(["BG", *clusters.tolist()])
+        ax2.yaxis.tick_right()
+        ax2.yaxis.set_label_position("right")
 
-    ax2.set_xticks([])
+        ax2.set_xticks([])
+
+        sns.despine(left=True, bottom=True, ax=ax2)
 
     sns.despine(left=True, bottom=True, ax=ax1)
-    sns.despine(left=True, bottom=True, ax=ax2)
 
-    plt.tight_layout()
-
-    return fig
+    if return_fig:
+        plt.tight_layout()
+        return fig
+    else:
+        return ax1
 
 
 def save_cluster_selection(

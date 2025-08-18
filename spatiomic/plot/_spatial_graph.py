@@ -17,7 +17,8 @@ def spatial_graph(
     edge_color_multiplier: float = 0.6,
     title: Optional[str] = None,
     seed: int = 0,
-) -> plt.Figure:
+    ax: Optional[plt.Axes] = None,
+) -> Union[plt.Figure, plt.Axes]:
     """Plot a graph of spatial cluster-cluster relationships.
 
     Args:
@@ -30,15 +31,19 @@ def spatial_graph(
         edge_color_multiplier (float, optional): The multiplier for the edge weights for color. Defaults to 0.6.
         title (str, optional): The title of the plot. Defaults to None.
         seed (int, optional): Seed for the layout algorithm, only used if graphviz is not installed. Defaults to 0.
+        ax: Existing axes to plot on. If None, creates new figure. Defaults to None.
 
     Returns:
-        plt.Figure: The figure.
+        plt.Figure if ax is None, otherwise the provided plt.Axes.
     """
-    sns.set_theme(style="white", font="Arial")
-    sns.set_context("paper")
-
     # plot the graph
-    fig, ax = plt.subplots(figsize=(7.5, 7.5), dpi=200)
+    if ax is None:
+        sns.set_theme(style="white", font="Arial")
+        sns.set_context("paper")
+        fig, ax = plt.subplots(figsize=(7.5, 7.5), dpi=200)
+        return_fig = True
+    else:
+        return_fig = False
 
     graph = graph.copy()
 
@@ -122,7 +127,10 @@ def spatial_graph(
     if title is not None:
         ax.set_title(title, fontsize=16)
 
-    plt.axis("off")
-    plt.tight_layout()
+    ax.axis("off")
 
-    return fig
+    if return_fig:
+        plt.tight_layout()
+        return fig
+    else:
+        return ax

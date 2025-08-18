@@ -17,7 +17,8 @@ def cluster_scatter(
     title_y: str = "Dimension 2",
     figsize: Optional[Tuple[Union[int, float], Union[int, float]]] = None,
     colormap: Optional[ListedColormap] = None,
-) -> plt.Figure:
+    ax: Optional[plt.Axes] = None,
+) -> Union[plt.Figure, plt.Axes]:
     """Scatter the points and color them according to the clusters.
 
     Args:
@@ -26,9 +27,10 @@ def cluster_scatter(
         title_x (str, optional): The title for the x-axis. Defaults to "Dimension 1".
         title_y (str, optional): The title for the y-axis. Defaults to "Dimension 2".
         colormap (Optional[ListedColormap], optional): The colormap to use. Defaults to None.
+        ax: Existing axes to plot on. If None, creates new figure. Defaults to None.
 
     Returns:
-        plt.Figure: The figure.
+        plt.Figure if ax is None, otherwise the provided plt.Axes.
     """
     assert data.shape[1] == 2, "The data must have exactly 2 dimensions."
 
@@ -39,12 +41,18 @@ def cluster_scatter(
     )
     cmap = create_colormap(color_count=cluster_count) if colormap is None else colormap
 
-    sns.set_theme(style="white", font="Arial")
-    sns.set_context("paper")
-
-    fig = plt.figure(figsize=figsize)
-
-    ax1 = fig.add_subplot()
+    # Setup plotting
+    if ax is None:
+        sns.set_theme(style="white", font="Arial")
+        sns.set_context("paper")
+        fig = plt.figure(figsize=figsize)
+        ax1 = fig.add_subplot()
+        return_fig = True
+        show_colorbar = True
+    else:
+        ax1 = ax
+        return_fig = False
+        show_colorbar = False
 
     ax1.set_xticks([])
     ax1.set_yticks([])
@@ -58,26 +66,31 @@ def cluster_scatter(
         hue=clusters,
         palette=cmap.colors,
         legend=False,
+        ax=ax1,
     )
 
-    # draw the colorbar as an image
-    divider = make_axes_locatable(ax1)
+    # draw the colorbar as an image only when creating new figure
+    if show_colorbar:
+        divider = make_axes_locatable(ax1)
 
-    ax2 = divider.append_axes("right", size="5%", pad=0.05)
-    ax2.imshow(np.expand_dims(np.arange(0, cluster_count), axis=1), cmap=cmap)
+        ax2 = divider.append_axes("right", size="5%", pad=0.05)
+        ax2.imshow(np.expand_dims(np.arange(0, cluster_count), axis=1), cmap=cmap)
 
-    ax2.set_yticks(np.arange(0, cluster_count))
-    ax2.set_yticklabels(
-        np.arange(0, cluster_count) if all(isinstance(i, int) for i in clusters) else np.unique(clusters)
-    )
-    ax2.yaxis.tick_right()
-    ax2.yaxis.set_label_position("right")
+        ax2.set_yticks(np.arange(0, cluster_count))
+        ax2.set_yticklabels(
+            np.arange(0, cluster_count) if all(isinstance(i, int) for i in clusters) else np.unique(clusters)
+        )
+        ax2.yaxis.tick_right()
+        ax2.yaxis.set_label_position("right")
 
-    ax2.set_xticks([])
+        ax2.set_xticks([])
+
+        sns.despine(ax=ax2, left=True, bottom=True)
 
     sns.despine(ax=ax1)
-    sns.despine(ax=ax2, left=True, bottom=True)
 
-    plt.tight_layout()
-
-    return fig
+    if return_fig:
+        plt.tight_layout()
+        return fig
+    else:
+        return ax1

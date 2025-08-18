@@ -7,7 +7,7 @@ packages = ["spatiomic"]
 
 [project]
 name = "spatiomic"
-version = "0.5.1"
+version = "0.6.0"
 description = "A python toolbox for spatial omics analysis."
 requires-python = ">=3.11"
 license = { file = "LICENSE" }
@@ -206,6 +206,7 @@ dev = [
 ]
 
 [project.optional-dependencies]
+cellpose = ["cellpose>=4.0.1,<5"]
 cuda-12 = [
     "cuml-cu12>=25.6.0",
     "cugraph-cu12>=25.6.0",

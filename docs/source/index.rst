@@ -19,6 +19,7 @@ Welcome to the spatiomic documentation!
    tutorials/registration
    tutorials/clustering
    tutorials/spatial
+   tutorials/segment
    tutorials/scverse
 
 .. toctree::

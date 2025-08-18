@@ -22,7 +22,8 @@ def connectivity_graph(
     figsize: Tuple[Union[int, float], Union[int, float]] = (7.5, 7.5),
     colormap: Optional[ListedColormap] = None,
     seed: int = 0,
-) -> plt.Figure:
+    ax: Optional[plt.Axes] = None,
+) -> Union[plt.Figure, plt.Axes]:
     """Plot a connectivity graph.
 
     Args:
@@ -37,14 +38,23 @@ def connectivity_graph(
             to None.
         seed (int, optional): Seed for the layout algorithm, only used if graphviz is not installed. Defaults to 0.
 
-    Returns:
-        plt.Figure: A figure of the graph, plotted in 2D.
-    """
-    sns.set_theme(style="white", font="Arial")
-    sns.set_context("paper")
+        ax: Existing axes to plot on. If None, creates new figure. Defaults to None.
 
+    Returns:
+        plt.Figure if ax is None, otherwise the provided plt.Axes.
+    """
     # plot the graph
-    fig = plt.figure(figsize=figsize, dpi=300)
+    if ax is None:
+        sns.set_theme(style="white", font="Arial")
+        sns.set_context("paper")
+        fig = plt.figure(figsize=figsize, dpi=300)
+        ax1 = fig.add_subplot()
+        return_fig = True
+        show_colorbar = True
+    else:
+        ax1 = ax
+        return_fig = False
+        show_colorbar = False
 
     graph_nx = graph.to_networkx()
 
@@ -58,8 +68,6 @@ def connectivity_graph(
     except ImportError:
         warn("Graphviz not installed, using spring layout from networkx.", ImportWarning, stacklevel=2)
         pos = nx.spring_layout(graph_nx, k=0.5, iterations=100, seed=seed)
-
-    ax1 = fig.add_subplot()
 
     cmap_raw: ListedColormap
     node_colors: Union[str, List[Any]]
@@ -103,7 +111,7 @@ def connectivity_graph(
     ax1.set_yticks([])
     ax1.set_xticks([])
 
-    if clusters is not None and cluster_legend and isinstance(cmap_raw, ListedColormap):
+    if clusters is not None and cluster_legend and isinstance(cmap_raw, ListedColormap) and show_colorbar:
         # draw the colorbar as an image
         divider = make_axes_locatable(ax1)
 
@@ -120,6 +128,9 @@ def connectivity_graph(
         ax2.set_xticks([])
 
     sns.despine(left=True, bottom=True)
-    fig.tight_layout()
 
-    return fig
+    if return_fig:
+        fig.tight_layout()
+        return fig
+    else:
+        return ax1
