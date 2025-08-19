@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Optional, Union
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -16,7 +16,8 @@ def som_clusters(
     clusters: NDArray,
     title: str = "Self-Organizing Map Clusters",
     colormap: Optional[ListedColormap] = None,
-) -> plt.Figure:
+    ax: Optional[plt.Axes] = None,
+) -> Union[plt.Figure, plt.Axes]:
     """Plot a self-organizing map in 2D with corresponding clusters.
 
     Args:
@@ -24,22 +25,30 @@ def som_clusters(
         clusters (NDArray): The clusters.
         title (str, optional): The title for the plot. Defaults to "Self-Organizing Map Clusters".
         colormap (Optional[ListedColormap], optional): Custom colormap. Defaults to None.
+        ax: Existing axes to plot on. If None, creates new figure. Defaults to None.
 
     Returns:
-        plt.Figure: The figure.
+        plt.Figure if ax is None, otherwise the provided plt.Axes.
     """
     from . import colormap as create_colormap
-
-    sns.set_theme(style="white", font="Arial")
-    sns.set_context("paper")
 
     cluster_count = len(np.unique(clusters))
 
     cmap = create_colormap(color_count=cluster_count) if colormap is None else colormap
 
-    # visualize the som map
-    fig = plt.figure()
-    ax1 = fig.add_subplot()
+    # Setup plotting
+    if ax is None:
+        sns.set_theme(style="white", font="Arial")
+        sns.set_context("paper")
+        fig = plt.figure()
+        ax1 = fig.add_subplot()
+        return_fig = True
+        show_colorbar = True
+    else:
+        ax1 = ax
+        return_fig = False
+        show_colorbar = False
+
     ax1.set_title(title)
 
     ax1.imshow(
@@ -50,21 +59,24 @@ def som_clusters(
     ax1.set_xticks([])
     ax1.set_yticks([])
 
-    # draw the colorbar as an image
-    divider = make_axes_locatable(ax1)
+    # draw the colorbar as an image only when creating new figure
+    if show_colorbar:
+        divider = make_axes_locatable(ax1)
 
-    ax2 = divider.append_axes("right", size="5%", pad=0.05)
-    ax2.imshow(np.expand_dims(np.arange(0, cluster_count), axis=1), cmap=cmap)
+        ax2 = divider.append_axes("right", size="5%", pad=0.05)
+        ax2.imshow(np.expand_dims(np.arange(0, cluster_count), axis=1), cmap=cmap)
 
-    ax2.set_yticks(np.arange(0, cluster_count))
-    ax2.set_yticklabels(np.arange(0, cluster_count))
-    ax2.yaxis.tick_right()
-    ax2.yaxis.set_label_position("right")
+        ax2.set_yticks(np.arange(0, cluster_count))
+        ax2.set_yticklabels(np.arange(0, cluster_count))
+        ax2.yaxis.tick_right()
+        ax2.yaxis.set_label_position("right")
 
-    ax2.set_xticks([])
+        ax2.set_xticks([])
 
-    sns.despine(left=True, bottom=True)
+        sns.despine(left=True, bottom=True)
 
-    plt.tight_layout()
-
-    return fig
+    if return_fig:
+        plt.tight_layout()
+        return fig
+    else:
+        return ax1

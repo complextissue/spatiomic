@@ -43,7 +43,7 @@ jobs:
           version: "latest"
       - name: Install dependencies
         run: |
-          uv sync --dev
+          uv sync --extra cellpose --dev
       - name: Lint with ruff
         run: |
           uv run ruff check --fix --exit-non-zero-on-fix spatiomic

@@ -19,6 +19,7 @@ Welcome to the spatiomic documentation!
    tutorials/registration
    tutorials/clustering
    tutorials/spatial
+   tutorials/segment
    tutorials/scverse
 
 .. toctree::
@@ -27,6 +28,13 @@ Welcome to the spatiomic documentation!
    :glob:
 
    autoapi/spatiomic/index
+
+.. toctree::
+   :caption: GitHub
+   :maxdepth: 4
+   :glob:
+
+   spatiomic repository <https://github.com/complextissue/spatiomic>
 
 .. toctree::
    :caption: Other projects

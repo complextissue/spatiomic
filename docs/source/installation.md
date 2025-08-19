@@ -34,6 +34,12 @@ uv add spatiomic --optional cuda-12
 uv add spatiomic --optional cuda-11
 ```
 
+For Cellpose segmentation functionality, install with cellpose extras:
+
+```bash
+uv add spatiomic --optional cellpose
+```
+
 :::
 
 :::{tab-item} pip
@@ -51,6 +57,12 @@ pip install "spatiomic[cuda-12]"
 
 # For CUDA 11
 pip install "spatiomic[cuda-11]"
+```
+
+For Cellpose segmentation functionality, install with cellpose extras:
+
+```bash
+pip install "spatiomic[cellpose]"
 ```
 
 :::

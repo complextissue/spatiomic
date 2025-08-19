@@ -11,7 +11,7 @@ install:
 	uv sync
 
 install-dev:
-	uv sync --dev
+	uv sync --extra cellpose --dev
 	python -m certifi
 	pre-commit install --hook-type pre-commit --hook-type pre-push
 

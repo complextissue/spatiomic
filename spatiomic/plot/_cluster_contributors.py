@@ -28,7 +28,8 @@ def cluster_contributors(
     annotate_neutral: bool = False,
     figsize: Tuple[Union[int, float], Union[int, float]] = (8, 5),
     title: Optional[str] = None,
-) -> plt.Figure:
+    ax: Optional[plt.Axes] = None,
+) -> Union[plt.Figure, plt.Axes]:
     """Create half of a volcano plot to show the increased contributors to a cluster.
 
     .. warning:: When only p-values are available, the -log10(p-value) will be calculated with a small pseudo count
@@ -57,13 +58,11 @@ def cluster_contributors(
         annotate_neutral (bool, optional): Whether to annotate the neutral values. Defaults to False.
         figsize (Tuple[Union[int, float], Union[int, float]], optional): The size of the figure. Defaults to (8, 5).
         title (Optional[str], optional): The title of the plot. Defaults to None.
+        ax: Existing axes to plot on. If None, creates new figure. Defaults to None.
 
     Returns:
-        plt.Figure: The figure.
+        plt.Figure if ax is None, otherwise the provided plt.Axes.
     """
-    sns.set_theme(style="white", font="Arial")
-    sns.set_context("paper")
-
     # copy the data and check the columns
     df_contributors = data.copy()
 
@@ -116,7 +115,13 @@ def cluster_contributors(
     df_contributors["log2_fold_change"] = df_contributors["log2_fold_change"].astype(float)
 
     # create the plot
-    fig, ax = plt.subplots(figsize=figsize, dpi=300)
+    if ax is None:
+        sns.set_theme(style="white", font="Arial")
+        sns.set_context("paper")
+        fig, ax = plt.subplots(figsize=figsize, dpi=300)
+        return_fig = True
+    else:
+        return_fig = False
 
     ax.axvline(x=increased_log2_fold_change_threshold, color="#aaaaaa", linestyle="--")
 
@@ -204,6 +209,8 @@ def cluster_contributors(
     if title is not None:
         ax.set_title(title)
 
-    fig.tight_layout()
-
-    return fig
+    if return_fig:
+        fig.tight_layout()
+        return fig
+    else:
+        return ax

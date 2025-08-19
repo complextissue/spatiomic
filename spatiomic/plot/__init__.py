@@ -12,6 +12,7 @@ from ._connectivity_graph import connectivity_graph
 from ._marker_expression import marker_expression
 from ._registration_similarity import registration_similarity
 from ._registration_slope import registration_slope
+from ._segmentation_overlay import save_segmentation_overlay, segmentation_overlay
 from ._som_clusters import som_clusters
 from ._som_distance import som_distance
 from ._som_marker_expression import som_marker_expression
@@ -33,6 +34,8 @@ __all__ = [
     "registration_slope",
     "save_cluster_image",
     "save_cluster_selection",
+    "save_segmentation_overlay",
+    "segmentation_overlay",
     "som_clusters",
     "som_distance",
     "som_marker_expression",
