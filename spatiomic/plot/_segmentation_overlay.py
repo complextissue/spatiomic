@@ -108,7 +108,6 @@ def save_segmentation_overlay(
     save_path: str,
     masks: Optional[NDArray] = None,
     boundary_color: str = "#FF0000",
-    boundary_width: int = 2,
     mask_colormap: Optional[ListedColormap] = None,
     mask_alpha: float = 0.5,
     show_boundaries: bool = True,
@@ -122,7 +121,6 @@ def save_segmentation_overlay(
         save_path: Path where to save the image.
         masks: Segmentation masks. Optional.
         boundary_color: Color for mask boundaries. Defaults to "#FF0000".
-        boundary_width: Width of boundary lines in pixels. Defaults to 2.
         mask_colormap: Custom colormap for masks. Defaults to None.
         mask_alpha: Transparency of mask overlay. Defaults to 0.5.
         show_boundaries: Whether to show mask boundaries. Defaults to True.
