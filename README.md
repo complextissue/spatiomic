@@ -15,7 +15,7 @@ It contains functions for pixel-level clustering, differential cluster abundance
 
 The main goal of this package is to organize different packages and methods that are commonly used when dealing with high-dimensional imaging data behind a single API that allows for scalable high-performance computing applications, whenever possible on the GPU.
 
-`spatiomic` has been published as part of `PathoPlex` in Nature: [https://www.nature.com/articles/s41586-025-09225-2](https://www.nature.com/articles/s41586-025-09225-2).
+`spatiomic` has been published as part of `PathoPlex` in Nature: [https://www.nature.com/articles/s41586-025-09225-2](https://www.nature.com/articles/s41586-025-09225-2). It is part of the [scverse® ecosystem](https://scverse.org/packages/#ecosystem).
 
 ## Installation
 
