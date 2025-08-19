@@ -16,7 +16,6 @@ def segmentation_overlay(
     image: NDArray,
     masks: Optional[NDArray] = None,
     boundary_color: str = "#FF0000",
-    boundary_width: int = 2,
     mask_colormap: Optional[ListedColormap] = None,
     mask_alpha: float = 0.5,
     show_boundaries: bool = True,
@@ -31,7 +30,6 @@ def segmentation_overlay(
         masks: Segmentation masks where each region has a unique positive integer ID.
             Background should be 0. Optional.
         boundary_color: Color for mask boundaries. Defaults to "#FF0000" (red).
-        boundary_width: Width of boundary lines in pixels. Defaults to 2.
         mask_colormap: Custom colormap for displaying masks. If None, uses default colormap.
         mask_alpha: Transparency of mask overlay (0=transparent, 1=opaque). Defaults to 0.5.
         show_boundaries: Whether to show mask boundaries. Defaults to True.
@@ -44,13 +42,6 @@ def segmentation_overlay(
 
     Raises:
         ValueError: If neither show_boundaries nor show_masks is True.
-
-    Example:
-        >>> import numpy as np
-        >>> image = np.random.rand(100, 100)
-        >>> masks = np.zeros((100, 100), dtype=int)
-        >>> masks[25:75, 25:75] = 1
-        >>> fig = segmentation_overlay(image, masks, show_boundaries=True)
     """
     if masks is not None and not show_boundaries and not show_masks:
         raise ValueError("At least one of show_boundaries or show_masks must be True when masks are provided")
@@ -78,13 +69,11 @@ def segmentation_overlay(
             if mask_colormap is None:
                 mask_colormap = create_colormap(color_count=mask_count, color_override={0: "#000000"})
 
-            # Create masked array to hide background
-            mask_overlay = np.ma.masked_where(masks == 0, masks)
-            ax.imshow(mask_overlay, cmap=mask_colormap, alpha=mask_alpha)
+            ax.imshow(masks, cmap=mask_colormap, alpha=mask_alpha)
 
         if show_boundaries:
             # Find and display boundaries
-            boundaries = find_boundaries(masks, mode="thick" if boundary_width > 1 else "inner")
+            boundaries = find_boundaries(masks, mode="thick")
 
             # Create boundary overlay
             boundary_overlay = np.zeros((*boundaries.shape, 4))
@@ -154,7 +143,6 @@ def save_segmentation_overlay(
         image=image,
         masks=masks,
         boundary_color=boundary_color,
-        boundary_width=boundary_width,
         mask_colormap=mask_colormap,
         mask_alpha=mask_alpha,
         show_boundaries=show_boundaries,

@@ -32,13 +32,6 @@ def cluster_image(
 
     Returns:
         plt.Figure if ax is None, otherwise the provided plt.Axes.
-
-    Example:
-        >>> import numpy as np
-        >>> clusters = np.zeros((100, 100), dtype=int)
-        >>> clusters[25:75, 25:75] = 1
-        >>> clusters[40:60, 40:60] = 2
-        >>> fig = cluster_image(clusters, title="Cluster Image")
     """
     # Calculate cluster count and create colormap if needed
     cluster_count = np.max(image) + 1

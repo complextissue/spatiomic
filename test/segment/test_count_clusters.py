@@ -13,7 +13,7 @@ def test_count_clusters_basic(sample_clustered_image: NDArray, sample_mask_image
     """Test basic cluster counting functionality."""
     result = so.segment.count_clusters(
         clustered_img=sample_clustered_image,
-        masked_img=sample_mask_image,
+        masks=sample_mask_image,
         cluster_count=3,
         normalize=False,
         exclude_background=True,
@@ -38,7 +38,7 @@ def test_count_clusters_normalization(sample_clustered_image: NDArray, sample_ma
     """Test normalized cluster counts."""
     result = so.segment.count_clusters(
         clustered_img=sample_clustered_image,
-        masked_img=sample_mask_image,
+        masks=sample_mask_image,
         cluster_count=3,
         normalize=True,
         exclude_background=True,
@@ -59,7 +59,7 @@ def test_count_clusters_include_background(sample_clustered_image: NDArray, samp
     """Test including background in results."""
     result = so.segment.count_clusters(
         clustered_img=sample_clustered_image,
-        masked_img=sample_mask_image,
+        masks=sample_mask_image,
         cluster_count=3,
         exclude_background=False,
         use_gpu=False,
@@ -77,7 +77,7 @@ def test_count_clusters_empty_regions() -> None:
     mask = np.array([[1, 1], [3, 3]], dtype=np.int32)  # Region 2 is missing
 
     result = so.segment.count_clusters(
-        clustered_img=clustered, masked_img=mask, cluster_count=3, normalize=True, use_gpu=False
+        clustered_img=clustered, masks=mask, cluster_count=3, normalize=True, use_gpu=False
     )
 
     # Should handle missing regions gracefully
@@ -91,7 +91,7 @@ def test_count_clusters_single_cluster_per_region() -> None:
     mask = np.array([[1, 2], [3, 3]], dtype=np.int32)
 
     result = so.segment.count_clusters(
-        clustered_img=clustered, masked_img=mask, cluster_count=3, normalize=False, use_gpu=False
+        clustered_img=clustered, masks=mask, cluster_count=3, normalize=False, use_gpu=False
     )
 
     # Region 1 should have 1 count for cluster 0
@@ -105,7 +105,7 @@ def test_count_clusters_parameter_validation(sample_clustered_image: NDArray, sa
     """Test different cluster_count values."""
     # Test with more clusters than present in data
     result = so.segment.count_clusters(
-        clustered_img=sample_clustered_image, masked_img=sample_mask_image, cluster_count=5, use_gpu=False
+        clustered_img=sample_clustered_image, masks=sample_mask_image, cluster_count=5, use_gpu=False
     )
 
     assert result.shape[1] == 5
@@ -120,7 +120,7 @@ def test_count_clusters_gpu_cpu_consistency(sample_clustered_image: NDArray, sam
     # CPU version
     result_cpu = so.segment.count_clusters(
         clustered_img=sample_clustered_image,
-        masked_img=sample_mask_image,
+        masks=sample_mask_image,
         cluster_count=3,
         normalize=False,
         use_gpu=False,
@@ -129,7 +129,7 @@ def test_count_clusters_gpu_cpu_consistency(sample_clustered_image: NDArray, sam
     # GPU version (will fall back to CPU if CuPy not available)
     result_gpu = so.segment.count_clusters(
         clustered_img=sample_clustered_image,
-        masked_img=sample_mask_image,
+        masks=sample_mask_image,
         cluster_count=3,
         normalize=False,
         use_gpu=True,
@@ -146,7 +146,7 @@ def test_count_clusters_zero_cluster_count() -> None:
     mask = np.array([[1, 1], [2, 2]], dtype=np.int32)
 
     # Test zero cluster count should still work
-    result = so.segment.count_clusters(clustered_img=clustered, masked_img=mask, cluster_count=0, use_gpu=False)
+    result = so.segment.count_clusters(clustered_img=clustered, masks=mask, cluster_count=0, use_gpu=False)
     assert result.shape[1] == 0
 
 
@@ -157,9 +157,7 @@ def test_count_clusters_different_dtypes() -> None:
     clustered_int64 = np.array([[0, 1], [1, 2]], dtype=np.int64)
     mask_int16 = np.array([[1, 1], [2, 2]], dtype=np.int16)
 
-    result = so.segment.count_clusters(
-        clustered_img=clustered_int64, masked_img=mask_int16, cluster_count=3, use_gpu=False
-    )
+    result = so.segment.count_clusters(clustered_img=clustered_int64, masks=mask_int16, cluster_count=3, use_gpu=False)
 
     assert isinstance(result, pd.DataFrame)
     assert result.shape == (2, 3)
@@ -174,7 +172,7 @@ def test_count_clusters_zero_division_in_normalization() -> None:
 
     # Force an empty region by using a mask value that doesn't exist
     result = so.segment.count_clusters(
-        clustered_img=clustered, masked_img=mask, cluster_count=2, normalize=True, use_gpu=False
+        clustered_img=clustered, masks=mask, cluster_count=2, normalize=True, use_gpu=False
     )
 
     # Should not contain NaN values

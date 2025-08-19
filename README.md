@@ -68,7 +68,7 @@ This requires that the development requirements of the package as well as the pa
 
 #### Python version & dependencies
 
-`spatiomic` requires Python version 3.10 or above (3.12 recommended).
+`spatiomic` requires Python version 3.11 or above (3.12 recommended).
 
 #### Code editors
 

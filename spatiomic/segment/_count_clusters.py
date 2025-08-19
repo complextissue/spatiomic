@@ -11,7 +11,7 @@ from spatiomic._internal._import_package import import_package
 
 def count_clusters(
     clustered_img: npt.NDArray[np.integer[Any]],
-    masked_img: npt.NDArray[np.integer[Any]],
+    masks: npt.NDArray[np.integer[Any]],
     cluster_count: int,
     normalize: bool = False,
     exclude_background: bool = True,
@@ -21,7 +21,7 @@ def count_clusters(
 
     Args:
         clustered_img: The clustered image array where each pixel value represents a cluster ID.
-        masked_img: The segmented cell mask image where each pixel value represents a mask region ID.
+        masks: The segmented cell mask image where each pixel value represents a mask region ID.
         cluster_count: The number of clusters to count.
         normalize: Whether to return row-normalized cluster counts (relative) instead of absolute counts.
         exclude_background: Whether to exclude background pixels (mask value 0) from analysis.
@@ -45,10 +45,10 @@ def count_clusters(
 
     # Convert arrays to appropriate backend
     clustered_img_xp = xp.asarray(clustered_img)
-    masked_img_xp = xp.asarray(masked_img)
+    masks_xp = xp.asarray(masks)
 
     # Get unique mask regions, optionally excluding background (0)
-    unique_regions = xp.unique(masked_img_xp)
+    unique_regions = xp.unique(masks_xp)
     if exclude_background and 0 in unique_regions:
         unique_regions = unique_regions[unique_regions != 0]
 
@@ -61,7 +61,7 @@ def count_clusters(
 
         # Vectorized counting for all pixels at once
         for i, region in enumerate(unique_regions):
-            region_mask = masked_img_xp == region
+            region_mask = masks_xp == region
             if xp.any(region_mask):
                 region_clusters = clustered_img_xp[region_mask]
                 counts = xp.bincount(region_clusters, minlength=cluster_count)[:cluster_count]
