@@ -7,7 +7,7 @@ packages = ["spatiomic"]
 
 [project]
 name = "spatiomic"
-version = "0.6.0"
+version = "0.6.1"
 description = "A python toolbox for spatial omics analysis."
 requires-python = ">=3.11"
 license = { file = "LICENSE" }
@@ -202,24 +202,23 @@ dev = [
     "sphinx-copybutton",
     "sphinx-design",
     "sphinx-rtd-theme",
-    "spatiomic[cuda-12]",
 ]
 
 [project.optional-dependencies]
 cellpose = ["cellpose>=4.0.1,<5"]
+spatialdata = ["spatialdata==0.5.0"]
 cuda-12 = [
-    "cuml-cu12>=25.6.0",
-    "cugraph-cu12>=25.6.0",
-    "nx-cugraph-cu12>=25.6.0",
-    "cucim-cu12>=25.6.0",
+    "cuml-cu12>=24.6.0",
+    "cugraph-cu12>=24.6.0",
+    "nx-cugraph-cu12>=24.6.0",
+    "cucim-cu12>=24.6.0",
 ]
 cuda-11 = [
-    "cuml-cu11>=25.6.0",
-    "cugraph-cu11>=25.6.0",
-    "nx-cugraph-cu11>=25.6.0",
-    "cucim-cu11>=25.6.0",
+    "cuml-cu11>=24.6.0",
+    "cugraph-cu11>=24.6.0",
+    "nx-cugraph-cu11>=24.6.0",
+    "cucim-cu11>=24.6.0",
 ]
-
 
 [tool.uv]
 default-groups = []
