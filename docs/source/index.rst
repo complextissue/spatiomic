@@ -21,6 +21,7 @@ Welcome to the spatiomic documentation!
    tutorials/spatial
    tutorials/segment
    tutorials/scverse
+   tutorials/spatialdata
 
 .. toctree::
    :caption: API Documentation
@@ -49,6 +50,7 @@ Welcome to the spatiomic documentation!
    :caption: Additional Information
    :maxdepth: 2
 
+   Complex Tissue Lab <https://complextissue.com>
    coverage
    code_of_conduct
    imprint
