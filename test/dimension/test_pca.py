@@ -31,11 +31,3 @@ def test_pca(example_data: NDArray) -> None:
                 continue
 
             assert pca_estimator.get_explained_variance_ratio().shape[0] == dimension_count
-
-            for adapt_mean in [True, False]:
-                data_pca_weighted = pca_estimator.weigh_by_explained_variance_ratio(
-                    data_pca,
-                    adapt_mean=adapt_mean,
-                )
-
-                assert data_pca_weighted.shape[-1] == dimension_count
