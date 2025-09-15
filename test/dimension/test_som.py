@@ -12,7 +12,6 @@ import spatiomic as so
 
 
 @pytest.mark.cpu
-@pytest.mark.no_github_ci
 def test_som_cpu(example_data: NDArray) -> None:
     """Test the Som class."""
     node_count = (3, 3)
