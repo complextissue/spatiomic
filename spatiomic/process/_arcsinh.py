@@ -53,11 +53,14 @@ class Arcsinh(Processer):
     def transform(
         self,
         data: NDArray,
+        cofactors: int | float | NDArray = 1,
     ) -> NDArray:
         """Arcsinh transform the data channel-wise.
 
         Args:
             data (NDArray): Data to arcsinh transform, channels being the last dimension.
+            cofactors (int | float | NDArray, optional): Cofactors to scale the data before transformation. Either a
+                single value or one per channel. Defaults to 1.
 
         Returns:
             NDArray: The arcsinh transformed data.
@@ -66,6 +69,10 @@ class Arcsinh(Processer):
 
         data_shape = data.shape
         data = self.xp.reshape(self.xp.array(data), (-1, data_shape[-1]))
+
+        if isinstance(cofactors, np.ndarray) or cofactors != 1:
+            data = self._validate_apply_cofactors(data, data_shape[-1], cofactors)
+
         data = self.xp.arcsinh(data).get() if self.xp.__name__ == "cupy" else self.xp.arcsinh(data)
 
         return data.reshape(data_shape)
@@ -75,18 +82,26 @@ class Arcsinh(Processer):
     def inverse_transform(
         self,
         data: NDArray,
+        cofactors: int | float | NDArray = 1,
     ) -> NDArray:
         """Inverse arcsinh transform the data channel-wise.
 
         Args:
             data (NDArray): Data to inverse arcsinh transform, channels being the last dimension.
+            cofactors (int | float | NDArray, optional): The original cofactors used to scale the data before
+                transformation. Either a single value or one per channel. These will be inverted before applying.
+                Defaults to 1.
 
         Returns:
             NDArray: The inverse arcsinh transformed data.
         """
         data_shape = data.shape
         data = self.xp.reshape(self.xp.array(data), (-1, data_shape[-1]))
+
         data = self.xp.sinh(data).get() if self.xp.__name__ == "cupy" else self.xp.sinh(data)
+
+        if isinstance(cofactors, np.ndarray) or cofactors != 1:
+            data = self._validate_apply_cofactors(data, data_shape[-1], 1 / cofactors)
 
         return data.reshape(data_shape)
 
@@ -95,13 +110,49 @@ class Arcsinh(Processer):
     def fit_transform(
         self,
         data: NDArray,
+        cofactors: int | float | NDArray = 1,
     ) -> NDArray:
         """Fit and transform the data channel-wise.
 
         Args:
             data (NDArray): Data to fit and transform, channels being the last dimension.
+            cofactors (int | float | NDArray, optional): Cofactors to scale the data before transformation. Either a
+                single value or one per channel. Defaults to 1.
 
         Returns:
             NDArray: The arcsinh transformed data.
         """
-        return self.transform(data)  # type: ignore
+        return self.transform(data, cofactors=cofactors)  # type: ignore
+
+    def _validate_apply_cofactors(
+        self,
+        data: NDArray,
+        channel_count: int,
+        cofactors: int | float | NDArray,
+    ) -> NDArray:
+        """Validate and apply cofactors to the data.
+
+        Args:
+            data (NDArray): Data to apply cofactors to.
+            channel_count (int): Number of channels in the data.
+            cofactors (int | float | NDArray): Cofactors to apply.
+
+        Returns:
+            NDArray: The data with cofactors applied.
+        """
+        check_channel_dimension(data.shape)
+
+        if isinstance(cofactors, (int, float)):
+            data = data / cofactors
+        else:
+            assert isinstance(cofactors, np.ndarray)
+            assert cofactors.ndim == 1, f"Expected cofactors to be 1-dimensional, but got {cofactors.ndim}-dimensional."
+            assert cofactors.shape[0] == channel_count, (
+                f"Expected cofactors to match the number of channels ({channel_count}), "
+                f"but got {cofactors.shape[0]} cofactors."
+            )
+            assert np.all(cofactors != 0), "Cofactors must not contain zeros."
+            assert np.all(cofactors > 0), "Cofactors must be positive."
+            data = data / self.xp.array(cofactors)
+
+        return data
