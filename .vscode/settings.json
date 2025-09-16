@@ -44,7 +44,6 @@
     "*": false,
     "plaintext": false,
     "markdown": false,
-    "scminput": false,
     "python": true
   }
 }
