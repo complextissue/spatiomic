@@ -3,6 +3,7 @@ from types import ModuleType
 from typing import Any, List, Optional, Tuple, Union
 
 import numpy as np
+import pandas as pd
 from igraph import Graph, set_random_number_generator
 
 from spatiomic._internal._anndata_method import anndata_method
@@ -41,7 +42,7 @@ class Leiden:
         use_gpu: bool = True,
         *args: Any,  # noqa: ARG002
         **kwargs: dict,  # noqa: ARG002
-    ) -> Tuple[List[int], float]:
+    ) -> Tuple[np.ndarray, float]:
         """Create a neighborhood-graph based on the data and perform Leiden clustering on it.
 
         .. warning:: The GPU version of Leiden may provide different results than the CPU version.
@@ -74,8 +75,6 @@ class Leiden:
         if use_gpu:
             from warnings import warn
 
-            import networkx as nx
-
             warn(
                 "The GPU version of Leiden may provide different results than the CPU version.",
                 UserWarning,
@@ -84,20 +83,24 @@ class Leiden:
 
             self.graph = graph
 
-            # convert the Graph to a networkx Graph
-            graph_nx = graph.to_networkx(create_using=nx.Graph)
-
-            # perform the Leiden clustering on the networkx Graph
+            # perform the Leiden clustering with cuGraph
             parts, modularity = graph_library.leiden(  # type: ignore
-                graph_nx,
+                graph_library.from_edgelist(  # type: ignore
+                    pd.DataFrame(
+                        {
+                            "source": [edge.source for edge in graph.es],
+                            "destination": [edge.target for edge in graph.es],
+                        }
+                    ),
+                ),
                 max_iter=iteration_count,
                 resolution=resolution,
                 random_state=seed,
             )
 
-            communities = list(parts.values())
+            parts = parts.sort_values("vertex")
 
-            return (communities, modularity)
+            return (parts["partition"].to_numpy(), modularity)
         else:
             set_random_number_generator(_IgraphRandomNumberGenerator(seed))
 
@@ -117,4 +120,4 @@ class Leiden:
 
             self.graph = graph
 
-            return (communities, modularity)
+            return (np.array(communities), modularity)

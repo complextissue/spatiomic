@@ -7,7 +7,7 @@ packages = ["spatiomic"]
 
 [project]
 name = "spatiomic"
-version = "0.6.2"
+version = "0.7.0"
 description = "A python toolbox for spatial omics analysis."
 requires-python = ">=3.11"
 license = { file = "LICENSE" }
@@ -53,7 +53,7 @@ dependencies = [
 [project.urls]
 Home = "https://github.com/complextissue/spatiomic"
 Source = "https://github.com/complextissue/spatiomic"
-Documentation = "https://complextissue.github.io/spatiomic/"
+Documentation = "https://spatiomic.org"
 
 [tool.ruff]
 include = [
@@ -126,7 +126,7 @@ warn_return_any = true
 warn_unused_configs = true
 warn_redundant_casts = true
 disallow_untyped_defs = true
-python_version = "3.12"
+python_version = "3.13"
 ignore_missing_imports = true
 exclude = ["^docs/.*", "^test/.*"]
 

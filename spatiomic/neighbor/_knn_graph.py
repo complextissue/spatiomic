@@ -83,6 +83,9 @@ class KnnGraph:
                     return_distance=False,
                 )
             else:
+                if use_gpu:
+                    raise ValueError("The `distance_max` parameter is not supported when using the GPU.")
+
                 neighbor_idx, distances = neighbor_finder.radius_neighbors(
                     data,
                     radius=distance_max,

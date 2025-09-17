@@ -283,7 +283,7 @@ def get_stats(
     group_data = [data[group_idx == idx, :] for idx in unique_group_idx]
 
     test_kwargs = {} if not isinstance(test_kwargs, dict) else test_kwargs
-    if test == "t" and not dependent and not equal_variance:
+    if test == "t" and not dependent and equal_variance is not None:
         test_kwargs["equal_var"] = equal_variance
     elif equal_variance is not None:
         raise ValueError("The equal_variance argument can only be used with independent t-tests.")
