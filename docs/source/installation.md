@@ -82,7 +82,7 @@ Install `spatiomic` from source:
 ```bash
 git clone --depth 1 https://github.com/complextissue/spatiomic.git
 cd spatiomic
-uv sync --dev
+uv sync --dev --extra cellpose
 ```
 
 :::

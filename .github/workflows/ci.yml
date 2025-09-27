@@ -23,9 +23,6 @@ jobs:
             python: "3.12"
           - os: ubuntu-latest
             python: "3.13"
-          - os: ubuntu-latest
-            python: "3.13"
-            pip-flags: "--pre"
 
     name: Python ${{ matrix.python }}
 
@@ -35,14 +32,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v5
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v6
-        with:
-          python-version: ${{ matrix.python-version }}
-      - name: Install the latest version of uv
+      - name: Install the latest version of uv and setup Python
         uses: astral-sh/setup-uv@v6
         with:
           version: "latest"
+          python-version: ${{ matrix.python-version }}
+          enable-cache: true
       - name: Install dependencies
         uses: nick-fields/retry@v3
         with:
