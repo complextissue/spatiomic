@@ -2,9 +2,9 @@
   <img src="docs/source/_static/logo.png" alt="spatiomic logo" width="200">
 </p>
 
-<hr style="border: none; height: 2px; background: linear-gradient(90deg, transparent, #ddd, transparent); margin: 16px 0;" />
+<hr style="border: none; height: 2px; margin: 16px 0;" />
 
-<h1 style="display: none;">spatiomic</h1>
+<h1 style="display: none;" class="hidden">spatiomic</h1>
 
 [![Version](https://img.shields.io/pypi/v/spatiomic)](https://pypi.org/project/spatiomic/)
 [![License](https://img.shields.io/pypi/l/spatiomic)](https://github.com/complextissue/spatiomic)
