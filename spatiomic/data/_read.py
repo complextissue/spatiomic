@@ -1,28 +1,57 @@
 import os
 from pathlib import Path
-from typing import List, Literal, Tuple, Union
+from typing import TYPE_CHECKING, List, Optional, Tuple, Union, cast
 
 import numpy as np
-from numpy.typing import NDArray
-from tifffile import imread, imwrite
+from numpy.typing import DTypeLike, NDArray
+from tifffile import TiffFile, imwrite
+
+if TYPE_CHECKING:
+    from aicspylibczi import CziFile  # noqa: F401
+    from qptifffile import QPTiffFile  # noqa: F401
+    from readlif.reader import LifFile  # noqa: F401
 
 
 class Read:
     """A class to read in microscopy files."""
 
+    @classmethod
+    def _get_transpose_order(cls, input_dimension_order: str) -> List[int]:
+        """Get transpose order for converting to XYC format with optional T and Z dimensions.
+
+        Args:
+            input_dimension_order: String specifying dimension order (e.g., "TCYX", "XYC").
+
+        Returns:
+            List of indices for numpy transpose operation.
+        """
+        target_dims = ["X", "Y", "C"]
+
+        if "T" in input_dimension_order:
+            target_dims.insert(0, "T")
+        if "Z" in input_dimension_order:
+            target_dims.insert(-1, "Z")
+
+        return [input_dimension_order.index(dim) for dim in target_dims]
+
     @staticmethod
     def read_lif(
-        file_path: str,
+        file_path: Union[str, Path],
         image_idx: int = 0,
+        dtype: Optional[DTypeLike] = None,
     ) -> NDArray:
         """Read a single lif file on a given path and returns it.
 
         Args:
             file_path (str): Location of the file to be read.
+            image_idx (int, optional): The index of the image in the lif file to be read. Defaults to 0.
+            dtype (Optional[DTypeLike], optional): The dtype of the data in the lif file.
+                If None, keeps original dtype. Defaults to None.
 
         Returns:
             NDArray: An array containing the channels of the .lif file
         """
+        file_path = str(file_path)
         assert "." in file_path and file_path.rsplit(".", 1)[1].lower() == "lif", "File has to have a .lif extension."
 
         assert os.path.exists(file_path), "Path to .lif image does not exist."
@@ -37,7 +66,10 @@ class Read:
         image = lif_file.get_image(image_idx)
 
         # iterate through all channels, channels being Pillow objects
-        channel_list = np.array([np.array(i) for i in image.get_iter_c(t=0, z=0)], dtype=np.float32)
+        channel_list = np.array([np.array(i) for i in image.get_iter_c(t=0, z=0)])
+
+        if dtype is not None:
+            channel_list = channel_list.astype(dtype)
 
         return channel_list
 
@@ -116,17 +148,23 @@ class Read:
     @classmethod
     def read_czi(
         cls,
-        file_path: str,
+        file_path: Union[str, Path],
         input_dimension_order: str = "XYC",
+        dtype: Optional[DTypeLike] = None,
     ) -> NDArray:
         """Read a single czi file on a given path and returns it.
 
         Args:
             file_path (str): Location of the file to be read.
+            input_dimension_order (str, optional): The dimension order of the channels in the czi file.
+                Defaults to "XYC".
+            dtype (Optional[DTypeLike], optional): The dtype of the data in the czi file.
+                If None, keeps original dtype. Defaults to None.
 
         Returns:
             NDArray: An array containing the channels of the .czi file
         """
+        file_path = str(file_path)
         assert "." in file_path and file_path.rsplit(".", 1)[1].lower() == "czi", "File has to have a .czi extension."
 
         assert os.path.exists(file_path), "Path to .czi image does not exist."
@@ -143,12 +181,10 @@ class Read:
             image=image,
             image_shape=list(image_shape),
         )
+        if dtype is not None and image_data.dtype != dtype:
+            image_data = image_data.astype(dtype)
 
-        transpose_dimension_order = [
-            input_dimension_order.index("X"),
-            input_dimension_order.index("Y"),
-            input_dimension_order.index("C"),
-        ]
+        transpose_dimension_order = cls._get_transpose_order(input_dimension_order)
 
         image_data = np.transpose(
             image_data,
@@ -157,49 +193,131 @@ class Read:
 
         return image_data
 
-    @staticmethod
+    @classmethod
     def read_tiff(
-        file_path: Union[str, List[str]],
+        cls,
+        file_path: Union[str, Path, List[Union[str, Path]]],
         input_dimension_order: str = "XYC",
-        precision: Literal["float32", "float64"] = "float32",
-    ) -> NDArray:
+        dtype: Optional[DTypeLike] = None,
+        return_channels: bool = False,
+    ) -> Union[NDArray, Tuple[NDArray, List[str]]]:
         """Read a single tiff file on a given path and returns it.
 
         Args:
             file_path (str): Location of the file to be read.
             input_dimension_order (str, optional): The dimension order of the channels in the tiff file.
                 Defaults to "XYC".
-            precision (Literal["float32", "float64"], optional): The precision of the data in the tiff file.
-                Defaults to "float32".
+            dtype (Optional[DTypeLike], optional): The dtype of the data in the tiff file.
+                If None, keeps original dtype. Defaults to None.
+            return_channels (bool, optional): Whether to return the channel names. Only works on imagej tiffs.
+                Defaults to False.
 
         Returns:
-            NDArray: An array containing the channels of the .tiff file in XYC dimension order.
+            Union[NDArray, Tuple[NDArray, List[str]]]: An array containing the channels of the .tiff file in XYC dimension order.
+                If return_channels is True and ImageJ metadata is found, returns tuple of (array, channel_names).
         """
         image_data = []
+        channels: Optional[List[str]] = None
         file_paths = file_path if isinstance(file_path, list) else [file_path]
 
         for file_path in file_paths:
+            file_path = str(file_path)
             assert "." in file_path and file_path.rsplit(".", 1)[1].lower() in [
                 "tiff",
                 "tif",
             ], "File has to have a .tiff extension."
             assert os.path.exists(file_path), "Path to .tiff image does not exist."
 
-            transpose_dimension_order = [
-                input_dimension_order.index("X"),
-                input_dimension_order.index("Y"),
-                input_dimension_order.index("C"),
-            ]
+            transpose_dimension_order = cls._get_transpose_order(input_dimension_order)
+
+            # Use TiffFile to check for ImageJ format and read metadata
+            with TiffFile(file_path) as tif:
+                is_imagej = tif.is_imagej
+                img_array = tif.asarray()
+
+                # Extract channel names from ImageJ metadata if available
+                if is_imagej and return_channels and tif.imagej_metadata is not None:
+                    imagej_meta = tif.imagej_metadata
+                    if "Labels" in imagej_meta:
+                        file_channels = imagej_meta["Labels"]
+                        if channels is None:
+                            channels = file_channels
+                        else:
+                            assert channels == file_channels, "All images must have the same channel names."
+
+            # Apply dtype conversion only if specified
+            if dtype is not None:
+                img_array = img_array.astype(dtype)
 
             image_data.append(
                 np.transpose(
-                    np.array(imread(file_path), dtype=(np.float32 if precision == "float32" else np.float64)),
+                    img_array,
                     transpose_dimension_order,
                 )
             )
 
         # if only one image was read, return it as an array
-        if len(file_paths) == 1:
-            return np.array(image_data[0])
+        result_array = np.array(image_data[0]) if len(file_paths) == 1 else np.array(image_data)
+
+        if return_channels and channels is not None:
+            return result_array, channels
+
+        return result_array
+
+    @staticmethod
+    def read_qptiff(
+        file_path: Union[str, Path, List[Union[str, Path]]],
+        level: int = 0,
+        dtype: Optional[DTypeLike] = None,
+        return_channels: bool = True,
+    ) -> Union[NDArray, Tuple[NDArray, List[str]]]:
+        """Read a single qupath tiff file on a given path and returns it.
+
+        Args:
+            file_path (str): Location of the file or files to be read.
+            level (int, optional): The level of the qupath tiff file to be read. Defaults to 0.
+            dtype (Optional[DTypeLike], optional): The dtype of the data in the qptiff file.
+                If None, keeps original dtype. Defaults to None.
+            return_channels (bool, optional): Whether to return the channel names. Defaults to True.
+
+        Returns:
+            Union[NDArray, Tuple[NDArray, List[str]]]: An array containing the channels of the qupath tiff file.
+        """
+        try:
+            from qptifffile import QPTiffFile  # type: ignore
+        except ImportError as excp:
+            raise ImportError(
+                "The qptifffile package is required to read qupath tiff files. Please install it."
+            ) from excp
+
+        image_data = []
+        channels: Optional[List[str]] = None
+        file_paths = file_path if isinstance(file_path, list) else [file_path]
+
+        for file_path in file_paths:
+            file_path = str(file_path)
+            assert "." in file_path and file_path.rsplit(".", 1)[1].lower() in [
+                "qptiff",
+                "qptif",
+            ], "File has to have a .qptiff extension."
+            assert os.path.exists(file_path), "Path to .qptiff image does not exist."
+
+            with QPTiffFile(file_path) as qptiff:
+                image_channels = qptiff.get_biomarkers()
+
+                assert len(image_channels) > 0, f"Image {file_path} contained no channels"
+
+                if channels is None:
+                    channels = image_channels
+                else:
+                    assert set(channels) == set(image_channels), "All images have to contain the same channels."
+
+                img_array = qptiff.read_region(channels, level=level)
+                if dtype is not None:
+                    img_array = img_array.astype(dtype)
+                image_data.append(img_array)
+
+        if return_channels:
+            return np.array(image_data), cast(List[str], channels)
 
         return np.array(image_data)

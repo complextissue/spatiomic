@@ -1,7 +1,8 @@
+from collections.abc import Callable
 from inspect import signature
 from itertools import combinations
 from logging import warning
-from typing import Any, Callable, Dict, List, Literal, Optional, Tuple, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Literal, Optional, Tuple, TypeAlias, Union, cast
 
 import numpy as np
 import pandas as pd
@@ -10,11 +11,27 @@ from scipy import stats
 from scipy.stats._resampling import PermutationTestResult
 from statsmodels.stats.multitest import multipletests
 
+if TYPE_CHECKING:
+    from scipy.stats._mannwhitneyu import MannwhitneyuResult
+    from scipy.stats._morestats import WilcoxonResult
+    from scipy.stats._stats_py import RanksumsResult, TtestResult
+
+SCIPY_TEST_TYPE: TypeAlias = Callable[
+    [NDArray, NDArray],
+    Union[
+        "TtestResult",
+        "RanksumsResult",
+        "MannwhitneyuResult",
+        "WilcoxonResult",
+        float,
+    ],
+]
+
 
 def _get_test_function(
     test: Literal["t", "wilcoxon", "mwu", "mannwhitneyu"],
     dependent: bool,
-) -> Union["stats.ttest_ind", "stats.ttest_rel", "stats.ranksums", "stats.mannwhitneyu", "stats.wilcoxon"]:
+) -> SCIPY_TEST_TYPE:
     """Get the statistical test function based on the test and dependent arguments.
 
     Args:
@@ -28,16 +45,16 @@ def _get_test_function(
         test = "mwu"
 
     if test == "t" and not dependent:
-        test_function = stats.ttest_ind
+        test_function = cast(Callable, stats.ttest_ind)
     elif test == "t" and dependent:
-        test_function = stats.ttest_rel
+        test_function = cast(Callable, stats.ttest_rel)
     elif test == "wilcoxon" and not dependent:
-        test_function = stats.ranksums
+        test_function = cast(Callable, stats.ranksums)
     elif test == "mwu" and not dependent:
         # this provides similar results to ranksums but with continuity correction
-        test_function = stats.mannwhitneyu
+        test_function = cast(Callable, stats.mannwhitneyu)
     elif test == "wilcoxon" and dependent:
-        test_function = stats.wilcoxon
+        test_function = cast(Callable, stats.wilcoxon)
     else:
         raise NotImplementedError(
             f"The test {test} for {'dependent' if dependent else 'independent'} data is not implemented."
@@ -49,9 +66,7 @@ def _get_test_function(
 def _permutation_test(
     data: NDArray,
     data_comparison: NDArray,
-    test_function: Union[
-        "stats.ttest_ind", "stats.ttest_rel", "stats.ranksums", "stats.mannwhitneyu", "stats.wilcoxon", Callable
-    ],
+    test_function: SCIPY_TEST_TYPE,
     dependent: bool,
     permutation_count: int,
     seed: int,
@@ -85,7 +100,9 @@ def _permutation_test(
         if "dependent" in test_function_parameters:
             kwargs["dependent"] = dependent  # type: ignore
 
-        result = test_function(data, data_comparison, **kwargs)
+        # Ensure we only pass arguments that the function expects
+        filtered_kwargs = {k: v for k, v in kwargs.items() if k in test_function_parameters}
+        result = test_function(data, data_comparison, **filtered_kwargs)
         return result.statistic if hasattr(result, "statistic") else result  # type: ignore
 
     return stats.permutation_test(
@@ -94,6 +111,7 @@ def _permutation_test(
         n_resamples=permutation_count,
         permutation_type=("independent" if not dependent else "samples"),
         vectorized=vectorized,
+        axis=0,
         rng=seed,
     )
 

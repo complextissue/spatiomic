@@ -7,7 +7,7 @@ packages = ["spatiomic"]
 
 [project]
 name = "spatiomic"
-version = "0.7.0"
+version = "0.8.0"
 description = "A python toolbox for spatial omics analysis."
 requires-python = ">=3.11"
 license = { file = "LICENSE" }
@@ -42,6 +42,7 @@ dependencies = [
     "scikit-image",
     "scikit-learn",
     "scipy>=0.16.1",
+    "scipy-stubs",
     "seaborn",
     "statsmodels",
     "umap-learn",
@@ -121,7 +122,6 @@ skip-magic-trailing-comma = false
 line-ending = "auto"
 
 [tool.mypy]
-plugins = ["numpy.typing.mypy_plugin"]
 warn_return_any = true
 warn_unused_configs = true
 warn_redundant_casts = true
@@ -141,7 +141,6 @@ markers = [
     "cpu: marks tests that explicitly run the CPU, not the GPU version (deselect with '-m \"not cpu\"')",
     "no_github_ci: marks tests that should not be run on GitHub CI (deselect with '-m \"not no_github_ci\"')",
     "gpu: marks tests that require a GPU (deselect with '-m \"not gpu\"')",
-    "datafiles: takes files provided by pytest-datafiles'",
 ]
 
 [tool.coverage.run]
@@ -182,7 +181,7 @@ dev = [
     "ipywidgets",
     "jupyter-client",
     "jupyter-core",
-    "mypy==1.17.0",
+    "mypy==1.18.2",
     "myst-parser",
     "nbsphinx",
     "opencv-python-headless",
@@ -192,9 +191,9 @@ dev = [
     "pre-commit",
     "pygments",
     "pytest",
-    "pytest-datafiles",
+    "qptifffile",
     "readlif",
-    "ruff==0.9.10",
+    "ruff==0.13.2",
     "session-info2",
     "sphinx",
     "sphinx-autoapi",

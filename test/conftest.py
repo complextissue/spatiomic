@@ -21,7 +21,7 @@ def generate_cycle_pixels(
     shift: bool = True,
 ) -> NDArray:
     """Return pixels for a cycle with 3 channels."""
-    example_img = imread(os.path.join(FILE_DIR, "kidney-tissue-fluorescence.tif"))[0, :, :, :]
+    example_img = imread(os.path.join(FILE_DIR, "data/test_files/kidney-tissue-fluorescence.tiff"))[0, :, :, :]
     offset: NDArray[np.float32] = np.random.default_rng().integers(size=2, low=5, high=20).astype(np.float32)
 
     if shift:
