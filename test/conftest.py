@@ -11,10 +11,7 @@ from spatiomic.process import register
 
 np.random.seed(1308419541)
 
-FILE_DIR = os.path.join(
-    os.path.dirname(os.path.realpath(__file__)),
-    "test_files",
-)
+FILE_DIR = os.path.dirname(os.path.realpath(__file__))
 
 
 def generate_cycle_pixels(
