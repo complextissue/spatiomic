@@ -2,9 +2,12 @@
   <img src="docs/source/_static/logo.png" alt="spatiomic logo" width="200">
 </p>
 
-<hr style="border: none; height: 2px; margin: 16px 0;" />
+---
 
-<h1 style="display: none;" class="hidden">spatiomic</h1>
+<!--
+# spatiomic
+This heading is in a comment to maintain semantic structure while using the logo as the visual title
+-->
 
 [![Version](https://img.shields.io/pypi/v/spatiomic)](https://pypi.org/project/spatiomic/)
 [![License](https://img.shields.io/pypi/l/spatiomic)](https://github.com/complextissue/spatiomic)
