@@ -1,6 +1,7 @@
 name: Test Package
 
 on:
+  workflow_dispatch:
   schedule:
     # run every Tuesday at 17:00 UTC
     - cron: "0 17 * * 2"
@@ -11,15 +12,20 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: true
       matrix:
         include:
-          - os: ubuntu-24.04
+          - os: ubuntu-latest
             python: "3.11"
-          - os: ubuntu-24.04
+          - os: ubuntu-latest
             python: "3.12"
+          - os: ubuntu-latest
+            python: "3.13"
+          - os: ubuntu-latest
+            python: "3.13"
+            pip-flags: "--pre"
 
     name: Python ${{ matrix.python }}
 
@@ -28,12 +34,12 @@ jobs:
       PYTHON: ${{ matrix.python }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v5
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         with:
           path: ${{ env.pythonLocation }}
           key: ${{ env.pythonLocation }}-${{ hashFiles('pyproject.toml') }}
@@ -44,7 +50,7 @@ jobs:
       - name: Install dependencies
         uses: nick-fields/retry@v3
         with:
-          timeout_seconds: 5
+          timeout_minutes: 5
           max_attempts: 3 # The nvidia index is unreliable
           command: uv sync --extra cellpose --dev
       - name: Lint with ruff
@@ -64,6 +70,7 @@ jobs:
           uv run coverage run -m pytest --maxfail=10 -m "not gpu" -m "not no_github_ci"
           uv run coverage xml
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
         with:
+          fail_ci_if_error: true
           token: ${{ secrets.CODECOV_TOKEN }}
