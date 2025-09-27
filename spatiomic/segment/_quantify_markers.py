@@ -92,7 +92,7 @@ def quantify_markers(
     # Convert arrays to appropriate backend
     image_xp = xp.asarray(image)
     masks_xp = xp.asarray(masks)  # Get image dimensions
-    height, width, n_channels = image_xp.shape
+    _height, _width, channel_count = image_xp.shape
 
     # Get unique mask regions, optionally excluding background (0)
     unique_regions = xp.unique(masks_xp)
@@ -100,20 +100,20 @@ def quantify_markers(
         unique_regions = unique_regions[unique_regions != 0]
 
     # Initialize quantification matrix
-    if len(unique_regions) == 0 or n_channels == 0:
-        quantified_values = xp.zeros((len(unique_regions), n_channels), dtype=xp.float64)
+    if len(unique_regions) == 0 or channel_count == 0:
+        quantified_values = xp.zeros((len(unique_regions), channel_count), dtype=xp.float64)
     else:
-        quantified_values = xp.zeros((len(unique_regions), n_channels), dtype=xp.float64)
+        quantified_values = xp.zeros((len(unique_regions), channel_count), dtype=xp.float64)
 
         # Vectorized quantification for each region and channel
         for i, region in enumerate(unique_regions):
             region_mask = masks_xp == region
             if xp.any(region_mask):
                 # Extract pixel values for this region across all channels
-                region_pixels = image_xp[region_mask]  # Shape: (n_pixels_in_region, n_channels)
+                region_pixels = image_xp[region_mask]  # Shape: (n_pixels_in_region, channel_count)
 
                 # Apply quantification function to each channel
-                for channel_idx in range(n_channels):
+                for channel_idx in range(channel_count):
                     channel_values = region_pixels[:, channel_idx]
                     if len(channel_values) > 0:
                         # Convert to numpy for function compatibility if needed
@@ -139,10 +139,10 @@ def quantify_markers(
     # Set up channel names
     column_names: List[Union[str, int]]
     if channel_names is None:
-        column_names = list(range(n_channels))
+        column_names = list(range(channel_count))
     else:
-        if len(channel_names) != n_channels:
-            msg = f"Number of channel names ({len(channel_names)}) must match number of channels ({n_channels})"
+        if len(channel_names) != channel_count:
+            msg = f"Number of channel names ({len(channel_names)}) must match number of channels ({channel_count})"
             raise ValueError(msg)
         column_names = channel_names
 

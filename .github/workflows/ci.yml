@@ -42,8 +42,11 @@ jobs:
         with:
           version: "latest"
       - name: Install dependencies
-        run: |
-          uv sync --extra cellpose --dev
+        uses: nick-fields/retry@v3
+        with:
+          timeout_seconds: 5
+          max_attempts: 3 # The nvidia index is unreliable
+          command: uv sync --extra cellpose --dev
       - name: Lint with ruff
         run: |
           uv run ruff check --fix --exit-non-zero-on-fix spatiomic
