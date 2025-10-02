@@ -123,7 +123,7 @@ def spatial_weights(
         weight_list.append(np.full(len(focal_indices), 1.0))
 
     if not focals_list:
-        sparse_matrix = coo_matrix(([], ([], [])), shape=(cell_count, cell_count))
+        sparse_matrix = coo_matrix((np.array([]), (np.array([]), np.array([]))), shape=(cell_count, cell_count))
     else:
         sparse_matrix = coo_matrix(
             (

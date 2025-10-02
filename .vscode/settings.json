@@ -14,7 +14,11 @@
   "[python]": {
     "editor.formatOnPaste": false,
     "editor.formatOnSaveMode": "file",
-    "editor.defaultFormatter": "charliermarsh.ruff"
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.codeActionsOnSave": {
+      "source.fixAll.ruff": "explicit",
+      "source.organizeImports.ruff": "explicit"
+    }
   },
   "python.analysis.extraPaths": ["spatiomic", "test", "examples"],
   "python.analysis.exclude": ["**/.venv/**", "**/__pycache__/**"],

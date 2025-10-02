@@ -1,4 +1,13 @@
+<p align="center">
+  <img src="docs/source/_static/logo.png" alt="spatiomic logo" width="200">
+</p>
+
+---
+
+<!--
 # spatiomic
+This heading is in a comment to maintain semantic structure while using the logo as the visual title
+-->
 
 [![Version](https://img.shields.io/pypi/v/spatiomic)](https://pypi.org/project/spatiomic/)
 [![License](https://img.shields.io/pypi/l/spatiomic)](https://github.com/complextissue/spatiomic)
@@ -16,6 +25,14 @@ It contains functions for pixel-level clustering, differential cluster abundance
 The main goal of this package is to organize different packages and methods that are commonly used when dealing with high-dimensional imaging data behind a single API that allows for scalable high-performance computing applications, whenever possible on the GPU.
 
 `spatiomic` has been published as part of `PathoPlex` in Nature: [https://www.nature.com/articles/s41586-025-09225-2](https://www.nature.com/articles/s41586-025-09225-2). It is part of the [scverse® ecosystem](https://scverse.org/packages/#ecosystem).
+
+**📚 Full documentation and tutorials are available at [spatiomic.org](https://spatiomic.org)**
+
+<p align="center">
+  <a href="https://spatiomic.org">
+    <img src="docs/source/_static/example.png" alt="spatiomic pixel clustering example" width="480">
+  </a>
+</p>
 
 ## Installation
 
