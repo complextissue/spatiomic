@@ -12,26 +12,121 @@ class Register:
     """Expose registration methods."""
 
     @staticmethod
+    def _preprocess_images(
+        pixels: NDArray,
+        reference_pixels: NDArray,
+        blur: bool = False,
+        match_histogram: bool = False,
+        threshold: bool = False,
+        threshold_percentile: Union[int, float] = 70,
+        use_gpu: bool = True,
+    ) -> Tuple[NDArray, NDArray]:
+        """Preprocess images with optional blur, histogram matching, and thresholding.
+
+        Args:
+            pixels (NDArray): The pixels to preprocess.
+            reference_pixels (NDArray): The reference pixels to preprocess.
+            blur (bool, optional): Whether to apply Gaussian blur. Defaults to False.
+            match_histogram (bool, optional): Whether to match histograms. Defaults to False.
+            threshold (bool, optional): Whether to apply thresholding. Defaults to False.
+            threshold_percentile (Union[int, float], optional): Percentile for thresholding. Defaults to 70.
+            use_gpu (bool, optional): Whether to use GPU acceleration. Defaults to True.
+
+        Returns:
+            Tuple[NDArray, NDArray]: The preprocessed pixels and reference pixels.
+        """
+        if use_gpu:
+            try:
+                import cupy as cp  # type: ignore
+
+                pixels_gpu = cp.array(pixels)
+                reference_pixels_gpu = cp.array(reference_pixels)
+
+                if blur:
+                    from cucim.skimage.filters import gaussian  # type: ignore
+
+                    pixels_gpu = gaussian(pixels_gpu)
+                    reference_pixels_gpu = gaussian(reference_pixels_gpu)
+
+                if match_histogram:
+                    from cucim.skimage.exposure import match_histograms  # type: ignore
+
+                    pixels_gpu = match_histograms(pixels_gpu, reference_pixels_gpu)
+
+                if threshold:
+                    threshold_limit = cp.percentile(reference_pixels_gpu, threshold_percentile)
+                    reference_pixels_gpu = cp.where(reference_pixels_gpu < threshold_limit, 0, reference_pixels_gpu)
+                    pixels_gpu = cp.where(pixels_gpu < threshold_limit, 0, pixels_gpu)
+
+                return pixels_gpu.get(), reference_pixels_gpu.get()  # type: ignore
+            except Exception:
+                use_gpu = False
+
+        if blur:
+            from skimage.filters import gaussian
+
+            pixels = gaussian(pixels)
+            reference_pixels = gaussian(reference_pixels)
+
+        if match_histogram:
+            from skimage.exposure import match_histograms
+
+            pixels = match_histograms(pixels, reference_pixels)
+
+        if threshold:
+            threshold_limit = np.percentile(reference_pixels, threshold_percentile)
+            reference_pixels = np.where(reference_pixels < threshold_limit, 0, reference_pixels)
+            pixels = np.where(pixels < threshold_limit, 0, pixels)
+
+        return pixels, reference_pixels
+
+    @staticmethod
     def get_ssim(
         pixels: NDArray,
         reference_pixels: NDArray,
+        use_gpu: bool = True,
     ) -> float:
         """Calculate the structural similarity index measure.
 
         Args:
             pixels (NDArray): A 2D array of pixels.
             reference_pixels (NDArray): The 2D reference array for calculation of the structural similarity.
+            use_gpu (bool, optional): Whether to use the cucim GPU implementation. Defaults to True.
 
         Returns:
             float: The structural similarity index measure.
         """
+        if use_gpu:
+            try:
+                import cupy as cp  # type: ignore
+                from cucim.skimage.metrics import (  # type: ignore
+                    structural_similarity,
+                )
+
+                pixels = cp.array(pixels)
+                reference_pixels = cp.array(reference_pixels)
+                data_range = float(cp.max(pixels) - cp.min(pixels))
+
+                ssim = structural_similarity(
+                    pixels,
+                    reference_pixels,
+                    full=False,
+                    data_range=data_range,
+                )
+
+                return float(ssim.get())  # type: ignore
+            except Exception:
+                use_gpu = False
+
         from skimage.metrics import structural_similarity
+
+        data_range = float(np.max(pixels) - np.min(pixels))
 
         ssim = structural_similarity(
             pixels,
             reference_pixels,
             full=False,
-            data_range=np.max(pixels) - np.min(pixels),
+            data_range=data_range,
         )
 
         return float(ssim)
@@ -65,30 +160,22 @@ class Register:
                 Defaults to "phase_correlation".
             upsample_factor (int, optional): The upsample factor to use for the phase correlation method.
                 Defaults to 1.
-            use_gpu (bool, optional):  Whether to use the cucim phase_correlation gpu implementation.
-                Defaults to True.
+            use_gpu (bool, optional): Whether to use cucim GPU implementations. Defaults to True.
 
         Returns:
             Tuple[float, float]: The offset on the y- and the x-axis.
         """
-        if blur:
-            from skimage.filters import gaussian
-
-            pixels = gaussian(pixels)
-            reference_pixels = gaussian(reference_pixels)
-
-        if match_histogram:
-            from skimage.exposure import match_histograms
-
-            pixels = match_histograms(pixels, reference_pixels)
-
-        if threshold:
-            threshold_limit = np.percentile(reference_pixels, threshold_percentile)
-            reference_pixels[reference_pixels < threshold_limit] = 0
-            pixels[pixels < threshold_limit] = 0
+        pixels, reference_pixels = cls._preprocess_images(
+            pixels,
+            reference_pixels,
+            blur=blur,
+            match_histogram=match_histogram,
+            threshold=threshold,
+            threshold_percentile=threshold_percentile,
+            use_gpu=use_gpu,
+        )
 
         if method == "chi2_shift":
-            # requires image_registration and typing_extensions>=3.10.0.1 and fftw for best performance
             from image_registration.chi2_shifts import chi2_shift  # type: ignore
 
             shift = chi2_shift(
@@ -105,17 +192,18 @@ class Register:
             (offset_y, offset_x) = cls.get_phase_shift(
                 pixels=pixels,
                 reference_pixels=reference_pixels,
-                blur=blur,
-                match_histogram=match_histogram,
-                threshold=threshold,
+                blur=False,
+                match_histogram=False,
+                threshold=False,
                 use_gpu=use_gpu,
                 upsample_factor=upsample_factor,
             )
 
         return (offset_y, offset_x)
 
-    @staticmethod
+    @classmethod
     def get_phase_shift(
+        cls,
         pixels: NDArray,
         reference_pixels: NDArray,
         blur: bool = False,
@@ -137,27 +225,20 @@ class Register:
                 percentile of the reference. Defaults to False.
             upsample_factor (int, optional): The upsample factor to use for the phase correlation method.
                 Defaults to 1.
-            use_gpu (bool, optional):  Whether to use the cucim phase_correlation gpu implementation instead of chi2
-                shift. Defaults to True.
+            use_gpu (bool, optional): Whether to use cucim GPU implementations. Defaults to True.
 
         Returns:
             Tuple[float, float]: The offset on the y- and the x-axis.
         """
-        if blur:
-            from skimage.filters import gaussian
-
-            pixels = gaussian(pixels)
-            reference_pixels = gaussian(reference_pixels)
-
-        if match_histogram:
-            from skimage.exposure import match_histograms
-
-            pixels = match_histograms(pixels, reference_pixels)
-
-        if threshold:
-            threshold_limit = np.percentile(reference_pixels, 70)  # type: ignore
-            reference_pixels[reference_pixels < threshold_limit] = 0
-            pixels[pixels < threshold_limit] = 0
+        pixels, reference_pixels = cls._preprocess_images(
+            pixels,
+            reference_pixels,
+            blur=blur,
+            match_histogram=match_histogram,
+            threshold=threshold,
+            threshold_percentile=70,
+            use_gpu=use_gpu,
+        )
 
         if use_gpu:
             try:
