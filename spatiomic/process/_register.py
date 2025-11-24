@@ -105,16 +105,22 @@ class Register:
 
                 pixels = cp.array(pixels)
                 reference_pixels = cp.array(reference_pixels)
+                data_range = float(cp.max(pixels) - cp.min(pixels))
+
+                ssim = structural_similarity(
+                    pixels,
+                    reference_pixels,
+                    full=False,
+                    data_range=data_range,
+                )
+
+                return float(ssim.get())  # type: ignore
             except Exception:
-                from skimage.metrics import structural_similarity
-
                 use_gpu = False
-        else:
-            from skimage.metrics import structural_similarity
 
-        data_range = np.max(pixels) - np.min(pixels)
-        if use_gpu and hasattr(data_range, "get"):
-            data_range = data_range.get()  # type: ignore
+        from skimage.metrics import structural_similarity
+
+        data_range = float(np.max(pixels) - np.min(pixels))
 
         ssim = structural_similarity(
             pixels,
@@ -122,9 +128,6 @@ class Register:
             full=False,
             data_range=data_range,
         )
-
-        if use_gpu and hasattr(ssim, "get"):
-            ssim = ssim.get()  # type: ignore
 
         return float(ssim)
 
