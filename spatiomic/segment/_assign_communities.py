@@ -50,8 +50,9 @@ def assign_communities(
     # Initialize output with same shape as masks
     community_image = np.zeros_like(masks)
 
-    # Assign community labels (adding 1 to avoid confusion with background)
+    # Assign community labels (adding 1 to avoid confusion with background, if needed)
+    pseudocount = 1 if communities_array.min() == 0 else 0
     for i, region_id in enumerate(unique_regions):
-        community_image[masks == region_id] = communities_array[i] + 1
+        community_image[masks == region_id] = communities_array[i] + pseudocount
 
     return community_image
