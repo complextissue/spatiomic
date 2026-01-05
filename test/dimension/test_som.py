@@ -79,27 +79,27 @@ def test_som_cpu(example_data: NDArray) -> None:
 
         # TODO: add test cases for flattening and returning distances
 
-    # test quantization error calculation
-    quantization_error = data_som.get_quantization_error(example_data)
-    assert isinstance(quantization_error, float)
+        # test quantization error calculation
+        quantization_error = data_som.get_quantization_error(example_data)
+        assert isinstance(quantization_error, float)
 
-    if distance_metric in ["correlation", "cosine"]:
-        assert quantization_error >= 0.0 and quantization_error <= 1.0, (
-            f"Quantization error out of bounds for {distance_metric} distance metric: {quantization_error}"
-        )
+        if distance_metric in ["correlation", "cosine"]:
+            assert quantization_error >= 0.0 and quantization_error <= 1.0, (
+                f"Quantization error out of bounds for {distance_metric} distance metric: {quantization_error}"
+            )
 
-    # test saving and loading
-    temp_file_name = f"{uuid4()}.p"
-    temp_file_name = os.path.join(os.path.dirname(os.path.realpath(__file__)), temp_file_name)
-    data_som.save(save_path=temp_file_name)
+        # test saving and loading
+        temp_file_name = f"{uuid4()}.p"
+        temp_file_name = os.path.join(os.path.dirname(os.path.realpath(__file__)), temp_file_name)
+        data_som.save(save_path=temp_file_name)
 
-    assert os.path.isfile(temp_file_name)
+        assert os.path.isfile(temp_file_name)
 
-    new_som = so.dimension.som()
-    new_som.load(save_path=temp_file_name)
+        new_som = so.dimension.som()
+        new_som.load(save_path=temp_file_name)
 
-    assert data_som.get_config() == new_som.get_config()
-    assert np.all(data_som.get_nodes() == new_som.get_nodes())
+        assert data_som.get_config() == new_som.get_config()
+        assert np.all(data_som.get_nodes() == new_som.get_nodes())
 
-    # remove the temp file
-    os.remove(temp_file_name)
+        # remove the temp file
+        os.remove(temp_file_name)

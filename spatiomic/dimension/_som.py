@@ -90,6 +90,7 @@ class Som(LoadableDimensionReducer):
 
     def set_estimators(
         self,
+        initialize_som: bool = True,
     ) -> None:
         """Set the XPySOM and nearest neighbor finder estimators."""
         # Check whether we can use cupy to work on the GPU
@@ -98,29 +99,30 @@ class Som(LoadableDimensionReducer):
         )
 
         # Initialise XPySOM instance
-        try:
-            self.som = XPySom(
-                self.node_count[0],
-                self.node_count[1],
-                self.dimension_count,
-                activation_distance=self.distance_metric,
-                neighborhood_function=self.neighborhood,
-                learning_rate=self.learning_rate_initial,
-                learning_rateN=self.learning_rate_final,
-                sigma=self.sigma_initial,
-                sigmaN=self.sigma_final,
-                xp=self.xp,
-                n_parallel=self.parallel_count,
-                random_seed=self.seed,
-            )
-        except ValueError as excp:
-            if self.distance_metric == "correlation":
-                raise ValueError(
-                    "Using XPySOM with Pearson correlation requires a custom implementation. "
-                    "You can install it via `pip install git+https://github.com/complextissue/xpysom`."
-                ) from excp
-            else:
-                raise excp
+        if initialize_som:
+            try:
+                self.som = XPySom(
+                    self.node_count[0],
+                    self.node_count[1],
+                    self.dimension_count,
+                    activation_distance=self.distance_metric,
+                    neighborhood_function=self.neighborhood,
+                    learning_rate=self.learning_rate_initial,
+                    learning_rateN=self.learning_rate_final,
+                    sigma=self.sigma_initial,
+                    sigmaN=self.sigma_final,
+                    xp=self.xp,
+                    n_parallel=self.parallel_count,
+                    random_seed=self.seed,
+                )
+            except ValueError as excp:
+                if self.distance_metric == "correlation":
+                    raise ValueError(
+                        "Using XPySOM with Pearson correlation requires a custom implementation. "
+                        "You can install it via `pip install git+https://github.com/complextissue/xpysom`."
+                    ) from excp
+                else:
+                    raise excp
 
         # Create the nearest neighbor finder
         self.neighbor_estimator = get_neighbor_finder(
@@ -366,12 +368,15 @@ class Som(LoadableDimensionReducer):
         Args:
             save_path (str): The path where to load the SOM and its configuration from.
         """
-        # load and set the som and load the class config
+        # Load and set the som and load the class config
         with open(save_path, "rb") as infile:
             config, self.som = pickle.load(infile)  # nosec
 
-        # initialise an XPySOM object with the data and set the class variables
+        # Initialise an XPySOM object with the data and set the class variables
         self.set_config(**config)
+
+        # Re-initialize estimators without re-initializing the SOM
+        self.set_estimators(initialize_som=False)
 
     def save(
         self,

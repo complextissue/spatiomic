@@ -12,11 +12,14 @@ from ._normalize import Normalize as normalize
 from ._register import Register as register
 from ._zscore import ZScore as zscore
 
+standardize = zscore
+
 __all__ = [
     "arcsinh",
     "clip",
     "log1p",
     "normalize",
     "register",
+    "standardize",
     "zscore",
 ]
