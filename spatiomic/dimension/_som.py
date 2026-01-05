@@ -4,7 +4,6 @@ from typing import List, Literal, Optional, Tuple, Union
 
 import numpy as np
 from numpy.typing import NDArray
-from xpysom import XPySom
 
 from spatiomic._internal._anndata_method import anndata_method
 from spatiomic._internal._data_method import data_method
@@ -83,44 +82,24 @@ class Som(LoadableDimensionReducer):
             parallel_count=parallel_count,
             n_jobs=n_jobs,
             seed=seed,
+            use_gpu=use_gpu,
         )
 
-        self.use_gpu = use_gpu
         self.set_estimators()
 
     def set_estimators(
         self,
     ) -> None:
-        """Set the XPySOM and nearest neighbor finder estimators."""
+        """Set the XPySOM and nearest neighbor finder estimators.
+
+        Args:
+            initialize_som (bool, optional): Whether to initialize a new SOM instance. Set to False when loading
+                a previously saved SOM to avoid overwriting loaded weights. Defaults to True.
+        """
         # Check whether we can use cupy to work on the GPU
         self.xp, self.cuml = (
             import_package("cupy", alternative=np, return_success=True) if self.use_gpu else (np, False)  # type: ignore
         )
-
-        # Initialise XPySOM instance
-        try:
-            self.som = XPySom(
-                self.node_count[0],
-                self.node_count[1],
-                self.dimension_count,
-                activation_distance=self.distance_metric,
-                neighborhood_function=self.neighborhood,
-                learning_rate=self.learning_rate_initial,
-                learning_rateN=self.learning_rate_final,
-                sigma=self.sigma_initial,
-                sigmaN=self.sigma_final,
-                xp=self.xp,
-                n_parallel=self.parallel_count,
-                random_seed=self.seed,
-            )
-        except ValueError as excp:
-            if self.distance_metric == "correlation":
-                raise ValueError(
-                    "Using XPySOM with Pearson correlation requires a custom implementation. "
-                    "You can install it via `pip install git+https://github.com/complextissue/xpysom`."
-                ) from excp
-            else:
-                raise excp
 
         # Create the nearest neighbor finder
         self.neighbor_estimator = get_neighbor_finder(
@@ -146,6 +125,7 @@ class Som(LoadableDimensionReducer):
         parallel_count: int = 8096,
         n_jobs: int = -1,
         seed: Optional[int] = None,
+        use_gpu: bool = True,
     ) -> None:
         """Set the config of the SOM class.
 
@@ -164,7 +144,10 @@ class Som(LoadableDimensionReducer):
                 Defaults to None.
             sigma_final (Optional[int], optional): The final size of the neighborhood, lower values. Defaults to None.
             parallel_count (int, optional): Data points to process concurrently. Defaults to 8096.
+            n_jobs (int, optional): Jobs to perform simoustaneously when using the sklearn NearestNeighbor class.
+                The value -1 means unlimited jobs. Defaults to -1.
             seed (Optional[int], optional): The random seed. Defaults to None.
+            use_gpu (bool, optional): Whether to use cupy. Defaults to True.
         """
         if sigma_initial is None:
             sigma_initial = ceil(min(node_count[0], node_count[1]) / 2)
@@ -185,6 +168,7 @@ class Som(LoadableDimensionReducer):
         self.parallel_count = parallel_count
         self.n_jobs = n_jobs
         self.seed = seed
+        self.use_gpu = use_gpu
 
     def get_config(
         self,
@@ -207,6 +191,7 @@ class Som(LoadableDimensionReducer):
             "parallel_count": self.parallel_count,
             "n_jobs": self.n_jobs,
             "seed": self.seed,
+            "use_gpu": self.use_gpu,
         }
 
     @anndata_method(input_attribute="X")
@@ -372,6 +357,7 @@ class Som(LoadableDimensionReducer):
 
         # initialise an XPySOM object with the data and set the class variables
         self.set_config(**config)
+        self.set_estimators()
 
     def save(
         self,
