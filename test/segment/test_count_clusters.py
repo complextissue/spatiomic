@@ -164,6 +164,16 @@ def test_count_clusters_different_dtypes() -> None:
 
 
 @pytest.mark.cpu
+def test_count_clusters_out_of_range_raises() -> None:
+    """A cluster id >= cluster_count must raise instead of being silently dropped."""
+    clustered = np.array([[0, 1], [2, 5]], dtype=np.int32)  # id 5 is out of range for cluster_count=3
+    mask = np.array([[1, 1], [1, 1]], dtype=np.int32)
+
+    with pytest.raises(ValueError, match="out of range"):
+        so.segment.count_clusters(clustered_img=clustered, masks=mask, cluster_count=3, use_gpu=False)
+
+
+@pytest.mark.cpu
 def test_count_clusters_zero_division_in_normalization() -> None:
     """Test handling of empty regions during normalization."""
     # Create a case where a mask region has no pixels

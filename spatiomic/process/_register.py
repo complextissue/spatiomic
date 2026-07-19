@@ -314,8 +314,10 @@ class Register:
         else:
             raise ValueError("Shift can only be applied to image in XY or XYC format.")
 
-        # check that cupy exists and that pixels is a cupy array
-        if use_gpu and "cp" in globals() and isinstance(pixels, cp.NDArray):  # type: ignore
+        # Move a cupy result back to the host so a numpy array is always returned. `cp` is imported locally
+        # inside the `use_gpu` branch above, so the previous `"cp" in globals()` guard was always False (leaking
+        # a cupy array); duck-typing on `.get` is robust regardless of how the array was produced.
+        if hasattr(pixels, "get"):
             pixels = pixels.get()  # type: ignore
 
         return pixels.astype(np.float32 if precision == "float32" else np.float64)

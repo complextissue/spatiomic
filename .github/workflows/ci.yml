@@ -58,7 +58,7 @@ jobs:
           uv run bandit --verbose --ini .bandit.ini -ll --recursive spatiomic
       - name: Test with pytest
         run: |
-          uv run coverage run -m pytest --maxfail=10 -m "not gpu" -m "not no_github_ci"
+          uv run coverage run -m pytest --maxfail=10 -m "not gpu and not no_github_ci"
           uv run coverage xml
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
