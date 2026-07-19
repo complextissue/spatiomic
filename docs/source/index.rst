@@ -47,6 +47,13 @@ Welcome to the spatiomic documentation!
    BioContextAI <https://biocontext.ai>
 
 .. toctree::
+   :caption: For LLMs
+   :maxdepth: 1
+
+   llms.txt <https://spatiomic.org/llms.txt>
+   llms-full.txt <https://spatiomic.org/llms-full.txt>
+
+.. toctree::
    :caption: Additional Information
    :maxdepth: 2
 

@@ -48,6 +48,7 @@ extensions = [
     "sphinxcontrib.mermaid",
     "nbsphinx",
     "myst_parser",
+    "sphinx_llms_txt",
 ]
 myst_enable_extensions = [
     "amsmath",
@@ -106,6 +107,15 @@ intersphinx_mapping = dict(  # noqa: C408
 
 viewcode_follow_imported_members = True
 viewcode_line_numbers = False
+
+# -- Options for llms.txt output ---------------------------------------------
+
+# Base URL of the published documentation, used to build absolute links in the
+# generated llms.txt / llms-full.txt files.
+html_baseurl = "https://spatiomic.org"
+
+llms_txt_title = "spatiomic"
+llms_txt_summary = info["Summary"]
 
 # -- Options for HTML output -------------------------------------------------
 
