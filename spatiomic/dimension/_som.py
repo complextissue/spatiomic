@@ -348,7 +348,7 @@ class Som(LoadableDimensionReducer):
 
         # Vectorized node-label lookup (equivalent to indexing clusters by each nearest-node id, but avoids
         # a per-pixel Python loop that is prohibitively slow at full image resolution).
-        data_labelled = clusters[np.asarray(neighbor_idx).ravel()]
+        data_labelled: NDArray = clusters[np.asarray(neighbor_idx).ravel()]
         data_labelled = data_labelled.reshape(data_shape[:-1]) if not flatten else data_labelled
 
         # save the labelled data if a path was provided

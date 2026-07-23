@@ -28,7 +28,7 @@ check: install-dev
 # Testing
 #
 unittest:
-	uv run coverage run -m pytest --maxfail=10 -m "not gpu"
+	uv run coverage run -m pytest --maxfail=10 -m "not gpu and not no_github_ci"
 
 unittest-gpu:
 	uv run coverage run -m pytest --maxfail=10
