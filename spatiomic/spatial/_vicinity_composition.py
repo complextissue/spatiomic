@@ -161,9 +161,11 @@ def vicinity_composition(
         if xp.__name__ == "cupy":
             xp.random.seed(seed + permutation_seed)
 
-        # Generate permutation and calculate vicinity composition
+        # Generate permutation and calculate vicinity composition. The cluster labels must be permuted across
+        # ALL pixels (complete spatial randomness): permuting the 2D image directly only shuffles rows and
+        # preserves within-row spatial structure, which yields anti-conservative, invalid p-values.
         return calculate_vicinity_composition(
-            xp.random.permutation(data),
+            xp.random.permutation(data.ravel()).reshape(data.shape),
             neighborhood_offset,
             ignore_identities,
             ignore_repeated,

@@ -74,8 +74,8 @@ def spatial_weights(
         data_shape = (3, 3)
         neighborhood_offset = neighborhood_offset(
             neighborhood_type="queen",
-            steps=5,
-            exclude_inner_steps=2,
+            order=2,
+            exclude_inner_order=1,
         )
         spatial_weights_matrix = spatial_weights(
             data_shape,

@@ -1,4 +1,5 @@
 from typing import Any, Literal
+from warnings import warn
 
 import numpy as np
 from numpy.typing import NDArray
@@ -46,10 +47,22 @@ class Subsample:
             assert 0 < fraction <= 1, "Fraction must be between 0 and 1."
             count = int(np.floor(fraction * pixel_count))
 
+        if count > pixel_count:
+            warn(
+                f"Requested subsample count ({count}) exceeds the number of available pixels ({pixel_count}). "
+                "Returning all available pixels.",
+                UserWarning,
+                stacklevel=2,
+            )
+            count = int(pixel_count)
+
+        # Sample WITHOUT replacement so that no pixel is duplicated in the subsample. Duplicated pixels would
+        # otherwise bias any estimator fitted on the subsample (e.g. clip/normalize percentiles, SOM training).
         subsample_pixels = data.reshape((-1, dimension_count))[
             np.random.choice(
                 pixel_count,
                 size=count,
+                replace=False,
             ),
             :,
         ]

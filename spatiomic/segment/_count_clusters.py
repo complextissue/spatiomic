@@ -64,7 +64,14 @@ def count_clusters(
             region_mask = masks_xp == region
             if xp.any(region_mask):
                 region_clusters = clustered_img_xp[region_mask]
-                counts = xp.bincount(region_clusters, minlength=cluster_count)[:cluster_count]
+                max_cluster_id = int(region_clusters.max())
+                if max_cluster_id >= cluster_count:
+                    raise ValueError(
+                        f"clustered_img contains cluster id {max_cluster_id}, which is out of range for "
+                        f"cluster_count={cluster_count}. Increase cluster_count to at least "
+                        f"{max_cluster_id + 1} to avoid silently dropping counts."
+                    )
+                counts = xp.bincount(region_clusters, minlength=cluster_count)
                 cluster_counts[i, :] = counts
 
     # Convert back to numpy for pandas compatibility

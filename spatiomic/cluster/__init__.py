@@ -8,7 +8,6 @@ from ._leiden import Leiden as leiden
 
 __all__ = [
     "agglomerative",
-    "biclustering",
     "kmeans",
     "leiden",
     "som",
