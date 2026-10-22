@@ -8,6 +8,8 @@ from libpysal.weights import W, lat2W
 from numpy.typing import NDArray
 from tqdm import tqdm
 
+from spatiomic._internal._check_cluster_image import check_cluster_image
+
 
 class Autocorrelation:
     """Class to perform spatial autocorrelation analysis on a 2D image of clusters or an XYC image."""
@@ -26,13 +28,18 @@ class Autocorrelation:
         Analyse the spatial autocorrelation of each cluster or each channel in the image using Moran's I or Geary's C.
 
         Args:
-            data (NDArray): The 2D image to perform autocorrelation analysis on.
+            data (NDArray): The 2D image of integer clusters or the XYC image to perform autocorrelation analysis on.
+                Unassigned pixels (-1) are not analysed as a cluster.
             spatial_weights (Optional[W], optional): The spatial weights to use. If None, queen contiguity weights are
                 generated based on the data shape using `lat2W`. Defaults to None.
             method (Literal["moran", "geary"], optional): The method to use. Defaults to "moran".
             permutation_count (int, optional): The number of permutations to use for p-value calculation, 0 if no
                 simulation is to be performed.
                 Defaults to 0.
+
+        Raises:
+            TypeError: If a clustered image is not of integer type.
+            ValueError: If a clustered image contains labels below -1.
 
         Returns:
             pd.DataFrame: A DataFrame containing the Moran's I analysis results for each cluster.
@@ -42,21 +49,13 @@ class Autocorrelation:
         assert len(data_shape) == 2 or len(data_shape) == 3, (
             "Data must be a 2D image where the pixel values are the clusters or an image with a channel dimensionality."
         )
-        assert channel_image or data.dtype in [
-            int,
-            np.int8,
-            np.int16,
-            np.uint8,
-            np.uint16,
-        ], "Clusters in data must be integer type."
-        assert channel_image or bool(np.any(data < 0)) is False, (
-            "Data contains negative values. Clusters cannot be negative."
-        )
+        if not channel_image:
+            check_cluster_image(data)
 
         spatial_weights_matrix = (
             lat2W(data_shape[0], data_shape[1], rook=False) if spatial_weights is None else spatial_weights
         )
-        unique_clusters = np.unique(data) if not channel_image else np.arange(data_shape[-1])
+        unique_clusters = np.unique(data[data >= 0]) if not channel_image else np.arange(data_shape[-1])
 
         base_columns = [
             ("cluster" if not channel_image else "channel"),

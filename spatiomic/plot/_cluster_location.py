@@ -17,7 +17,7 @@ def cluster_location(
     """Plot the location of each cluster in a labelled image individually.
 
     Args:
-        image (NDArray): The clustered image.
+        image (NDArray): The clustered image. Unassigned pixels (-1) are not shown as a cluster.
         title (str, optional): Title for the figure. Defaults to "Isolated Clusters".
         cluster_title (str, optional): Text to be preprended to the cluster number. Defaults to "Cluster".
         cluster_labels (Optional[List[Union[str, int]]], optional): Custom names for the clusters. Defaults to None.
@@ -31,6 +31,7 @@ def cluster_location(
     image = image.ravel()
 
     clusters = np.unique(image)
+    clusters = clusters[clusters >= 0]
     column_count = ceil(sqrt(len(clusters)))
     row_count = ceil(sqrt(len(clusters)))
 

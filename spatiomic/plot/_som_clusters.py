@@ -30,9 +30,10 @@ def som_clusters(
     Returns:
         plt.Figure if ax is None, otherwise the provided plt.Axes.
     """
-    from . import colormap as create_colormap
+    from ._colormap import colormap as create_colormap
+    from ._colormap import get_cluster_colors
 
-    cluster_count = len(np.unique(clusters))
+    cluster_count = int(np.max(clusters)) + 1
 
     cmap = create_colormap(color_count=cluster_count) if colormap is None else colormap
 
@@ -51,10 +52,7 @@ def som_clusters(
 
     ax1.set_title(title)
 
-    ax1.imshow(
-        np.array(clusters).reshape(som.node_count),
-        cmap=cmap,
-    )
+    ax1.imshow(get_cluster_colors(np.array(clusters).reshape(som.node_count), cmap))
 
     ax1.set_xticks([])
     ax1.set_yticks([])
@@ -64,7 +62,7 @@ def som_clusters(
         divider = make_axes_locatable(ax1)
 
         ax2 = divider.append_axes("right", size="5%", pad=0.05)
-        ax2.imshow(np.expand_dims(np.arange(0, cluster_count), axis=1), cmap=cmap)
+        ax2.imshow(get_cluster_colors(np.expand_dims(np.arange(0, cluster_count), axis=1), cmap))
 
         ax2.set_yticks(np.arange(0, cluster_count))
         ax2.set_yticklabels(np.arange(0, cluster_count))

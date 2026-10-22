@@ -8,6 +8,7 @@ from libpysal.weights import W, lat2SW
 from numpy.typing import NDArray
 
 from spatiomic._internal._check_channel_dimension import check_channel_dimension
+from spatiomic._internal._check_cluster_image import check_cluster_image
 
 
 class LocalHeteroskedasticity:
@@ -42,8 +43,9 @@ class LocalHeteroskedasticity:
 
         Raises:
             ValueError: If input data dimensions are not 2D or 3D.
-            ValueError: If input data is a clustered image but not of integer type.
-            ValueError: If input data is a clustered image and contains negative values.
+            TypeError: If input data is a clustered image but not of integer type.
+            ValueError: If input data is a clustered image and contains labels below -1. Unassigned pixels (-1)
+                belong to no cluster.
             ValueError: If `channel_names` are provided for a clustered image (2D input).
             ValueError: If `channel_names` are provided for a 3D image (XYC) but do not match the number of channels.
         """
@@ -52,10 +54,7 @@ class LocalHeteroskedasticity:
         check_channel_dimension(data_shape, dimension_count_min=2, dimension_count_max=3)
 
         if not channel_image:
-            if not np.issubdtype(data.dtype, np.integer):
-                raise ValueError("Data must be a clustered image of integer type.")
-            if np.any(data < 0):
-                raise ValueError("Clustered image data cannot contain negative values.")
+            check_cluster_image(data)
             if channel_names is not None:
                 warn(
                     "`channel_names` are ignored for clustered image input (2D data).",
@@ -83,8 +82,11 @@ class LocalHeteroskedasticity:
         if not channel_image:
             # Process clustered image (2D integer array)
             cluster_count = data.max() + 1
-            # One-hot encode the cluster labels
-            data_for_losh = np.eye(cluster_count)[data].reshape((-1, cluster_count))
+            labels = data.ravel()
+            # One-hot encode the cluster labels, unassigned pixels (-1) belong to no cluster
+            data_for_losh = np.zeros((labels.size, cluster_count))
+            assigned = labels >= 0
+            data_for_losh[np.flatnonzero(assigned), labels[assigned]] = 1
             index = list(range(cluster_count))
         else:
             # Process channel image (3D array XYC)

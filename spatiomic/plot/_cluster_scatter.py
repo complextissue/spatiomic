@@ -8,6 +8,7 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 from numpy.typing import NDArray
 
 from ._colormap import colormap as create_colormap
+from ._colormap import get_cluster_colors
 
 
 def cluster_scatter(
@@ -74,7 +75,7 @@ def cluster_scatter(
         divider = make_axes_locatable(ax1)
 
         ax2 = divider.append_axes("right", size="5%", pad=0.05)
-        ax2.imshow(np.expand_dims(np.arange(0, cluster_count), axis=1), cmap=cmap)
+        ax2.imshow(get_cluster_colors(np.expand_dims(np.arange(0, cluster_count), axis=1), cmap))
 
         ax2.set_yticks(np.arange(0, cluster_count))
         ax2.set_yticklabels(

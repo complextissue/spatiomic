@@ -6,6 +6,7 @@ import seaborn as sns
 from matplotlib.colors import ListedColormap
 
 from ._colormap import colormap as create_colormap
+from ._colormap import get_cluster_colors
 
 
 def cluster_legend(
@@ -40,7 +41,7 @@ def cluster_legend(
     else:
         return_fig = False
 
-    ax.imshow(np.expand_dims(np.arange(0, cluster_count), axis=0), cmap=colormap)
+    ax.imshow(get_cluster_colors(np.expand_dims(np.arange(0, cluster_count), axis=0), colormap))
 
     ax.set_xticks(np.arange(0, cluster_count))
 

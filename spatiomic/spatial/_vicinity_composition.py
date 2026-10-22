@@ -6,6 +6,7 @@ from joblib import Parallel, delayed
 from numpy.typing import NDArray
 
 from spatiomic._internal._anndata_method import anndata_method
+from spatiomic._internal._check_cluster_image import check_cluster_image
 from spatiomic._internal._import_package import import_package
 from spatiomic._internal._seed_method import seed_method
 
@@ -29,7 +30,8 @@ def vicinity_composition(
     """Get the counts of neighboring clusters for each cluster in an image.
 
     Args:
-        data (np.ndarray): The image of clusters.
+        data (np.ndarray): The image of integer clusters. Unassigned pixels (-1) are neither counted as a cluster nor
+            as a neighbor and keep their location in permutations.
         neighborhood_offset (np.ndarray, optional): The neighborhood offset array. Can be created using the
             `neighborhood_offset` function. Defaults to `pixel_level_queen_neighborhood_offset`.
         ignore_identities (bool, optional): Whether to ignore pixels from the same cluster in the vicinity.
@@ -42,6 +44,10 @@ def vicinity_composition(
         seed (int, optional): The random seed to use for the permutations. Defaults to 0.
         n_jobs (int, optional): Number of parallel jobs to use for permutation calculations. Defaults to -1.
 
+    Raises:
+        TypeError: If the data is not of integer type.
+        ValueError: If the data contains labels below -1.
+
     Returns:
         Union[pd.DataFrame, [pd.DataFrame, pd.DataFrame]]: A DataFrame containing the counts of neighbors from each
             cluster for each cluster. If permutations is not None, a tuple of two DataFrames containing the counts of
@@ -52,15 +58,7 @@ def vicinity_composition(
     else:
         xp: "np" = import_package("cupy", alternative=np)
 
-    # check that the data is integer type and has no negative values
-    assert data.dtype in [
-        int,
-        np.int8,
-        np.int16,
-        np.uint8,
-        np.uint16,
-    ], "Clusters in data_reference must be integer type."
-    assert bool(np.any(data < 0)) is False, "data_reference contains negative values. Clusters cannot be negative."
+    check_cluster_image(data)
 
     padding_size = np.max(np.abs(neighborhood_offset))
     data = xp.array(data).astype(int)
@@ -77,7 +75,7 @@ def vicinity_composition(
         img_padded = xp.pad(data, (padding_size, padding_size), mode="constant", constant_values=-1)
 
         results = {}
-        clusters = sorted(xp.unique(data))
+        clusters = [cluster for cluster in sorted(xp.unique(data).tolist()) if cluster >= 0]
 
         # get values of neighbouring pixels for all offsets
         neighbors_list = [
@@ -162,15 +160,20 @@ def vicinity_composition(
             xp.random.seed(seed + permutation_seed)
 
         # Generate permutation and calculate vicinity composition. The cluster labels must be permuted across
-        # ALL pixels (complete spatial randomness): permuting the 2D image directly only shuffles rows and
-        # preserves within-row spatial structure, which yields anti-conservative, invalid p-values.
+        # ALL assigned pixels (complete spatial randomness): permuting the 2D image directly only shuffles rows and
+        # preserves within-row spatial structure, which yields anti-conservative, invalid p-values. Unassigned
+        # pixels (-1) keep their location.
+        data_permuted = data.copy()
+        assigned = data_permuted >= 0
+        data_permuted[assigned] = xp.random.permutation(data_permuted[assigned])
+
         return calculate_vicinity_composition(
-            xp.random.permutation(data.ravel()).reshape(data.shape),
+            data_permuted,
             neighborhood_offset,
             ignore_identities,
             ignore_repeated,
             padding_size,
-        )
+        ).reindex(index=df_vicinity_composition.index, columns=df_vicinity_composition.columns, fill_value=0)
 
     if n_jobs != 1:
         # Parallel processing of permutations

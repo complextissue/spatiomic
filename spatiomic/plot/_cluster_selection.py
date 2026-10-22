@@ -8,6 +8,43 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 from numpy.typing import NDArray
 
 from ._colormap import colormap as create_colormap
+from ._colormap import get_cluster_colors
+
+
+def get_selection_image(
+    image: NDArray,
+    clusters: Union[NDArray, List[int]],
+    colormap: Optional[ListedColormap] = None,
+) -> tuple[NDArray, ListedColormap, NDArray]:
+    """Map the selected clusters to 1 to n and all other pixels, including unassigned ones (-1), to 0.
+
+    Args:
+        image (NDArray): The clustered image.
+        clusters (Union[NDArray, List[int]]): The clusters to show.
+        colormap (Optional[ListedColormap], optional): The colormap with one color per cluster. Defaults to None.
+
+    Raises:
+        ValueError: If the colormap has fewer colors than the highest cluster label plus one.
+
+    Returns:
+        tuple[NDArray, ListedColormap, NDArray]: The selection image, the colormap with black for the background
+            followed by the colors of the selected clusters, and the sorted selected clusters.
+    """
+    clusters = np.unique(clusters)
+    cluster_count = int(max(np.max(image), np.max(clusters))) + 1
+    colormap = create_colormap(color_count=cluster_count) if colormap is None else colormap
+
+    if len(colormap.colors) < cluster_count:  # type: ignore
+        raise ValueError(
+            "When a colormap is provided, the color count has to be equal or greater than the cluster count."
+        )
+
+    image_selection = np.zeros(image.shape, dtype=np.int64)
+    for index, cluster in enumerate(clusters):
+        image_selection[image == cluster] = index + 1
+
+    selection_colormap = ListedColormap(["#000", *[colormap.colors[cluster] for cluster in clusters]])  # type: ignore
+    return image_selection, selection_colormap, clusters
 
 
 def cluster_selection(
@@ -28,32 +65,8 @@ def cluster_selection(
     Returns:
         plt.Figure if ax is None, otherwise the provided plt.Axes.
     """
-    img_shape = image.shape
-    image = image.ravel()
-
-    clusters = np.unique(clusters)
-    cluster_count = np.max(np.unique(np.array(image))) + 1
+    image_selection, cmap, clusters = get_selection_image(image, clusters, colormap)
     cluster_count_included = len(clusters)
-
-    cmap_raw = create_colormap(color_count=cluster_count) if colormap is None else colormap
-
-    colors = ["#000"]
-
-    # create a blank image and set the background to -1
-    image_combined = np.zeros((image.shape)) - 1
-    colormap_raw = cmap_raw.colors
-
-    assert len(colormap_raw) >= cluster_count, (  # type: ignore
-        "When a colormap is provided, the color count has to be equal or greater than the cluster count."
-    )
-
-    for idx, cluster in enumerate(clusters):
-        # add cluster color to colors for colormap
-        colors.append(colormap_raw[cluster])  # type: ignore
-
-        image_combined[image == cluster] = idx
-
-    cmap = ListedColormap(colors)
 
     # Setup plotting
     if ax is None:
@@ -70,14 +83,14 @@ def cluster_selection(
 
     ax1.set_xticks([])
     ax1.set_yticks([])
-    ax1.imshow(image_combined.reshape(img_shape), cmap=cmap)
+    ax1.imshow(get_cluster_colors(image_selection, cmap), interpolation="nearest")
 
     # draw the colorbar as an image only when creating new figure
     if show_colorbar:
         divider = make_axes_locatable(ax1)
 
         ax2 = divider.append_axes("right", size="5%", pad=0.05)
-        ax2.imshow(np.expand_dims(np.arange(0, cluster_count_included + 1), axis=1), cmap=cmap)
+        ax2.imshow(get_cluster_colors(np.expand_dims(np.arange(0, cluster_count_included + 1), axis=1), cmap))
 
         ax2.set_yticks(np.arange(0, cluster_count_included + 1))
         ax2.set_yticklabels(["BG", *clusters.tolist()])
@@ -111,29 +124,5 @@ def save_cluster_selection(
         clusters (Union[NDArray, List[int]]): The clusters to show.
         colormap (Optional[ListedColormap], optional): The colormap to use. Defaults to None.
     """
-    img_shape = image.shape
-    image = image.ravel()
-
-    clusters = np.array(clusters)
-    cluster_count = np.max(np.unique(np.array(clusters))) + 1
-    cmap_raw = create_colormap(color_count=cluster_count) if colormap is None else colormap
-
-    colors = ["#000"]
-
-    # create a blank image and set the background to -1
-    image_combined = np.zeros((image.shape)) - 1
-    colormap_raw = cmap_raw.colors
-
-    assert len(colormap_raw) >= cluster_count, (  # type: ignore
-        "When a colormap is provided, the color count has to be equal or greater than the cluster count."
-    )
-
-    for idx, cluster in enumerate(clusters):
-        # add cluster color to colors for colormap
-        colors.append(colormap_raw[cluster])  # type: ignore
-
-        image_combined[image == cluster] = idx
-
-    cmap = ListedColormap(colors)
-
-    plt.imsave(save_path, image_combined.reshape(img_shape), cmap=cmap)
+    image_selection, cmap, _ = get_selection_image(image, clusters, colormap)
+    plt.imsave(save_path, get_cluster_colors(image_selection, cmap))
