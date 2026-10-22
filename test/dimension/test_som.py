@@ -1,105 +1,89 @@
 """Test Som class."""
 
 import os
-from typing import List, Literal
-from uuid import uuid4
+from typing import Literal
 
 import numpy as np
 import pytest
 from numpy.typing import NDArray
+from scipy.spatial.distance import cdist
 
 import spatiomic as so
 
 
 @pytest.mark.cpu
-def test_som_cpu(example_data: NDArray) -> None:
-    """Test the Som class."""
-    node_count = (3, 3)
-    dimension_count = 4
-    distance_metrics: List[Literal["euclidean", "manhattan", "correlation", "cosine"]] = [
-        "euclidean",
-        "manhattan",
-        # "correlation",  # Requires the custom implementation available at https://github.com/complextissue/xpysom
-        "cosine",
-    ]
+@pytest.mark.parametrize("distance_metric", ["euclidean", "cosine"])
+def test_som_cpu(
+    example_data: NDArray,
+    distance_metric: Literal["euclidean", "cosine"],
+    tmp_path: str,
+) -> None:
+    """Test that the SOM finds the nearest node, its distance and the node labels and survives saving and loading."""
+    node_count = (3, 4)
+    data_som = so.dimension.som(
+        node_count=node_count,
+        dimension_count=example_data.shape[-1],
+        distance_metric=distance_metric,
+        use_gpu=False,
+        seed=0,
+    )
 
-    for distance_metric in distance_metrics:
-        data_som = so.dimension.som(
-            node_count=node_count,
-            dimension_count=dimension_count,
-            distance_metric=distance_metric,  # type: ignore
-            use_gpu=False,
-            seed=0,
-        )
+    subsample_data = so.data.subsample().fit_transform(example_data, method="count", count=1000, seed=0)
+    data_som.fit(subsample_data, iteration_count=5)
 
-        # test configuration retrieval and setting
-        config = data_som.get_config()
-        data_som.set_config(**config)
+    nodes = data_som.get_nodes()
+    assert np.array_equal(data_som.get_nodes(flatten=False)[1, 2], nodes[1 * node_count[1] + 2])
 
-        # ensure that the configuration didn't change through setting and retrieval
-        assert data_som.get_config() == config
+    data_flat = example_data.reshape(-1, example_data.shape[-1])
+    distances_expected = cdist(data_flat, nodes, metric=distance_metric)
+    distances, node_ids = data_som.predict(example_data, return_distance=True)
 
-        subsample_data = so.data.subsample().fit_transform(example_data, method="count", count=100)
+    np.testing.assert_allclose(distances_expected[np.arange(len(data_flat)), node_ids], distances, atol=1e-5)
+    np.testing.assert_allclose(distances_expected.min(axis=1), distances, atol=1e-5)
+    assert data_som.get_quantization_error(example_data) == pytest.approx(np.mean(distances), abs=1e-5)
 
-        # test fitting with and without pca initialisation
-        for pca_init in [True, False]:
-            data_som.fit(
-                subsample_data,
-                iteration_count=1,
-                pca_init=pca_init,
-            )
+    clusters = np.random.default_rng(0).integers(low=0, high=5, size=np.prod(node_count))
+    data_labelled = data_som.label(example_data, clusters=clusters)
+    assert np.array_equal(data_labelled, clusters[node_ids].reshape(example_data.shape[:-1]))
 
-        # get the nodes
-        for flatten in [True, False]:
-            nodes = data_som.get_nodes(flatten=flatten)
+    save_path = os.path.join(tmp_path, "som.p")
+    data_som.save(save_path=save_path)
+    loaded_som = so.dimension.som(use_gpu=False)
+    loaded_som.load(save_path)
 
-            if flatten:
-                assert nodes.shape[0] == np.multiply.reduce(np.array(node_count))
-            else:
-                assert nodes.shape[:2] == node_count
+    assert loaded_som.get_config() == data_som.get_config()
+    assert np.array_equal(loaded_som.get_nodes(), nodes)
+    assert np.array_equal(loaded_som.predict(example_data), node_ids)
 
-            assert nodes.shape[-1] == dimension_count
 
-        # create random labels for the som nodes
-        labels = np.random.randint(
-            low=0,
-            high=10,
-            size=np.multiply.reduce(np.array(node_count)),
-        )
+@pytest.mark.cpu
+def test_som_cosine_zero_norm() -> None:
+    """Test that zero-norm data points have no nearest node under the cosine metric."""
+    data_som = so.dimension.som(node_count=(1, 2), dimension_count=2, distance_metric="cosine", use_gpu=False)
+    data_som.set_nodes(np.array([[1.0, 0.0], [0.0, 1.0]]))
 
-        # label data according to the node labels
-        data_labelled = data_som.label(
-            example_data,
-            clusters=labels,
-        )
+    data = np.array([[0.0, 0.0], [0.0, 2.0]])
+    distances, node_ids = data_som.predict(data, return_distance=True)
 
-        assert np.max(data_labelled) <= np.max(labels)
-        assert np.min(data_labelled) >= np.min(labels)
-        assert data_labelled.shape == example_data.shape[:-1]
+    assert np.array_equal(node_ids, [-1, 1])
+    assert np.isnan(distances[0]) and distances[1] == pytest.approx(0.0, abs=1e-6)
+    assert np.array_equal(data_som.label(data, clusters=[3, 4]), [-1, 4])
+    assert data_som.get_quantization_error(data) == pytest.approx(0.0, abs=1e-6)
 
-        # TODO: add test cases for flattening and returning distances
 
-        # test quantization error calculation
-        quantization_error = data_som.get_quantization_error(example_data)
-        assert isinstance(quantization_error, float)
+@pytest.mark.cpu
+def test_som_distance_map() -> None:
+    """Test that the distance map sums the distances to the grid neighbors and is normalized to a maximum of 1."""
+    data_som = so.dimension.som(node_count=(1, 3), dimension_count=1, use_gpu=False)
+    data_som.set_nodes(np.array([[0.0], [1.0], [3.0]]))
 
-        if distance_metric in ["correlation", "cosine"]:
-            assert quantization_error >= 0.0 and quantization_error <= 1.0, (
-                f"Quantization error out of bounds for {distance_metric} distance metric: {quantization_error}"
-            )
+    np.testing.assert_allclose(data_som.get_distance_map(), [[1 / 3, 1.0, 2 / 3]])
 
-        # test saving and loading
-        temp_file_name = f"{uuid4()}.p"
-        temp_file_name = os.path.join(os.path.dirname(os.path.realpath(__file__)), temp_file_name)
-        data_som.save(save_path=temp_file_name)
 
-        assert os.path.isfile(temp_file_name)
+@pytest.mark.cpu
+def test_som_unsupported_metric(example_data: NDArray) -> None:
+    """Test that distance metrics that fastersom does not support raise an error."""
+    data_som = so.dimension.som(dimension_count=example_data.shape[-1], distance_metric="manhattan", use_gpu=False)  # type: ignore
 
-        new_som = so.dimension.som()
-        new_som.load(save_path=temp_file_name)
-
-        assert data_som.get_config() == new_som.get_config()
-        assert np.all(data_som.get_nodes() == new_som.get_nodes())
-
-        # remove the temp file
-        os.remove(temp_file_name)
+    with pytest.raises(ValueError, match="metric"):
+        data_som.fit(example_data, iteration_count=1)
