@@ -102,3 +102,22 @@ def test_som_unsupported_metric(example_data: NDArray) -> None:
 
     with pytest.raises(ValueError, match="metric"):
         data_som.fit(example_data, iteration_count=1)
+
+
+@pytest.mark.gpu
+def test_som_cupy_input(example_data: NDArray) -> None:
+    """Test that CuPy data gives the same nearest nodes and labels as NumPy data."""
+    cupy = pytest.importorskip("cupy")
+    data_som = so.dimension.som(node_count=(3, 4), dimension_count=example_data.shape[-1], seed=0)
+    data_som.fit(cupy.asarray(example_data), iteration_count=5)
+
+    distances, node_ids = data_som.predict(cupy.asarray(example_data), return_distance=True)
+    distances_numpy, node_ids_numpy = data_som.predict(example_data, return_distance=True)
+
+    assert np.array_equal(node_ids, node_ids_numpy)
+    np.testing.assert_allclose(distances, distances_numpy)
+
+    clusters = np.arange(np.prod((3, 4)))
+    assert np.array_equal(
+        data_som.label(cupy.asarray(example_data), clusters=clusters), data_som.label(example_data, clusters=clusters)
+    )
