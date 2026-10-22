@@ -328,8 +328,10 @@ class Som(LoadableDimensionReducer):
         Args:
             save_path (str): The path where to save the SOM and its configuration to.
         """
+        state = [self.get_config(), self.get_nodes()]
+
         with open(save_path, "wb") as outfile:
-            pickle.dump([self.get_config(), self.get_nodes()], outfile)
+            pickle.dump(state, outfile)
 
     def get_nodes(
         self,

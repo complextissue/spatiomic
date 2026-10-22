@@ -53,6 +53,10 @@ def test_som_cpu(
     save_path = os.path.join(tmp_path, "som.p")
     data_som.save(save_path=save_path)
     loaded_som = so.dimension.som(use_gpu=False)
+
+    with pytest.raises(ValueError, match="No SOM"):
+        loaded_som.save(save_path=save_path)
+
     loaded_som.load(save_path)
 
     assert loaded_som.get_config() == data_som.get_config()
