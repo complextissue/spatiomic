@@ -30,7 +30,7 @@ def som_distance(
     ax.set_xlabel("SOM Dimension 1")
     ax.set_yticks([])
     ax.set_xticks([])
-    ax.pcolor(som.som.distance_map(), cmap="vlag")
+    ax.pcolor(som.get_distance_map(), cmap="vlag")
 
     divider = make_axes_locatable(ax)
 
