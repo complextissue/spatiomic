@@ -48,7 +48,7 @@ dependencies = [
     "umap-learn",
     "llvmlite>=0.39.0",
     "astroid==3.3.11",
-    "fastersom>=0.2.0",
+    "fastersom>=0.3.0",
 ]
 
 [project.urls]

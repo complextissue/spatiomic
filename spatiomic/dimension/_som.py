@@ -56,7 +56,8 @@ class Som(LoadableDimensionReducer):
             initialization (Literal["random", "sample"], optional): Whether to initialise the nodes as random unit
                 vectors or as randomly chosen samples. Defaults to "random".
             batch_size (int | None, optional): Data points to process concurrently. Only affects memory usage and
-                speed. Defaults to None, which uses 65536 on the GPU and 8192 on the CPU.
+                speed. Defaults to None, which uses 8192 on the CPU and on the GPU a size based on the node count and
+                the free GPU memory.
             seed (int | None, optional): The random seed. Defaults to None.
             use_gpu (bool, optional): Whether to use a GPU (CUDA or MPS) if one is available. Defaults to True.
         """

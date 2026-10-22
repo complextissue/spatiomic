@@ -1627,15 +1627,15 @@ wheels = [
 
 [[package]]
 name = "fastersom"
-version = "0.2.0"
+version = "0.3.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "numpy" },
     { name = "torch" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/c6/b1/aa46277306c54a6dd7e16ac34857f688c2521cbd5d830b7c61e13db7934b/fastersom-0.2.0.tar.gz", hash = "sha256:bd7ea342789738410b9185d2f7b96c416634b505e67db45bbb5fd8d4205e4250", size = 14080, upload-time = "2026-10-22T14:14:44.001Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/a3/f3/7c2e7361c62b56e4c8d963ff1fbaab1c72ece16b703dd750c6cec8940c73/fastersom-0.3.0.tar.gz", hash = "sha256:b13e556625715869704714a935bf825461639994bbbf65f44491375a3011d94c", size = 15376, upload-time = "2026-10-22T18:14:55.791Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/63/88/1faa95f95c36476024bccd55affe969a354bb99453ec5a7ca9eea096bee0/fastersom-0.2.0-py3-none-any.whl", hash = "sha256:8caf65b59e1f08cfcc5d05a4f07504f087d8f7b6834ebe95f3b287065a9da545", size = 14451, upload-time = "2026-10-22T14:14:42.442Z" },
+    { url = "https://files.pythonhosted.org/packages/d0/ed/1f7bff8cb03eb082f3ef497729eb4797972c8637f6672a210f992150d201/fastersom-0.3.0-py3-none-any.whl", hash = "sha256:02c3b96667f58f4e9c62d6f86eaedcb2548634cc1df3799a849b3f77b05cb52b", size = 15725, upload-time = "2026-10-22T18:14:54.624Z" },
 ]
 
 [[package]]
@@ -5857,7 +5857,7 @@ requires-dist = [
     { name = "cuml-cu11", marker = "extra == 'cuda-11'", specifier = ">=24.10.0" },
     { name = "cuml-cu12", marker = "extra == 'cuda-12'", specifier = ">=24.10.0" },
     { name = "esda", specifier = ">=2.7.0" },
-    { name = "fastersom", specifier = ">=0.2.0" },
+    { name = "fastersom", specifier = ">=0.3.0" },
     { name = "joblib" },
     { name = "lazy-loader" },
     { name = "llvmlite", specifier = ">=0.39.0" },
