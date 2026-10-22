@@ -1,9 +1,7 @@
 import pickle
-from itertools import product
 from typing import Literal
 
 import numpy as np
-import torch
 from fastersom import SOM
 from numpy.typing import NDArray
 
@@ -19,7 +17,7 @@ class Som(LoadableDimensionReducer):
         self,
         node_count: tuple[int, int] = (50, 50),
         dimension_count: int = 5,
-        distance_metric: Literal["euclidean", "cosine"] = "euclidean",
+        distance_metric: Literal["euclidean", "manhattan", "cosine", "correlation"] = "euclidean",
         sigma_initial: float | None = None,
         sigma_final: float | None = None,
         initialization: Literal["random", "sample"] = "random",
@@ -48,8 +46,9 @@ class Som(LoadableDimensionReducer):
         Args:
             node_count (tuple[int, int], optional): Tuple determining the SOM node size. Defaults to (50, 50).
             dimension_count (int, optional): Dimensionality of the original data. Defaults to 5.
-            distance_metric (Literal["euclidean", "cosine"], optional): Distance metric to use. Under the cosine metric,
-                samples with zero norm have no nearest node. Defaults to "euclidean".
+            distance_metric (Literal["euclidean", "manhattan", "cosine", "correlation"], optional): Distance metric to
+                use. Samples with zero norm (cosine) or constant channels (correlation) have no nearest node.
+                Defaults to "euclidean".
             sigma_initial (float | None, optional): The initial width of the gaussian neighborhood in grid units.
                 Defaults to None, which uses ceil(min(node_count) / 2) / 2.
             sigma_final (float | None, optional): The width the neighborhood decays towards at the end of training.
@@ -79,7 +78,7 @@ class Som(LoadableDimensionReducer):
         self,
         node_count: tuple[int, int] = (50, 50),
         dimension_count: int = 5,
-        distance_metric: Literal["euclidean", "cosine"] = "euclidean",
+        distance_metric: Literal["euclidean", "manhattan", "cosine", "correlation"] = "euclidean",
         sigma_initial: float | None = None,
         sigma_final: float | None = None,
         initialization: Literal["random", "sample"] = "random",
@@ -91,8 +90,8 @@ class Som(LoadableDimensionReducer):
         Args:
             node_count (tuple[int, int], optional): Tuple determining the SOM node size. Defaults to (50, 50).
             dimension_count (int, optional): Dimensionality of the original data. Defaults to 5.
-            distance_metric (Literal["euclidean", "cosine"], optional): Distance metric to use.
-                Defaults to "euclidean".
+            distance_metric (Literal["euclidean", "manhattan", "cosine", "correlation"], optional): Distance metric to
+                use. Defaults to "euclidean".
             sigma_initial (float | None, optional): The initial width of the gaussian neighborhood in grid units.
                 Defaults to None.
             sigma_final (float | None, optional): The width the neighborhood decays towards at the end of training.
@@ -130,30 +129,22 @@ class Som(LoadableDimensionReducer):
             "seed": self.seed,
         }
 
-    def _create_som(
+    def _get_som_parameters(
         self,
-        iteration_count: int,
-    ) -> SOM:
-        """Create an unfitted fastersom SOM from the configuration.
-
-        Args:
-            iteration_count (int): The epochs to train the SOM for.
+    ) -> dict:
+        """Get the fastersom SOM parameters of the configuration, except the grid size, epochs and initialization.
 
         Returns:
-            SOM: The unfitted SOM.
+            dict: The keyword arguments for the fastersom SOM.
         """
-        return SOM(
-            n_rows=self.node_count[0],
-            n_cols=self.node_count[1],
-            n_epochs=iteration_count,
-            sigma_initial=self.sigma_initial,
-            sigma_final=self.sigma_final,
-            init=self.initialization,
-            metric=self.distance_metric,
-            random_state=self.seed,
-            device=None if self.use_gpu else "cpu",
-            batch_size=self.batch_size,
-        )
+        return {
+            "sigma_initial": self.sigma_initial,
+            "sigma_final": self.sigma_final,
+            "metric": self.distance_metric,
+            "random_state": self.seed,
+            "device": None if self.use_gpu else "cpu",
+            "batch_size": self.batch_size,
+        }
 
     def _get_fitted_som(
         self,
@@ -191,7 +182,12 @@ class Som(LoadableDimensionReducer):
         if data.shape[-1] != self.dimension_count:
             raise ValueError(f"data must have {self.dimension_count} channels, got {data.shape[-1]}")
 
-        self.som = self._create_som(iteration_count).fit(data)
+        self.som = SOM(
+            *self.node_count,
+            n_epochs=iteration_count,
+            init=self.initialization,
+            **self._get_som_parameters(),
+        ).fit(data)
 
     @anndata_method(input_attribute="X", output_uns="som_neighbors")
     @data_method
@@ -202,8 +198,8 @@ class Som(LoadableDimensionReducer):
     ) -> NDArray | tuple[NDArray, NDArray]:
         """Get the id of the nearest SOM node for each data point and optionally the distance to the node.
 
-        Under the cosine metric, data points with zero norm have no nearest node: their id is -1 and their distance is
-        NaN.
+        Data points with zero norm (cosine) or constant channels (correlation) have no nearest node: their id is -1 and
+        their distance is NaN.
 
         Args:
             data (NDArray): The channel-last data to find the nearest SOM node for.
@@ -212,36 +208,12 @@ class Som(LoadableDimensionReducer):
         Returns:
             NDArray | tuple[NDArray, NDArray]: The node id for each data point or the distances and node ids.
         """
-        node_ids: NDArray = self._get_fitted_som().predict(data)
-
         if not return_distance:
-            return node_ids
+            return self._get_fitted_som().predict(data)
 
-        return self._get_node_distance(data.reshape(-1, data.shape[-1]), node_ids), node_ids
+        node_ids, distances = self._get_fitted_som().predict(data, return_distance=True)
 
-    def _get_node_distance(
-        self,
-        data: NDArray,
-        node_ids: NDArray,
-    ) -> NDArray:
-        """Get the distance of each data point to its node in the SOM's distance metric.
-
-        Args:
-            data (NDArray): The flat data, shape (data point count, channel count).
-            node_ids (NDArray): The node id for each data point, -1 if it has none.
-
-        Returns:
-            NDArray: The distance for each data point, NaN if it has no node.
-        """
-        nodes = self.get_nodes()[node_ids]
-
-        if self.distance_metric == "euclidean":
-            return np.asarray(np.linalg.norm(data - nodes, axis=1))
-
-        with np.errstate(divide="ignore", invalid="ignore"):
-            similarity = np.sum(data * nodes, axis=1) / (np.linalg.norm(data, axis=1) * np.linalg.norm(nodes, axis=1))
-
-        return np.where(node_ids >= 0, np.clip(1 - similarity, 0, 2), np.nan)
+        return distances, node_ids
 
     @anndata_method(input_attribute="X", output_obs="som_neighbors")
     @data_method
@@ -279,8 +251,7 @@ class Som(LoadableDimensionReducer):
 
         This function internally uses the predict method to get the nearest node for each data point and then assigns
         the label of the nearest node to the data point. Labels have to be provided for each SOM node based on a
-        clustering of the SOM nodes. Data points without a nearest node (zero norm under the cosine metric) are
-        labelled -1.
+        clustering of the SOM nodes. Data points without a nearest node (see `predict`) are labelled -1.
 
         Args:
             data (NDArray): The data to be labelled based on the label of the nearest SOM node.
@@ -388,23 +359,12 @@ class Som(LoadableDimensionReducer):
                 count).
 
         Raises:
-            ValueError: If the nodes do not match the node count and dimension count of the configuration.
+            ValueError: If the nodes do not match the dimension count or node count of the configuration.
         """
-        if nodes.shape[-1] != self.dimension_count or nodes.size != np.prod(self.node_count) * self.dimension_count:
-            raise ValueError(
-                f"nodes must have shape {(*self.node_count, self.dimension_count)} or "
-                f"{(np.prod(self.node_count), self.dimension_count)}, got {nodes.shape}"
-            )
+        if nodes.shape[-1] != self.dimension_count:
+            raise ValueError(f"nodes must have {self.dimension_count} channels, got {nodes.shape[-1]}")
 
-        weights = np.asarray(nodes, dtype=np.float32).reshape((-1, self.dimension_count))
-
-        # fastersom only exposes a fitted state through fit, so its fitted attributes are set directly
-        som = self._create_som(iteration_count=1)
-        som._setup()
-        som._weights = torch.as_tensor(weights, device=som._device)
-        som.weights_ = weights
-        som.n_features_in_ = self.dimension_count
-        self.som = som
+        self.som = SOM.from_weights(nodes, *self.node_count, **self._get_som_parameters())
 
     def get_distance_map(
         self,
@@ -414,16 +374,7 @@ class Som(LoadableDimensionReducer):
         Returns:
             NDArray: The distances normalized to a maximum of 1, shape `node_count`.
         """
-        nodes = self.get_nodes(flatten=False)
-        row_count, column_count = self.node_count
-        nodes_padded = np.pad(nodes, ((1, 1), (1, 1), (0, 0)), constant_values=np.nan)
-
-        distance_map = np.zeros(self.node_count)
-        for row_offset, column_offset in product(range(3), range(3)):
-            neighbors = nodes_padded[row_offset : row_offset + row_count, column_offset : column_offset + column_count]
-            distance_map += np.nan_to_num(np.linalg.norm(nodes - neighbors, axis=-1))
-
-        return np.asarray(distance_map / np.max(distance_map))
+        return self._get_fitted_som().distance_map()
 
     def get_quantization_error(
         self,
@@ -432,8 +383,8 @@ class Som(LoadableDimensionReducer):
     ) -> float | tuple[float, NDArray]:
         """Get the quantization error of the SOM on the provided data.
 
-        The quantization error is the mean distance between each data point and its nearest SOM node. Under the
-        cosine metric, data points with zero norm are left out of the mean and their distance is NaN.
+        The quantization error is the mean distance between each data point and its nearest SOM node. Data
+        points without a nearest node (see `predict`) are left out of the mean and their distance is NaN.
 
         Args:
             data (NDArray): The data to get the quantization error for.

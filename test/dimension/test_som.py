@@ -12,10 +12,14 @@ import spatiomic as so
 
 
 @pytest.mark.cpu
-@pytest.mark.parametrize("distance_metric", ["euclidean", "cosine"])
+@pytest.mark.parametrize(
+    ("distance_metric", "scipy_metric"),
+    [("euclidean", "euclidean"), ("manhattan", "cityblock"), ("cosine", "cosine"), ("correlation", "correlation")],
+)
 def test_som_cpu(
     example_data: NDArray,
-    distance_metric: Literal["euclidean", "cosine"],
+    distance_metric: Literal["euclidean", "manhattan", "cosine", "correlation"],
+    scipy_metric: str,
     tmp_path: str,
 ) -> None:
     """Test that the SOM finds the nearest node, its distance and the node labels and survives saving and loading."""
@@ -35,7 +39,7 @@ def test_som_cpu(
     assert np.array_equal(data_som.get_nodes(flatten=False)[1, 2], nodes[1 * node_count[1] + 2])
 
     data_flat = example_data.reshape(-1, example_data.shape[-1])
-    distances_expected = cdist(data_flat, nodes, metric=distance_metric)
+    distances_expected = cdist(data_flat, nodes, metric=scipy_metric)
     distances, node_ids = data_som.predict(example_data, return_distance=True)
 
     np.testing.assert_allclose(distances_expected[np.arange(len(data_flat)), node_ids], distances, atol=1e-5)
@@ -57,12 +61,19 @@ def test_som_cpu(
 
 
 @pytest.mark.cpu
-def test_som_cosine_zero_norm() -> None:
-    """Test that zero-norm data points have no nearest node under the cosine metric."""
-    data_som = so.dimension.som(node_count=(1, 2), dimension_count=2, distance_metric="cosine", use_gpu=False)
+@pytest.mark.parametrize(
+    ("distance_metric", "data_point_without_node"),
+    [("cosine", [0.0, 0.0]), ("correlation", [2.0, 2.0])],
+)
+def test_som_data_point_without_node(
+    distance_metric: Literal["cosine", "correlation"],
+    data_point_without_node: list[float],
+) -> None:
+    """Test that zero-norm (cosine) and constant (correlation) data points have no nearest node."""
+    data_som = so.dimension.som(node_count=(1, 2), dimension_count=2, distance_metric=distance_metric, use_gpu=False)
     data_som.set_nodes(np.array([[1.0, 0.0], [0.0, 1.0]]))
 
-    data = np.array([[0.0, 0.0], [0.0, 2.0]])
+    data = np.array([data_point_without_node, [0.0, 2.0]])
     distances, node_ids = data_som.predict(data, return_distance=True)
 
     assert np.array_equal(node_ids, [-1, 1])
@@ -83,7 +94,7 @@ def test_som_distance_map() -> None:
 @pytest.mark.cpu
 def test_som_unsupported_metric(example_data: NDArray) -> None:
     """Test that distance metrics that fastersom does not support raise an error."""
-    data_som = so.dimension.som(dimension_count=example_data.shape[-1], distance_metric="manhattan", use_gpu=False)  # type: ignore
+    data_som = so.dimension.som(dimension_count=example_data.shape[-1], distance_metric="chebyshev", use_gpu=False)  # type: ignore
 
     with pytest.raises(ValueError, match="metric"):
         data_som.fit(example_data, iteration_count=1)
