@@ -280,7 +280,7 @@ class Som(LoadableDimensionReducer):
         else:
             node_ids = self.predict(data)
 
-        data_labelled: NDArray = np.where(node_ids >= 0, clusters[node_ids], -1)
+        data_labelled: NDArray = np.append(clusters, -1)[node_ids]
         data_labelled = data_labelled if flatten else data_labelled.reshape(data.shape[:-1])
 
         if save_path:
@@ -397,9 +397,7 @@ class Som(LoadableDimensionReducer):
             float | tuple[float, NDArray]: The mean quantization error and all distances if `return_distances` is set to
                 True.
         """
-        if not return_distances:
-            return self._get_fitted_som().quantization_error(data)
-
         distances, _ = self.predict(data, return_distance=True)
+        quantization_error = float(np.nanmean(distances, dtype=np.float64))
 
-        return float(np.nanmean(distances)), distances
+        return (quantization_error, distances) if return_distances else quantization_error
