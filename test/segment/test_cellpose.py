@@ -13,7 +13,7 @@ def test_cellpose_initialization() -> None:
     cellpose = so.segment.cellpose()
     # GPU usage depends on actual GPU availability, just check it's boolean
     assert isinstance(cellpose.use_gpu, bool)
-    assert cellpose.pretrained_model == "cpsam"
+    assert cellpose.pretrained_model == "cpsam_v2"
 
     cellpose_custom = so.segment.cellpose(use_gpu=False, pretrained_model="custom_model")
     assert cellpose_custom.use_gpu is False

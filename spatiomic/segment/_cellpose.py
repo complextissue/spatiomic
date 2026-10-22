@@ -10,11 +10,12 @@ class Cellpose:
     """Class that exposes the Cellpose segmentation algorithm.
 
     This class provides a simplified wrapper around the Cellpose segmentation model
-    for cell segmentation in microscopy images. Uses Cellpose 4 with SAM-based models.
+    for cell segmentation in microscopy images. Uses Cellpose 4 (>= 4.2) with SAM- or DINOv3-based models.
 
     Args:
         use_gpu: Whether to use GPU acceleration. Defaults to True.
-        pretrained_model: The type of Cellpose model to use. Defaults to 'cpsam'.
+        pretrained_model: The built-in Cellpose model ("cpsam_v2", "cpdino", "cpdino-vitb" or "cpsam") or
+            the path to a custom model. Defaults to "cpsam_v2".
         **kwargs: Additional parameters passed to the CellposeModel().
 
     Raises:
@@ -42,14 +43,15 @@ class Cellpose:
 
     def __init__(
         self,
-        pretrained_model: str = "cpsam",
+        pretrained_model: str = "cpsam_v2",
         use_gpu: bool = True,
         **kwargs: Any,
     ) -> None:
         """Initialize the Cellpose segmentation class.
 
         Args:
-            pretrained_model: The type of Cellpose model to use. Defaults to 'cpsam'.
+            pretrained_model: The built-in Cellpose model ("cpsam_v2", "cpdino", "cpdino-vitb" or "cpsam")
+                or the path to a custom model. Defaults to "cpsam_v2".
             use_gpu: Whether to use GPU acceleration. Defaults to True.
             **kwargs: Additional parameters passed to the CellposeModel().
 

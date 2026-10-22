@@ -7224,7 +7224,7 @@ test = [
 requires-dist = [
     { name = "adjusttext" },
     { name = "anndata", specifier = ">=0.12" },
-    { name = "cellpose", marker = "extra == 'cellpose'", specifier = ">=4.0.1,<5" },
+    { name = "cellpose", marker = "extra == 'cellpose'", specifier = ">=4.2,<5" },
     { name = "colorcet" },
     { name = "cucim-cu12", marker = "extra == 'cuda-12'", specifier = ">=25.10" },
     { name = "cucim-cu13", marker = "extra == 'cuda-13'", specifier = ">=25.10" },
