@@ -2,6 +2,7 @@
 
 import numpy as np
 import pandas as pd
+import pytest
 
 from spatiomic.spatial import vicinity_composition
 
@@ -61,3 +62,30 @@ def test_vicinity_composition_permutation(
 
     # ignore_identities defaults to True, so the diagonal is NaN
     assert np.all(np.isnan(np.diag(p_values_array)))
+
+
+@pytest.mark.parametrize("dtype", [np.int32, np.int64])
+@pytest.mark.parametrize("ignore_repeated", [False, True])
+def test_vicinity_composition_unassigned(
+    clustered_data: np.ndarray,
+    dtype: type,
+    ignore_repeated: bool,
+) -> None:
+    """Unassigned pixels (-1) count neither as a cluster nor as a neighbor.
+
+    The composition thus equals that of the image with the unassigned pixels as an extra cluster, without that cluster.
+    """
+    data = clustered_data.astype(dtype)
+    data[:16, :24] = -1
+    data_extra_cluster = np.where(data == -1, 10, data).astype(dtype)
+
+    result = vicinity_composition(data, ignore_repeated=ignore_repeated)
+    result_expected = vicinity_composition(data_extra_cluster, ignore_repeated=ignore_repeated).drop(
+        index=10, columns=10
+    )
+
+    pd.testing.assert_frame_equal(result, result_expected)
+
+    _, p_values = vicinity_composition(data, permutations=5, seed=0, n_jobs=1)
+    assert list(p_values.index) == list(range(10))
+    assert list(p_values.columns) == list(range(10))

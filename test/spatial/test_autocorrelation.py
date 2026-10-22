@@ -52,3 +52,20 @@ def test_autocorrelation(
     assert "gearys_c" not in result.columns or all(0 <= c <= 2 for c in result["gearys_c"]), (
         "Geary's C values must be between 0 and 2."
     )
+
+
+@pytest.mark.parametrize("method", ["moran", "geary"])
+def test_autocorrelation_unassigned(ordered_data: np.ndarray, method: Literal["moran", "geary"]) -> None:
+    """Unassigned pixels (-1) are not analysed as a cluster and the other clusters are analysed as before."""
+    data = np.tile(ordered_data, (4, 4)).astype(np.int32)
+    data[:3, :5] = -1
+    data_extra_cluster = np.where(data == -1, 5, data)
+
+    result = autocorrelation().predict(data, method=method)
+    result_expected = autocorrelation().predict(data_extra_cluster, method=method)
+
+    pd.testing.assert_frame_equal(
+        result.reset_index(drop=True),
+        result_expected[result_expected["cluster"] != 5].reset_index(drop=True),
+        check_dtype=False,
+    )

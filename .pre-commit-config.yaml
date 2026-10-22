@@ -29,16 +29,15 @@ repos:
       - id: ruff-check
         args: [--select, "I,RUF022", --fix, --exit-non-zero-on-fix]
       - id: ruff-format
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: "v2.4.0"
+  - repo: local
     hooks:
       - id: mypy
         stages: [pre-commit]
+        name: mypy
+        entry: uv run mypy -p spatiomic
         language: system
+        types: [python]
         pass_filenames: false
-        args: [-p, spatiomic]
-  - repo: local
-    hooks:
       - id: unittests
         stages: [pre-push]
         name: unittests

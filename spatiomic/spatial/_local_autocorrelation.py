@@ -8,6 +8,8 @@ from esda.moran import Moran_Local
 from libpysal.weights import W, lat2W
 from numpy.typing import NDArray
 
+from spatiomic._internal._check_cluster_image import check_cluster_image
+
 
 class LocalAutocorrelation:
     """Class to perform local spatial autocorrelation analysis on a 2D image of clusters or an XYC image."""
@@ -33,6 +35,10 @@ class LocalAutocorrelation:
             permutation_count (int, optional): The number of permutations to use for the pseudo-p-value calculation.
                 Only used if method is "moran". Defaults to 0.
 
+        Raises:
+            TypeError: If a clustered image is not of integer type.
+            ValueError: If a clustered image contains negative (including unassigned) labels.
+
         Returns:
             pd.DataFrame: The results of the local spatial autocorrelation analysis.
         """
@@ -41,16 +47,8 @@ class LocalAutocorrelation:
         assert len(data_shape) == 2 or len(data_shape) == 3, (
             "Data must be a 2D image where the pixel values are the clusters or an image with a channel dimensionality."
         )
-        assert channel_image or data.dtype in [
-            int,
-            np.int8,
-            np.int16,
-            np.uint8,
-            np.uint16,
-        ], "Clusters in data must be integer type."
-        assert channel_image or bool(np.any(data < 0)) is False, (
-            "Data contains negative values. Clusters cannot be negative."
-        )
+        if not channel_image:
+            check_cluster_image(data, allow_unassigned=False)
 
         if channel_image and data.dtype != np.float64:
             warn(

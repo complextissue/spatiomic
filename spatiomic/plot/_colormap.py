@@ -6,8 +6,41 @@ import os
 from typing import Dict, List, Literal, Optional, Tuple, Union
 from warnings import warn
 
+import matplotlib
 import numpy as np
-from matplotlib.colors import ListedColormap
+from matplotlib.colors import Colormap, ListedColormap, Normalize
+from numpy.typing import NDArray
+
+
+def get_cluster_colors(
+    clusters: NDArray,
+    colormap: Union[Colormap, str],
+) -> NDArray:
+    """Get the RGBA color of each cluster label.
+
+    With a `ListedColormap`, e.g., from `so.plot.colormap`, each cluster label gets the color with the same index in
+    the colormap, independent of which other clusters are present. A colormap name or another colormap, e.g., a
+    continuous one for segmentation masks with many labels, is spread from label 0 to the highest label. Unassigned
+    (negative) labels are transparent.
+
+    Args:
+        clusters (NDArray): The integer cluster labels.
+        colormap (Union[Colormap, str]): The colormap or the name of a matplotlib colormap.
+
+    Returns:
+        NDArray: The RGBA colors, with an additional last dimension of size 4.
+    """
+    clusters = np.asarray(clusters).astype(np.int64)
+    clusters_masked = np.ma.masked_less(clusters, 0)
+
+    if isinstance(colormap, ListedColormap):
+        colors: NDArray = colormap(clusters_masked)
+    else:
+        colormap = matplotlib.colormaps[colormap] if isinstance(colormap, str) else colormap
+        label_max = max(int(np.max(clusters, initial=0)), 1)
+        colors = colormap(Normalize(vmin=0, vmax=label_max)(clusters_masked))
+
+    return colors
 
 
 def get_random_colors(
