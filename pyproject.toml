@@ -47,7 +47,6 @@ dependencies = [
     "statsmodels",
     "umap-learn",
     "llvmlite>=0.39.0",
-    "xpysom==1.0.7",
     "astroid==3.3.11",
     "fastersom>=0.1.1",
 ]

@@ -5786,7 +5786,6 @@ dependencies = [
     { name = "seaborn" },
     { name = "statsmodels" },
     { name = "umap-learn" },
-    { name = "xpysom" },
 ]
 
 [package.optional-dependencies]
@@ -5878,7 +5877,6 @@ requires-dist = [
     { name = "spatialdata", marker = "extra == 'spatialdata'", specifier = "==0.6.1" },
     { name = "statsmodels" },
     { name = "umap-learn" },
-    { name = "xpysom", specifier = "==1.0.7" },
 ]
 provides-extras = ["cellpose", "spatialdata", "cuda-12", "cuda-11"]
 
@@ -6791,15 +6789,6 @@ sdist = { url = "https://files.pythonhosted.org/packages/3d/95/986aa38c585abe6ce
 wheels = [
     { url = "https://files.pythonhosted.org/packages/f3/72/8cc5d33d86260e030cd703a5b5021656d1c49066cad710825f0b23428ef6/xarray_spatial-0.4.0-py3-none-any.whl", hash = "sha256:6c207c90142f3fbba142e67bfd7f69767246aba6146aca9e130581b35799c9df", size = 2015343, upload-time = "2024-04-26T16:54:58.047Z" },
 ]
-
-[[package]]
-name = "xpysom"
-version = "1.0.7"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "numpy" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/5c/9a/4decfe7b4e0c348bd9b17c672105386430f5435cc041e1127c88595036d5/XPySom-1.0.7.tar.gz", hash = "sha256:3221ffc1e41df683aeba849e4177bfbf1f8e4b8d1b531f62078a6408ef5c5aed", size = 27094, upload-time = "2021-05-01T23:20:19.114Z" }
 
 [[package]]
 name = "yarl"
