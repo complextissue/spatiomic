@@ -9,7 +9,7 @@ build:
       - asdf install uv latest
       - asdf global uv latest
       - uv venv $READTHEDOCS_VIRTUALENV_PATH
-      - UV_PROJECT_ENVIRONMENT=$READTHEDOCS_VIRTUALENV_PATH uv sync --group dev --link-mode=copy
+      - UV_PROJECT_ENVIRONMENT=$READTHEDOCS_VIRTUALENV_PATH uv sync --group doc --link-mode=copy
       - UV_PROJECT_ENVIRONMENT=$READTHEDOCS_VIRTUALENV_PATH uv build
     install:
       - "true"

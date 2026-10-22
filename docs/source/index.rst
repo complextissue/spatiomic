@@ -31,6 +31,12 @@ Welcome to the spatiomic documentation!
    autoapi/spatiomic/index
 
 .. toctree::
+   :caption: Release Notes
+   :maxdepth: 1
+
+   release-notes/index
+
+.. toctree::
    :caption: GitHub
    :maxdepth: 4
    :glob:

@@ -113,37 +113,34 @@ class Read:
     def get_czi_image_channels(
         image: NDArray,
         image_shape: List[Tuple[str, int]],
-        ubyte: bool = True,
+        ubyte: bool = False,
     ) -> NDArray:
-        """Get the channels of an .czi image.
+        """Get the channels of an .czi image as a (C, Y, X) array.
+
+        All dimensions other than channels, height and width (e.g., scenes, time points or z-planes) are reduced to
+        their first element.
 
         Args:
             image (NDArray): The read CziFile of an image.
-            image_shape (List[Tuple[str, int]]): The shape of the CziFile.
+            image_shape (List[Tuple[str, int]]): The dimension names and sizes of the CziFile.
                 Example format of the image shape:
                 [('B', 1), ('H', 1), ('T', 1), ('C', 3), ('Z', 1), ('Y', 2048), ('X', 2048)]
-            ubyte (bool, optional): Whether to interpret the data as np.uint8.. Defaults to True.
+            ubyte (bool, optional): Whether to cast the data to np.uint8. Defaults to False.
 
         Returns:
             NDArray: An array containing the channels of the .czi file
         """
-        image_max_x = image_shape[-1][1]
-        image_max_y = image_shape[-2][1]
+        dimension_names = [dimension_name for dimension_name, _ in image_shape]
+        channels = image[tuple(slice(None) if name in "CYX" else 0 for name in dimension_names)]
 
-        channel_count = image_shape[-4][1]
+        kept_dimension_names = [name for name in dimension_names if name in "CYX"]
+        if "C" not in kept_dimension_names:
+            channels = channels[np.newaxis]
+            kept_dimension_names.insert(0, "C")
 
-        channels: Union[List, NDArray] = []
+        channels = np.transpose(channels, [kept_dimension_names.index(name) for name in "CYX"])
 
-        if isinstance(channels, list):
-            for i in range(0, channel_count):
-                channels.append(image[0, 0, 0, i, 0, 0:image_max_y, 0:image_max_x])
-
-        channels = np.array(channels)
-
-        if ubyte:
-            channels = channels.astype(np.uint8)
-
-        return channels
+        return channels.astype(np.uint8) if ubyte else channels
 
     @classmethod
     def read_czi(

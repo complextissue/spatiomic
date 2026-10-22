@@ -1,29 +1,29 @@
 """Test the count_clusters function."""
 
-import os
+from pathlib import Path
 
 import numpy as np
+import pytest
 
 from spatiomic.tool import count_clusters
 
 
-def test_count_clusters() -> None:
+@pytest.mark.parametrize("normalize", [True, False])
+def test_count_clusters(normalize: bool, tmp_path: Path) -> None:
     """Test the count_clusters function."""
     test_image = np.random.randint(0, 10, size=(100, 100))
 
-    np.save("test_image.npy", test_image)
+    image_path = tmp_path / "test_image.npy"
+    np.save(image_path, test_image)
 
-    for normalize in [True, False]:
-        df_cluster_counts = count_clusters(
-            ["test_image.npy"],
-            cluster_count=10,
-            normalize=normalize,
-        )
+    df_cluster_counts = count_clusters(
+        [str(image_path)],
+        cluster_count=10,
+        normalize=normalize,
+    )
 
-        assert df_cluster_counts.shape == (1, 10)
-        assert df_cluster_counts.index[0] == "test_image.npy"
+    assert df_cluster_counts.shape == (1, 10)
+    assert df_cluster_counts.index[0] == str(image_path)
 
-        if normalize:
-            assert np.allclose(df_cluster_counts.sum(axis=1), 1)
-
-    os.remove("test_image.npy")
+    if normalize:
+        assert np.allclose(df_cluster_counts.sum(axis=1), 1)

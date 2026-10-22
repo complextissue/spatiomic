@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Any, Callable, Dict, Optional, Tuple
 import numpy as np
 import pandas as pd
 from anndata import AnnData
-from numpy.typing import ArrayLike, NDArray
+from numpy.typing import NDArray
 
 from ._import_package import import_package
 
@@ -38,14 +38,15 @@ def _get_data_from_anndata(
     elif input_uns_name is not None:
         return_value = adata.uns[input_uns_name]
     else:
-        return_value = adata.X.toarray()
+        return_value = adata.X
 
-    if not isinstance(return_value, ArrayLike) and not isinstance(return_value, np.ndarray):
+    if hasattr(return_value, "toarray"):
+        return_value = return_value.toarray()
+
+    if return_value is None or isinstance(return_value, (dict, str)):
         raise TypeError("Returned data must be a numpy array.")
-    elif isinstance(return_value, ArrayLike):
-        return_value = np.array(return_value)
 
-    return return_value
+    return np.asarray(return_value)
 
 
 def _store_data_in_anndata(

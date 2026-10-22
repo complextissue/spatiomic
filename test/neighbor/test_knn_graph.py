@@ -1,47 +1,46 @@
 """Test the KNN graph construction function."""
 
-from typing import List, Literal
+from typing import Literal
 
+import networkx as nx
 import numpy as np
 import pytest
-from igraph import Graph
 
 import spatiomic as so
 
 
 @pytest.mark.cpu
-def test_knn_graph() -> None:
-    """Test KNN graph construction function."""
-    example_data = np.random.randint(size=(20, 20, 3), low=0, high=200)
-    example_data_batch = np.random.randint(size=400, low=0, high=1)
-    distance_metrics: List[Literal["euclidean", "manhattan", "correlation", "cosine"]] = [
-        "euclidean",
-        "manhattan",
-        "correlation",
-        "cosine",
-    ]
-    methods: List[Literal["simple", "batch_balanced"]] = ["simple", "batch_balanced"]
-    accuracies: List[Literal["fast", "accurate"]] = ["fast", "accurate"]
+@pytest.mark.parametrize("neighbor_count", [2, 5, 10])
+@pytest.mark.parametrize("method", ["simple", "batch_balanced"])
+@pytest.mark.parametrize("accuracy", ["fast", "accurate"])
+@pytest.mark.parametrize("distance_metric", ["euclidean", "manhattan", "correlation", "cosine"])
+def test_knn_graph(
+    neighbor_count: int,
+    method: Literal["simple", "batch_balanced"],
+    accuracy: Literal["fast", "accurate"],
+    distance_metric: Literal["euclidean", "manhattan", "correlation", "cosine"],
+) -> None:
+    """Test that every node has at least `neighbor_count` neighbors, in each batch for the batch-balanced method."""
+    rng = np.random.default_rng(0)
+    example_data = rng.integers(size=(20, 20, 3), low=0, high=200)
+    example_data_batch = rng.integers(size=400, low=0, high=2)
 
-    for method in methods:
-        for accuracy in accuracies:
-            for distance_metric in distance_metrics:
-                for neighbor_count in [2, 5, 10]:
-                    knn_graph = so.neighbor.knn_graph.create(
-                        data=example_data,
-                        batch=example_data_batch,
-                        neighbor_count=neighbor_count,
-                        method=method,
-                        distance_metric=distance_metric,
-                        accuracy=accuracy,
-                    )
+    knn_graph = so.neighbor.knn_graph.create(
+        data=example_data,
+        batch=example_data_batch,
+        neighbor_count=neighbor_count,
+        method=method,
+        distance_metric=distance_metric,
+        accuracy=accuracy,
+        use_gpu=False,
+    )
 
-                    assert isinstance(knn_graph, Graph)
+    assert isinstance(knn_graph, nx.Graph)
+    assert list(knn_graph.nodes) == list(range(example_data_batch.shape[0]))
 
-                    # Check neighbor count for each node (may vary since the graph is undirected)
-                    for node in knn_graph.vs:
-                        assert len(knn_graph.neighbors(node)) >= neighbor_count
-
-
-if __name__ == "__main__":
-    test_knn_graph()
+    batch_ids = np.unique(example_data_batch) if method == "batch_balanced" else [None]
+    for node in knn_graph.nodes:
+        neighbor_batches = example_data_batch[list(knn_graph.neighbors(node))]
+        for batch_id in batch_ids:
+            batch_neighbor_count = len(neighbor_batches) if batch_id is None else np.sum(neighbor_batches == batch_id)
+            assert batch_neighbor_count >= neighbor_count

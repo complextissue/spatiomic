@@ -1,7 +1,7 @@
 .DEFAULT_GOAL := test
 
 create-venv:
-	uv venv '.venv' --python 3.12
+	uv venv '.venv' --python 3.13
 	echo "Don't forget to activate with 'source .venv/bin/activate'"
 
 #
@@ -12,8 +12,7 @@ install:
 
 install-dev:
 	uv sync --extra cellpose --dev
-	python -m certifi
-	pre-commit install --hook-type pre-commit --hook-type pre-push
+	uv run pre-commit install --hook-type pre-commit --hook-type pre-push
 
 #
 # Checks & package upload

@@ -3,7 +3,7 @@
 :::{card}
 :class-card: sd-bg-warning
 :class-body: sd-bg-text-warning
-**spatiomic** only supports Python versions greater than or equal to **3.11**. Currently, not all optional dependencies are available for Python 3.13. For the best experience, please use Python 3.12.
+**spatiomic** only supports Python versions greater than or equal to **3.12**.
 :::
 
 :::{card} Recommendation
@@ -30,8 +30,8 @@ For the best GPU-accelerated experience (optional), install with CUDA extras:
 # For CUDA 12
 uv add spatiomic --optional cuda-12
 
-# For CUDA 11
-uv add spatiomic --optional cuda-11
+# For CUDA 13
+uv add spatiomic --optional cuda-13
 ```
 
 For Cellpose segmentation functionality, install with cellpose extras:
@@ -55,8 +55,8 @@ For the best GPU-accelerated experience (optional), install with CUDA extras:
 # For CUDA 12
 pip install "spatiomic[cuda-12]"
 
-# For CUDA 11
-pip install "spatiomic[cuda-11]"
+# For CUDA 13
+pip install "spatiomic[cuda-13]"
 ```
 
 For Cellpose segmentation functionality, install with cellpose extras:
@@ -99,5 +99,5 @@ These packages are not required for `spatiomic` to work but may speed certain op
 
 `spatiomic` will always try to perform heavy calculations on the GPU. However, for this to work, a CUDA-enabled system with these packages is required. If these packages are not available, `spatiomic` will default to CPU-based packages such as `numpy` and `sklearn`.
 
-The easiest way to install these GPU dependencies is to use the `cuda-11` or `cuda-12` extras when installing `spatiomic`. Alternatively, you may want to install a RAPIDS.AI-enabled Docker container for GPU support. Please refer to the [RAPIDS installation guide](https://docs.rapids.ai/install/) for more information.
+The easiest way to install these GPU dependencies is to use the `cuda-12` or `cuda-13` extras when installing `spatiomic`. Alternatively, you may want to install a RAPIDS.AI-enabled Docker container for GPU support. Please refer to the [RAPIDS installation guide](https://docs.rapids.ai/install/) for more information.
 :::

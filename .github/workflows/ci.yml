@@ -18,11 +18,11 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            python: "3.11"
-          - os: ubuntu-latest
             python: "3.12"
           - os: ubuntu-latest
             python: "3.13"
+          - os: ubuntu-latest
+            python: "3.14"
 
     name: Python ${{ matrix.python }}
 
@@ -36,14 +36,14 @@ jobs:
         uses: astral-sh/setup-uv@v6
         with:
           version: "latest"
-          python-version: ${{ matrix.python-version }}
+          python-version: ${{ matrix.python }}
           enable-cache: true
       - name: Install dependencies
         uses: nick-fields/retry@v3
         with:
           timeout_minutes: 5
           max_attempts: 3 # The nvidia index is unreliable
-          command: uv sync --extra cellpose --dev
+          command: uv sync --locked --extra cellpose --group test --group lint
       - name: Lint with ruff
         run: |
           uv run ruff check --fix --exit-non-zero-on-fix spatiomic
@@ -55,7 +55,7 @@ jobs:
           uv run mypy -p spatiomic
       - name: Check security with bandit
         run: |
-          uv run bandit --verbose --ini .bandit.ini -ll --recursive spatiomic
+          uv run bandit -ll --recursive spatiomic
       - name: Test with pytest
         run: |
           uv run coverage run -m pytest --maxfail=10 -m "not gpu and not no_github_ci"

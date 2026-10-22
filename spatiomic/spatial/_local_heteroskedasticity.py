@@ -85,11 +85,11 @@ class LocalHeteroskedasticity:
             cluster_count = data.max() + 1
             # One-hot encode the cluster labels
             data_for_losh = np.eye(cluster_count)[data].reshape((-1, cluster_count))
-            index = list(np.arange(cluster_count))
+            index = list(range(cluster_count))
         else:
             # Process channel image (3D array XYC)
             data_for_losh = data.reshape((-1, data_shape[-1]))
-            index = channel_names if channel_names is not None else list(np.arange(data_shape[-1]))
+            index = channel_names if channel_names is not None else list(range(data_shape[-1]))
 
         for i in range(data_for_losh.shape[-1]):
             losh.fit(data_for_losh[..., i])

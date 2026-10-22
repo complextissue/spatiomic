@@ -31,7 +31,7 @@ weaken them to make a run green.
 
 ## Toolchain (do not fight the config)
 
-- **Build/env:** `uv` + `hatchling`. Python **>=3.11** (targets 3.11/3.12/3.13).
+- **Build/env:** `uv` + `hatchling`. Python **>=3.12** (targets 3.12/3.13/3.14).
 - **Ruff:** line length 120, double quotes, Google docstring convention, mccabe
   max-complexity 7. Let ruff format the code — never hand-format around it.
 - **mypy:** `disallow_untyped_defs` — every function/method needs full type hints.

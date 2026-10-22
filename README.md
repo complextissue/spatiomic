@@ -48,7 +48,7 @@ or
 pip install spatiomic
 ```
 
-For the best GPU-accelerated experience (optional), a CUDA-compatible GPU and installation of the `cupy`, `cuml`, `cuGraph` and `cuCIM` packages is necessary. You can install them using the `cuda-11` or `cuda-12` extras.
+For the best GPU-accelerated experience (optional), a CUDA-compatible GPU and installation of the `cupy`, `cuml`, `cuGraph` and `cuCIM` packages is necessary. You can install them using the `cuda-12` or `cuda-13` extras.
 
 ```bash
 uv add spatiomic --optional cuda-12
@@ -85,7 +85,7 @@ This requires that the development requirements of the package as well as the pa
 
 #### Python version & dependencies
 
-`spatiomic` requires Python version 3.11 or above (3.12 recommended).
+`spatiomic` requires Python version 3.12 or above.
 
 #### Code editors
 
@@ -105,7 +105,7 @@ Using a modern computer (e.g., an M-series MacBook) without a CUDA-enabled GPU, 
 
 ### License
 
-The software is provided under the GNU General Public License, version 3 (GPL-3.0). Please consult `LICENSE.md` for further information.
+The software is provided under the Apache License, version 2.0 (Apache-2.0). Please consult `LICENSE` for further information. Versions before 0.10.0 were released under the GNU General Public License, version 3 (GPL-3.0).
 The `glasbey_light` color palette available through `so.plot.colormap` is part of `colorcet` and distributed under the Creative Commons Attribution 4.0 International Public License (CC-BY).
 
 ### Citation

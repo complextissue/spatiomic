@@ -1,146 +1,99 @@
-from itertools import combinations
-from random import shuffle
-from typing import List, Literal, Optional, Set, Tuple, Union
+from typing import Literal, Union
 
-from igraph import Graph
+import networkx as nx
+import numpy as np
 from numpy.typing import NDArray
+from scipy.sparse import csr_matrix
 
 from spatiomic._internal._get_neighbor_finder import get_neighbor_finder
 from spatiomic.dimension._som import Som
+from spatiomic.neighbor._knn_graph import KnnGraph
 
 
 class SnnGraph:
     """A class that exposes a static method for shared nearest neighbor graph construction."""
 
-    @staticmethod
-    def get_shared_neighbors(
-        nodes: Union[List[int], Set[int]],
-        neighbors: List[set],
-        shared_count_threshold: int = 1,
-    ) -> List[Tuple[int, int]]:
-        """Get the shared neighbors between nodes.
-
-        Args:
-            nodes (List[int]): The nodes.
-            neighbors (List[set]): The neighbors of each node.
-            shared_count_threshold (int, optional): The minimum number of shared neighbors for two nodes to be linked.
-                Defaults to 1.
-
-        Returns:
-            List[tuple]: A list of edges.
-        """
-        edges: List[Tuple[int, int]] = []
-
-        for node_1, node_2 in list(combinations(nodes, r=2)):
-            if len(neighbors[node_1] & neighbors[node_2]) > shared_count_threshold:
-                edges.append((node_1, node_2))
-
-        return edges
-
     @classmethod
     def create(
         cls,
-        knn_graph: Graph,
-        shared_count_threshold: int = 1,
-        fix_lonely_nodes: bool = True,
-        fix_lonely_nodes_method: Literal["random", "distance"] = "distance",
-        distance_data: Optional[Union[NDArray, Som]] = None,
+        data: Union[NDArray, Som],
+        neighbor_count: int = 20,
+        prune_threshold: float = 1 / 15,
+        connect_isolated_nodes: bool = True,
         distance_metric: Literal["euclidean", "manhattan", "correlation", "cosine"] = "euclidean",
         accuracy: Literal["fast", "accurate"] = "accurate",
         job_count: int = -1,
         use_gpu: bool = True,
-    ) -> Graph:
-        """Construct a shared nearest neighbor graph based on a k-nearest neighbor graph.
+    ) -> nx.Graph:
+        """Construct a Jaccard-weighted shared nearest neighbor graph of the data.
 
-        The shared nearest neighbor graph is an undirected graph where two nodes are connected if they have at least
-        `shared_count_threshold` neighbors in common.
-
-        If `fix_lonely_nodes` is True, then the lonely nodes (nodes that don't have any neighbors in the k-nearest
-        neighbor graph) are connected to their nearest neighbor. The method for connecting lonely nodes can be
-        specified with `fix_lonely_nodes_method`. If `fix_lonely_nodes_method` is `random`, then the lonely nodes are
-        connected to a random neighbor. If `fix_lonely_nodes_method` is `distance`, then the lonely nodes are connected
-        to their nearest neighbor based on the distance between them.
-
-        .. warning:: This method is not optimized for batch-balanced nearest neighbor calculation.
+        Each data point's neighborhood consists of itself and its `neighbor_count` nearest neighbors. Two data points
+        are connected by an edge whose `weight` is the Jaccard index of their neighborhoods, i.e., the number of shared
+        neighbors divided by the size of the union of both neighborhoods, as in Seurat and PhenoGraph. Edges with a
+        weight of at most `prune_threshold` are removed. The graph has no self-loops.
 
         Args:
-            knn_graph (Graph): A k-nearest neighbor graph.
-            shared_count_threshold (int, optional): The minimum number of shared neighbors for two nodes to be
-                connected. Defaults to 1.
-            fix_lonely_nodes (bool, optional): Whether to connect lonely nodes to the nearest neighbor.
-                Defaults to True.
-            fix_lonely_nodes_method (Literal["random", "distance"], optional): The method to use for connecting
-                lonely nodes. Defaults to "distance".
-            distance_data (Union[NDArray, Som]): The channel-last array of the data points used for knn graph
-                construction. Used for distance calculation if fix_lonely_nodes_method is `distance`.
-                Defaults to None.
+            data (Union[NDArray, Som]): A channel-last array of the data points or a fitted SOM whose nodes are used.
+            neighbor_count (int, optional): The number of nearest neighbors of each data point. Defaults to 20.
+            prune_threshold (float, optional): Edges with a Jaccard index less than or equal to this value are removed.
+                Defaults to 1 / 15.
+            connect_isolated_nodes (bool, optional): Whether to keep the edge with the highest Jaccard index for data
+                points that would have no edges after pruning. Defaults to True.
             distance_metric (Literal["euclidean", "manhattan", "correlation", "cosine"], optional): The distance metric
                 to be used for nearest neighbor calculation. Defaults to "euclidean".
-            accuracy (Literal["fast", "accurate"], optional): The accuracy of the nearest neighbor calculation. Used
-                only when method is `simple` or `batch_balanced`. Defaults to "accurate".
-            job_count (int, optional): Parallelization core count when method is `simple`. Defaults to -1.
+            accuracy (Literal["fast", "accurate"], optional): The accuracy of the nearest neighbor calculation.
+                Defaults to "accurate".
+            job_count (int, optional): Parallelization core count for the nearest neighbor calculation on the CPU.
+                Defaults to -1.
             use_gpu (bool, optional): Whether to use the GPU for nearest neighbor calculation if possible.
                 Defaults to True.
 
         Returns:
-            Graph: The shared nearest neighbor graph.
-
-        Raises:
-            ValueError: Raised when the distance data is not provided when using the distance method.
-            NotImplementedError: Raised when the specified method for connecting lonely nodes is not supported.
+            nx.Graph: The weighted, undirected shared nearest neighbor graph with one integer node per data point, in
+                the order of the flattened data.
         """
-        neighbors: List[Set[int]] = [set(adjacency_list) for adjacency_list in knn_graph.get_adjlist(mode="all")]
-        nodes: Union[List[int], Set[int]] = knn_graph.vs.indices
-        edges = cls.get_shared_neighbors(nodes, neighbors, shared_count_threshold)
+        if isinstance(data, Som):
+            data = data.get_nodes()
 
-        if fix_lonely_nodes:
-            # lonely nodes are the nodes that don't appear in the edge list
-            lonely_nodes = set(nodes) - {node for edge in edges for node in edge}
+        data = data.reshape(-1, data.shape[-1])
+        node_count = data.shape[0]
 
-            if fix_lonely_nodes_method == "random":
-                # for each lonely node, get all its neighbors in the knn graph and connect it to one of them
-                for node in lonely_nodes:
-                    # get all neighbors and shuffle them
-                    node_neighbors: List[int] = knn_graph.neighbors(node)
-                    shuffle(node_neighbors)
+        neighbor_finder = get_neighbor_finder(
+            neighbor_count=neighbor_count,
+            channel_count=data.shape[-1],
+            distance_metric=distance_metric,
+            accuracy=accuracy,
+            job_count=job_count,
+            use_gpu=use_gpu,
+        )
+        neighbor_finder.fit(data)
+        neighbor_idx = neighbor_finder.kneighbors(data, n_neighbors=neighbor_count + 1, return_distance=False)
 
-                    if len(node_neighbors) > 0:
-                        edges.append((node, node_neighbors[0]))
+        # each neighborhood includes the data point itself, even if duplicates displace it from its neighbor list
+        rows = np.concatenate([np.repeat(np.arange(node_count), neighbor_idx.shape[1]), np.arange(node_count)])
+        columns = np.concatenate([np.asarray(neighbor_idx).ravel(), np.arange(node_count)])
+        neighborhoods = csr_matrix((np.ones(len(rows), dtype=np.float32), (rows, columns)), shape=(node_count,) * 2)
+        neighborhoods.data[:] = 1.0
 
-                # remove lonely nodes without any neighbors in the original knn graph
-                nodes = {node for edge in edges for node in edge}
+        shared = (neighborhoods @ neighborhoods.T).tocoo()
+        neighborhood_sizes = np.asarray(neighborhoods.sum(axis=1)).ravel()
 
-            elif fix_lonely_nodes_method == "distance":
-                if distance_data is None:
-                    raise ValueError("Distance data must be provided when using the distance method.")
+        off_diagonal = shared.row != shared.col
+        sources, targets = shared.row[off_diagonal], shared.col[off_diagonal]
+        shared_counts = shared.data[off_diagonal]
+        weights = shared_counts / (neighborhood_sizes[sources] + neighborhood_sizes[targets] - shared_counts)
 
-                if isinstance(distance_data, Som):
-                    distance_data = distance_data.get_nodes()
+        keep = weights > prune_threshold
 
-                data_shape = distance_data.shape
-                distance_data = distance_data.reshape(-1, data_shape[-1])
+        if connect_isolated_nodes:
+            isolated = np.bincount(sources[keep], minlength=node_count) == 0
+            strongest_first = np.lexsort((-weights, sources))
+            _, first_index = np.unique(sources[strongest_first], return_index=True)
+            strongest = strongest_first[first_index]
+            keep[strongest[isolated[sources[strongest]]]] = True
 
-                # for each lonely node, find its nearest neighbor and connect them
-                neighbor_finder = get_neighbor_finder(
-                    neighbor_count=1,
-                    channel_count=data_shape[-1],
-                    distance_metric=distance_metric,
-                    accuracy=accuracy,
-                    job_count=job_count,
-                    use_gpu=use_gpu,
-                )
-                neighbor_finder.fit(distance_data)
-                neighbor_idx = neighbor_finder.kneighbors(
-                    distance_data,
-                    n_neighbors=2,
-                    return_distance=False,
-                )
-
-                for node in lonely_nodes:
-                    neighbor = neighbor_idx[node, 1]
-                    edges.append((node, neighbor))
-
-            else:
-                raise NotImplementedError(f"Method {fix_lonely_nodes_method} is not supported.")
-
-        return Graph(set(edges), directed=False)
+        return KnnGraph.create_graph(
+            zip(sources[keep], targets[keep], strict=True),
+            node_count=node_count,
+            weights=weights[keep],
+        )

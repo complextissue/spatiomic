@@ -24,12 +24,15 @@ def example_czi() -> Path:
 
 
 @pytest.fixture
-def example_lif() -> Path:
-    """Path to the example LIF file."""
-    return Path(__file__).parent / "test_files" / "lif_example.lif"
+def example_uint16_czi() -> Path:
+    """Path to a 16-bit CZI file with 3 channels of 48 x 64 pixels and S, T, C, Z, Y, X dimensions.
+
+    Written with pylibCZIrw from `np.random.default_rng(0).integers(0, 65535, size=(3, 48, 64), dtype=np.uint16)`.
+    """
+    return Path(__file__).parent / "test_files" / "example_uint16.czi"
 
 
 @pytest.fixture
-def example_lif_zip() -> Path:
-    """Path to the example LIF zip file."""
-    return Path(__file__).parent / "test_files" / "lif_example.lif.zip"
+def example_lif() -> Path:
+    """Path to the example LIF file."""
+    return Path(__file__).parent / "test_files" / "lif_example.lif"
