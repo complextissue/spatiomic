@@ -185,9 +185,9 @@ def vicinity_composition(
     )
     p_values = (higher_or_equal + 1) / (permutations + 1)
 
-    df_p_values = pd.DataFrame(p_values, index=df_vicinity_composition.index, columns=df_vicinity_composition.columns)
-
     if ignore_identities:
-        np.fill_diagonal(df_p_values.values, np.nan)
+        np.fill_diagonal(p_values, np.nan)
+
+    df_p_values = pd.DataFrame(p_values, index=df_vicinity_composition.index, columns=df_vicinity_composition.columns)
 
     return df_vicinity_composition, df_p_values

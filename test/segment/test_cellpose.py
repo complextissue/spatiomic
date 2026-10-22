@@ -24,7 +24,7 @@ def test_cellpose_initialization() -> None:
 def test_cellpose_predict_2d(sample_2d_image: NDArray) -> None:
     """Test Cellpose prediction on 2D image."""
     cellpose = so.segment.cellpose(use_gpu=False)
-    masks, flows, styles = cellpose.predict(sample_2d_image)
+    masks, _flows, _styles = cellpose.predict(sample_2d_image)
 
     assert isinstance(masks, np.ndarray)
     assert masks.shape == sample_2d_image.shape
@@ -35,7 +35,7 @@ def test_cellpose_predict_2d(sample_2d_image: NDArray) -> None:
 def test_cellpose_predict_3d(sample_3d_image: NDArray) -> None:
     """Test Cellpose prediction on 3D image."""
     cellpose = so.segment.cellpose(use_gpu=False)
-    masks, flows, styles = cellpose.predict(sample_3d_image)
+    masks, _flows, _styles = cellpose.predict(sample_3d_image)
 
     assert isinstance(masks, np.ndarray)
     assert masks.shape == sample_3d_image.shape[:2]
@@ -46,7 +46,7 @@ def test_cellpose_predict_3d(sample_3d_image: NDArray) -> None:
 def test_cellpose_predict_with_kwargs(sample_2d_image: NDArray) -> None:
     """Test Cellpose prediction with additional kwargs."""
     cellpose = so.segment.cellpose(use_gpu=False)
-    masks, flows, styles = cellpose.predict(
+    masks, _flows, _styles = cellpose.predict(
         sample_2d_image,
         flow_threshold=0.3,
         cellprob_threshold=0.1,

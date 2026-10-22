@@ -1,15 +1,13 @@
 import pickle
-from math import ceil
-from typing import List, Literal, Optional, Tuple, Union
+from typing import Literal
 
 import numpy as np
+from fastersom import SOM
 from numpy.typing import NDArray
-from xpysom import XPySom
+from sklearn.decomposition import PCA
 
 from spatiomic._internal._anndata_method import anndata_method
 from spatiomic._internal._data_method import data_method
-from spatiomic._internal._get_neighbor_finder import get_neighbor_finder
-from spatiomic._internal._import_package import import_package
 from spatiomic.dimension._base import LoadableDimensionReducer
 
 
@@ -18,174 +16,102 @@ class Som(LoadableDimensionReducer):
 
     def __init__(
         self,
-        node_count: Tuple[int, int] = (50, 50),
+        node_count: tuple[int, int] = (50, 50),
         dimension_count: int = 5,
-        distance_metric: Literal["euclidean", "manhattan", "correlation", "cosine"] = "euclidean",
-        neighborhood: str = "gaussian",
-        neighborhood_accuracy: Literal["fast", "accurate"] = "fast",
-        learning_rate_initial: float = 0.2,
-        learning_rate_final: float = 3e-3,
-        sigma_initial: Optional[int] = None,
-        sigma_final: Optional[int] = None,
-        parallel_count: int = 8096,
-        n_jobs: int = -1,
-        seed: Optional[int] = None,
+        distance_metric: Literal["euclidean", "manhattan", "cosine", "correlation"] = "euclidean",
+        sigma_initial: float | None = None,
+        sigma_final: float | None = None,
+        initialization: Literal["random", "sample", "pca"] = "random",
+        batch_size: int | None = None,
+        seed: int | None = None,
         use_gpu: bool = True,
     ) -> None:
         """Initialise a self-organising map with the provided configuration.
 
+        The map is a batch self-organizing map (Kohonen's batch map) on a rectangular grid with a gaussian neighborhood
+        whose width decays exponentially, implemented by `fastersom` in PyTorch.
+
         The advantage of self-organizing maps are, that they reduce the dimensionality of the data while preserving the
         feature dimensions. This potentially allows for a better interpretation of the data. The disadvantage is, that
-        its output are `representative` nodes and not the actual data points. There are four things to keep in mind so
+        its output are `representative` nodes and not the actual data points. There are three things to keep in mind so
         that the SOM best represents the biology of your data:
         - The SOM node count should be large enough to capture the topography of the data. If you data is very uniform,
             you can use a smaller node count. However, when working with tissue, very different imaging markers and
             multiple disease states, a larger node count is recommended.
         - The SOM should be trained for long enough to capture the topography of the data.
-        - The SOM should be trained with a final learning rate that is not too high, so that the SOM can accurately
-            represent small differences in the data.
         - The SOM should be trained with a final neighborhood size that is not too large. SOM nodes are not individually
             updated during training, but rather in a neighborhood. If your neighborhood is too large, other, perhaps
             more abundant biological signals will pull nodes that represent less abundant signals towards them, leading
             to a worse representation of the latter.
 
         Args:
-            node_count (Tuple[int, int], optional): Tuple determining the SOM node size. Defaults to (50, 50).
+            node_count (tuple[int, int], optional): Tuple determining the SOM node size. Defaults to (50, 50).
             dimension_count (int, optional): Dimensionality of the original data. Defaults to 5.
-            distance_metric (Literal["euclidean", "manhattan", "correlation", "cosine"], optional): Distance metric to
-                use. Defaults to "euclidean".
-            neighborhood (str, optional): The type of neighborhood used to determine related notes.
-                Defaults to "gaussian".
-            neighborhood_accuracy (Literal["fast", "accurate"], optional): The accuracy to use for the neighborhood.
-                Defaults to "fast".
-            learning_rate_initial (float, optional): The initial learning rate. Defaults to 0.2.
-            learning_rate_final (float, optional): The learning rate at the end of the SOM training. Defaults to 3e-3.
-            sigma_initial (Optional[int], optional): The initial size of the neighborhoods, higher values.
-                Defaults to None.
-            sigma_final (Optional[int], optional): The final size of the neighborhood, lower values. Defaults to None.
-            parallel_count (int, optional): Data points to process concurrently. Defaults to 8096.
-            n_jobs (int, optional): Jobs to perform simoustaneously when using the sklearn NearestNeighbor class.
-                The value -1 means unlimited jobs. Defaults to -1.
-            seed (Optional[int], optional): The random seed. Defaults to None.
-            use_gpu (bool, optional): Whether to use cupy. Defaults to True.
+            distance_metric (Literal["euclidean", "manhattan", "cosine", "correlation"], optional): Distance metric to
+                use. Samples with zero norm (cosine) or constant channels (correlation) have no nearest node.
+                Defaults to "euclidean".
+            sigma_initial (float | None, optional): The initial width of the gaussian neighborhood in grid units.
+                Defaults to None, which uses ceil(min(node_count) / 2) / 2.
+            sigma_final (float | None, optional): The width the neighborhood decays towards at the end of training.
+                Defaults to None, which uses 0.1 * sigma_initial.
+            initialization (Literal["random", "sample", "pca"], optional): Whether to initialise the nodes as random
+                unit vectors, as randomly chosen samples or on the plane of the first two principal components of the
+                data. Defaults to "random".
+            batch_size (int | None, optional): Data points to process concurrently. Only affects memory usage and
+                speed. Defaults to None, which uses 8192 on the CPU and on the GPU a size based on the node count and
+                the free GPU memory.
+            seed (int | None, optional): The random seed. Defaults to None.
+            use_gpu (bool, optional): Whether to use a GPU (CUDA or MPS) if one is available. Defaults to True.
         """
-        # set the class variables
         self.set_config(
             node_count=node_count,
             dimension_count=dimension_count,
-            distance_metric=distance_metric,  # type: ignore
-            neighborhood=neighborhood,
-            neighborhood_accuracy=neighborhood_accuracy,
-            learning_rate_initial=learning_rate_initial,
-            learning_rate_final=learning_rate_final,
+            distance_metric=distance_metric,
             sigma_initial=sigma_initial,
             sigma_final=sigma_final,
-            parallel_count=parallel_count,
-            n_jobs=n_jobs,
+            initialization=initialization,
+            batch_size=batch_size,
             seed=seed,
         )
 
         self.use_gpu = use_gpu
-        self.set_estimators()
-
-    def set_estimators(
-        self,
-        initialize_som: bool = True,
-    ) -> None:
-        """Set the XPySOM and nearest neighbor finder estimators."""
-        # Check whether we can use cupy to work on the GPU
-        self.xp, self.cuml = (
-            import_package("cupy", alternative=np, return_success=True) if self.use_gpu else (np, False)  # type: ignore
-        )
-
-        # Initialise XPySOM instance
-        if initialize_som:
-            try:
-                self.som = XPySom(
-                    self.node_count[0],
-                    self.node_count[1],
-                    self.dimension_count,
-                    activation_distance=self.distance_metric,
-                    neighborhood_function=self.neighborhood,
-                    learning_rate=self.learning_rate_initial,
-                    learning_rateN=self.learning_rate_final,
-                    sigma=self.sigma_initial,
-                    sigmaN=self.sigma_final,
-                    xp=self.xp,
-                    n_parallel=self.parallel_count,
-                    random_seed=self.seed,
-                )
-            except ValueError as excp:
-                if self.distance_metric == "correlation":
-                    raise ValueError(
-                        "Using XPySOM with Pearson correlation requires a custom implementation. "
-                        "You can install it via `pip install git+https://github.com/complextissue/xpysom`."
-                    ) from excp
-                else:
-                    raise excp
-
-        # Create the nearest neighbor finder
-        self.neighbor_estimator = get_neighbor_finder(
-            neighbor_count=1,
-            channel_count=self.dimension_count,
-            distance_metric=self.distance_metric,
-            accuracy=self.accuracy,
-            job_count=self.n_jobs,
-            use_gpu=self.use_gpu,
-        )
+        self.som: SOM | None = None
 
     def set_config(
         self,
-        node_count: Tuple[int, int] = (50, 50),
+        node_count: tuple[int, int] = (50, 50),
         dimension_count: int = 5,
-        distance_metric: Literal["euclidean", "manhattan", "correlation", "cosine"] = "euclidean",
-        neighborhood: str = "gaussian",
-        neighborhood_accuracy: Literal["fast", "accurate"] = "fast",
-        learning_rate_initial: float = 0.2,
-        learning_rate_final: float = 3e-3,
-        sigma_initial: Optional[int] = None,
-        sigma_final: Optional[int] = None,
-        parallel_count: int = 8096,
-        n_jobs: int = -1,
-        seed: Optional[int] = None,
+        distance_metric: Literal["euclidean", "manhattan", "cosine", "correlation"] = "euclidean",
+        sigma_initial: float | None = None,
+        sigma_final: float | None = None,
+        initialization: Literal["random", "sample", "pca"] = "random",
+        batch_size: int | None = None,
+        seed: int | None = None,
     ) -> None:
         """Set the config of the SOM class.
 
         Args:
-            node_count (Tuple[int, int], optional): Tuple determining the SOM node size. Defaults to (50, 50).
+            node_count (tuple[int, int], optional): Tuple determining the SOM node size. Defaults to (50, 50).
             dimension_count (int, optional): Dimensionality of the original data. Defaults to 5.
-            distance_metric (Literal["euclidean", "manhattan", "correlation", "cosine"], optional): Distance metric to
+            distance_metric (Literal["euclidean", "manhattan", "cosine", "correlation"], optional): Distance metric to
                 use. Defaults to "euclidean".
-            neighborhood (str, optional): The type of neighborhood used to determine related notes.
-                Defaults to "gaussian".
-            neighborhood_accuracy (Literal["fast", "accurate"], optional): The accuracy to use for the neighborhood.
-                Defaults to "fast".
-            learning_rate_initial (float, optional): The initial learning rate. Defaults to 0.2.
-            learning_rate_final (float, optional): The learning rate at the end of the SOM training. Defaults to 3e-3.
-            sigma_initial (Optional[int], optional): The initial size of the neighborhoods, higher values.
+            sigma_initial (float | None, optional): The initial width of the gaussian neighborhood in grid units.
                 Defaults to None.
-            sigma_final (Optional[int], optional): The final size of the neighborhood, lower values. Defaults to None.
-            parallel_count (int, optional): Data points to process concurrently. Defaults to 8096.
-            seed (Optional[int], optional): The random seed. Defaults to None.
+            sigma_final (float | None, optional): The width the neighborhood decays towards at the end of training.
+                Defaults to None.
+            initialization (Literal["random", "sample", "pca"], optional): Whether to initialise the nodes as random
+                unit vectors, as randomly chosen samples or on the plane of the first two principal components of the
+                data. Defaults to "random".
+            batch_size (int | None, optional): Data points to process concurrently. Defaults to None.
+            seed (int | None, optional): The random seed. Defaults to None.
         """
-        if sigma_initial is None:
-            sigma_initial = ceil(min(node_count[0], node_count[1]) / 2)
-
-        if sigma_final is None:
-            sigma_final = 0
-
-        # set the configuration as class variable so they can be used and or updated when saving/loading a map
         self.node_count = node_count
         self.dimension_count = dimension_count
         self.distance_metric = distance_metric
-        self.neighborhood = neighborhood
-        self.accuracy = neighborhood_accuracy
-        self.learning_rate_initial = learning_rate_initial
-        self.learning_rate_final = learning_rate_final
         self.sigma_initial = sigma_initial
         self.sigma_final = sigma_final
-        self.parallel_count = parallel_count
-        self.n_jobs = n_jobs
+        self.initialization = initialization
+        self.batch_size = batch_size
         self.seed = seed
 
     def get_config(
@@ -200,16 +126,74 @@ class Som(LoadableDimensionReducer):
             "node_count": self.node_count,
             "dimension_count": self.dimension_count,
             "distance_metric": self.distance_metric,
-            "neighborhood": self.neighborhood,
-            "neighborhood_accuracy": self.accuracy,
-            "learning_rate_initial": self.learning_rate_initial,
-            "learning_rate_final": self.learning_rate_final,
             "sigma_initial": self.sigma_initial,
             "sigma_final": self.sigma_final,
-            "parallel_count": self.parallel_count,
-            "n_jobs": self.n_jobs,
+            "initialization": self.initialization,
+            "batch_size": self.batch_size,
             "seed": self.seed,
         }
+
+    def _get_som_parameters(
+        self,
+    ) -> dict:
+        """Get the fastersom SOM parameters of the configuration, except the grid size, epochs and initialization.
+
+        Returns:
+            dict: The keyword arguments for the fastersom SOM.
+        """
+        return {
+            "sigma_initial": self.sigma_initial,
+            "sigma_final": self.sigma_final,
+            "metric": self.distance_metric,
+            "random_state": self.seed,
+            "device": None if self.use_gpu else "cpu",
+            "batch_size": self.batch_size,
+        }
+
+    def _get_fitted_som(
+        self,
+    ) -> SOM:
+        """Get the fitted fastersom SOM.
+
+        Raises:
+            ValueError: If no self-organizing map has been created or loaded.
+
+        Returns:
+            SOM: The fitted SOM.
+        """
+        if self.som is None:
+            raise ValueError("No SOM map has been created or loaded yet.")
+
+        return self.som
+
+    def _get_pca_nodes(
+        self,
+        data: NDArray,
+    ) -> NDArray:
+        """Get initial node weights that span the plane of the first two principal components of the data.
+
+        The grid rows and columns are spaced linearly along the first and second principal component, from minus to
+        plus one standard deviation around the data mean.
+
+        Args:
+            data (NDArray): The channel-last data.
+
+        Returns:
+            NDArray: The initial node weights, shape (*node_count, dimension_count).
+        """
+        data = data if isinstance(data, np.ndarray) else data.get()
+        data = data.reshape((-1, data.shape[-1]))
+        component_count = min(2, *data.shape)
+        pca = PCA(n_components=component_count, random_state=self.seed).fit(data)
+
+        axes = np.zeros((2, data.shape[-1]))
+        axes[:component_count] = pca.components_ * np.sqrt(pca.explained_variance_)[:, np.newaxis]
+
+        row_positions = np.linspace(-1, 1, self.node_count[0])[:, np.newaxis, np.newaxis]
+        column_positions = np.linspace(-1, 1, self.node_count[1])[np.newaxis, :, np.newaxis]
+
+        nodes: NDArray = pca.mean_ + row_positions * axes[0] + column_positions * axes[1]
+        return nodes
 
     @anndata_method(input_attribute="X")
     @data_method
@@ -217,25 +201,28 @@ class Som(LoadableDimensionReducer):
         self,
         data: NDArray,
         iteration_count: int = 50,
-        pca_init: bool = False,
     ) -> None:
         """Fit the SOM on the data.
 
         Args:
-            data (Union[pd.DataFrame, NDArray]): The data (channel-last) of which the SOM should capture the topography.
-            iteration_count (int, optional): The iterations to train the SOM for. Defaults to 50.
-            pca_init (bool, optional): Whether to initialise the SOM through PCA. Defaults to False.
+            data (NDArray): The data (channel-last) of which the SOM should capture the topography.
+            iteration_count (int, optional): The epochs to train the SOM for. Each epoch makes one update of all nodes
+                from all data points. Defaults to 50.
+
+        Raises:
+            ValueError: If the data does not have `dimension_count` channels.
         """
-        if data.ndim >= 3:
-            data = data.reshape((-1, data.shape[-1]))
+        if data.shape[-1] != self.dimension_count:
+            raise ValueError(f"data must have {self.dimension_count} channels, got {data.shape[-1]}")
 
-        if pca_init:
-            self.som.pca_weights_init(data)
+        init = self._get_pca_nodes(data) if self.initialization == "pca" else self.initialization
 
-        self.som.train(
-            data,
-            iteration_count,
-        )
+        self.som = SOM(
+            *self.node_count,
+            n_epochs=iteration_count,
+            init=init,
+            **self._get_som_parameters(),
+        ).fit(data)
 
     @anndata_method(input_attribute="X", output_uns="som_neighbors")
     @data_method
@@ -243,33 +230,25 @@ class Som(LoadableDimensionReducer):
         self,
         data: NDArray,
         return_distance: bool = False,
-    ) -> Union[NDArray, Tuple[NDArray, NDArray]]:
+    ) -> NDArray | tuple[NDArray, NDArray]:
         """Get the id of the nearest SOM node for each data point and optionally the distance to the node.
 
+        Data points with zero norm (cosine) or constant channels (correlation) have no nearest node: their id is -1 and
+        their distance is NaN.
+
         Args:
-            data (NDArray): The data to be labelled based on the label of the nearest SOM node.
+            data (NDArray): The channel-last data to find the nearest SOM node for.
             return_distance (bool, optional): Whether to return the distance to the nearest node. Defaults to False.
 
         Returns:
-            Union[NDArray, Tuple[NDArray, NDArray]]: The labels for each data point or the labels and distances.
+            NDArray | tuple[NDArray, NDArray]: The node id for each data point or the distances and node ids.
         """
-        assert data.shape[-1] == self.dimension_count, (
-            "The data must have the same number of channels as the SOM nodes."
-        )
+        if not return_distance:
+            return self._get_fitted_som().predict(data)
 
-        # label the data based on the nearest neighbors in the map
-        nodes = self.get_nodes().reshape((-1, self.dimension_count))
+        node_ids, distances = self._get_fitted_som().predict(data, return_distance=True)
 
-        self.neighbor_estimator.fit(
-            nodes,
-        )
-
-        result: Union[NDArray, Tuple[NDArray, NDArray]] = self.neighbor_estimator.kneighbors(
-            data.reshape((-1, self.dimension_count)),
-            return_distance=return_distance,
-        )
-
-        return result
+        return distances, node_ids
 
     @anndata_method(input_attribute="X", output_obs="som_neighbors")
     @data_method
@@ -277,26 +256,19 @@ class Som(LoadableDimensionReducer):
         self,
         data: NDArray,
         iteration_count: int = 50,
-        pca_init: bool = False,
         return_distance: bool = False,
-    ) -> Union[NDArray, Tuple[NDArray, NDArray]]:
+    ) -> NDArray | tuple[NDArray, NDArray]:
         """Fit the SOM on the data and return the id of the nearest SOM node for each data point.
 
         Args:
-            data (NDArray): The data to be labelled based on the label of the nearest SOM node.
-            iteration_count (int, optional): The iterations to train the SOM for. Defaults to 50.
-            pca_init (bool, optional): Whether to initialise the SOM through PCA. Defaults to False.
+            data (NDArray): The data to fit the SOM on and to find the nearest SOM node for.
+            iteration_count (int, optional): The epochs to train the SOM for. Defaults to 50.
             return_distance (bool, optional): Whether to return the distance to the nearest node. Defaults to False.
 
         Returns:
-            Union[NDArray, Tuple[NDArray, NDArray]]: The id of the nearest SOM node for each data point or the ids and
-                distances.
+            NDArray | tuple[NDArray, NDArray]: The node id for each data point or the distances and node ids.
         """
-        self.fit(
-            data,
-            iteration_count=iteration_count,
-            pca_init=pca_init,
-        )
+        self.fit(data, iteration_count=iteration_count)
 
         return self.predict(data, return_distance=return_distance)  # type: ignore
 
@@ -305,61 +277,51 @@ class Som(LoadableDimensionReducer):
     def label(
         self,
         data: NDArray,
-        clusters: Union[List[int], NDArray],
-        save_path: Optional[str] = None,
+        clusters: list[int] | NDArray,
+        save_path: str | None = None,
         return_distance: bool = False,
         flatten: bool = False,
-    ) -> Union[NDArray, Tuple[NDArray, NDArray]]:
+    ) -> NDArray | tuple[NDArray, NDArray]:
         """Get the label for each data point based on the label for its closest SOM node.
 
         This function internally uses the predict method to get the nearest node for each data point and then assigns
         the label of the nearest node to the data point. Labels have to be provided for each SOM node based on a
-        clustering of the SOM nodes.
+        clustering of the SOM nodes. Data points without a nearest node (see `predict`) are labelled -1.
 
         Args:
             data (NDArray): The data to be labelled based on the label of the nearest SOM node.
-            clusters (Union[List[int], NDArray]): A list of clusters (one for each SOM node).
-            save_path (Optional[str], optional): The path where to save the SOM and its configuration to.
-                Defaults to None.
+            clusters (list[int] | NDArray): A list of clusters (one for each SOM node).
+            save_path (str | None, optional): The `.npy` path where to save the labelled data to. Defaults to None.
             return_distance (bool, optional): Whether to return the distance to the nearest node. Defaults to False.
             flatten (bool, optional): Whether to flatten the input data in every but the channel dimension.
                 Defaults to False.
 
+        Raises:
+            ValueError: If the number of clusters does not match the node count or the save path is not `.npy`.
+
         Returns:
-            Union[NDArray, Tuple[NDArray, NDArray]]: The cluster for each data point or the clusters and distances.
+            NDArray | tuple[NDArray, NDArray]: The cluster for each data point or the clusters and distances.
         """
-        # cast labels to numpy array
-        clusters = np.array(clusters, dtype=np.uint16).ravel()
+        clusters = np.asarray(clusters, dtype=np.int32).ravel()
 
-        assert len(clusters) == np.multiply.reduce(self.node_count), (
-            "`clusters` must have the same number of elements as the self-organizing map node count."
-        )
+        if len(clusters) != np.prod(self.node_count):
+            raise ValueError("`clusters` must have the same number of elements as the self-organizing map node count.")
 
-        data_shape = data.shape
+        if save_path and not save_path.endswith(".npy"):
+            raise ValueError("The save path must end with `.npy`. Please add it to the path.")
 
-        result = self.predict(data, return_distance=return_distance)
-
-        distance = None
-        neighbor_idx: NDArray
         if return_distance:
-            distance, neighbor_idx = result
+            distance, node_ids = self.predict(data, return_distance=True)
         else:
-            neighbor_idx = np.array(result)
+            node_ids = self.predict(data)
 
-        # Vectorized node-label lookup (equivalent to indexing clusters by each nearest-node id, but avoids
-        # a per-pixel Python loop that is prohibitively slow at full image resolution).
-        data_labelled: NDArray = clusters[np.asarray(neighbor_idx).ravel()]
-        data_labelled = data_labelled.reshape(data_shape[:-1]) if not flatten else data_labelled
+        data_labelled: NDArray = np.append(clusters, -1)[node_ids]
+        data_labelled = data_labelled if flatten else data_labelled.reshape(data.shape[:-1])
 
-        # save the labelled data if a path was provided
         if save_path:
-            assert ".npy" in save_path, "The save path must end with `.npy`. Please add it to the path."
             np.save(save_path, data_labelled)
 
-        if return_distance and isinstance(distance, np.ndarray):
-            return data_labelled, distance
-        else:
-            return data_labelled
+        return (data_labelled, distance) if return_distance else data_labelled
 
     def load(
         self,
@@ -367,18 +329,30 @@ class Som(LoadableDimensionReducer):
     ) -> None:
         """Load a previously pickled SOM.
 
+        Maps saved by spatiomic versions based on `xpysom` can be loaded if `xpysom` is installed.
+
         Args:
             save_path (str): The path where to load the SOM and its configuration from.
+
+        Raises:
+            ModuleNotFoundError: If the map was saved with `xpysom` and it is not installed.
         """
-        # Load and set the som and load the class config
         with open(save_path, "rb") as infile:
-            config, self.som = pickle.load(infile)  # nosec
+            try:
+                config, nodes = pickle.load(infile)  # nosec
+            except ModuleNotFoundError as error:
+                raise ModuleNotFoundError(
+                    f"{error}. This map was saved by an xpysom-based version of spatiomic, "
+                    "install `xpysom==1.0.7` to load it and save it again."
+                ) from error
 
-        # Initialise an XPySOM object with the data and set the class variables
+        if not isinstance(nodes, np.ndarray):
+            nodes = nodes.get_weights()
+            config = {key: value for key, value in config.items() if key in self.get_config()}
+            config["sigma_initial"] = config["sigma_final"] = None
+
         self.set_config(**config)
-
-        # Re-initialize estimators without re-initializing the SOM
-        self.set_estimators(initialize_som=False)
+        self.set_nodes(nodes)
 
     def save(
         self,
@@ -388,15 +362,11 @@ class Som(LoadableDimensionReducer):
 
         Args:
             save_path (str): The path where to save the SOM and its configuration to.
-
-        Raises:
-            ValueError: If no self-organizing map has been created or loaded.
         """
-        if not self.som:
-            raise ValueError("No SOM map has been created or loaded yet.")
+        state = [self.get_config(), self.get_nodes()]
 
         with open(save_path, "wb") as outfile:
-            pickle.dump([self.get_config(), self.som], outfile)
+            pickle.dump(state, outfile)
 
     def get_nodes(
         self,
@@ -408,58 +378,61 @@ class Som(LoadableDimensionReducer):
             flatten (bool, optional): Whether to flatten the SOM dimensions (but not the channel dimensionality).
                 Defaults to True.
 
-        Raises:
-            ValueError: If no self-organizing map has been created or loaded.
-
         Returns:
             NDArray: The weights of the SOM nodes.
         """
-        if not self.som:
-            raise ValueError("No SOM map has been created or loaded yet.")
+        nodes: NDArray = self._get_fitted_som().weights_
 
-        nodes: NDArray = self.som.get_weights()
-
-        if flatten:
-            return nodes.reshape((-1, nodes.shape[-1]))
-        else:
-            return nodes
+        return nodes if flatten else nodes.reshape((*self.node_count, -1))
 
     def set_nodes(
         self,
         nodes: NDArray,
     ) -> None:
-        """Set the weights of a previously fit SOM.
+        """Set the weights of the SOM nodes, e.g., to restore a previously fit SOM.
 
         Args:
-            nodes (NDArray): The weights of the SOM nodes.
+            nodes (NDArray): The weights of the SOM nodes, shape (node count, channel count) or (*node_count, channel
+                count).
+
+        Raises:
+            ValueError: If the nodes do not match the dimension count or node count of the configuration.
         """
-        self.som._weights = nodes.reshape(self.som.get_weights().shape)
+        if nodes.shape[-1] != self.dimension_count:
+            raise ValueError(f"nodes must have {self.dimension_count} channels, got {nodes.shape[-1]}")
+
+        self.som = SOM.from_weights(nodes, *self.node_count, **self._get_som_parameters())
+
+    def get_distance_map(
+        self,
+    ) -> NDArray:
+        """Get the summed euclidean distance of each SOM node to its (up to eight) neighbors on the grid.
+
+        Returns:
+            NDArray: The distances normalized to a maximum of 1, shape `node_count`.
+        """
+        return self._get_fitted_som().distance_map()
 
     def get_quantization_error(
         self,
         data: NDArray,
         return_distances: bool = False,
-    ) -> Union[float, Tuple[float, np.ndarray]]:
+    ) -> float | tuple[float, NDArray]:
         """Get the quantization error of the SOM on the provided data.
 
-        Uses the neighbor finder to find the nearest neighbor of each data point in the SOM and calculates the
-        quantization error based on the distance between the data point and its nearest neighbor.
+        The quantization error is the mean distance between each data point and its nearest SOM node. Data
+        points without a nearest node (see `predict`) are left out of the mean and their distance is NaN.
 
         Args:
             data (NDArray): The data to get the quantization error for.
+            return_distances (bool, optional): Whether to also return the distance of each data point to its nearest
+                node. Defaults to False.
 
         Returns:
-            Union[float, Tuple[float, np.ndarray]]: The mean quantization error and all distances if `return_distances``
-                is set to True.
+            float | tuple[float, NDArray]: The mean quantization error and all distances if `return_distances` is set to
+                True.
         """
-        # label the data based on the nearest neighbors in the map
-        self.neighbor_estimator.fit(
-            self.get_nodes().reshape((-1, self.dimension_count)),
-        )
+        distances, _ = self.predict(data, return_distance=True)
+        quantization_error = float(np.nanmean(distances, dtype=np.float64))
 
-        distances, _ = self.neighbor_estimator.kneighbors(
-            data.reshape((-1, self.dimension_count)),
-            return_distance=True,
-        )
-
-        return float(np.mean(distances)) if return_distances is False else (float(np.mean(distances)), distances)
+        return (quantization_error, distances) if return_distances else quantization_error

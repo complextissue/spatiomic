@@ -82,6 +82,7 @@ def colormap(
             " or choose the `random_hls` flavor."
         )
 
+    colormap_raw: list[str | tuple[float, float, float]]
     if flavor == "glasbey":
         from colorcet import glasbey_light
 
@@ -92,9 +93,9 @@ def colormap(
             stacklevel=2,
         )
 
-        colormap_raw = glasbey_light[:color_count]
+        colormap_raw = list(glasbey_light[:color_count])
     else:
-        colormap_raw = get_random_colors(color_count=color_count, seed=seed)
+        colormap_raw = list(get_random_colors(color_count=color_count, seed=seed))
 
     # allow system level setting of clusters to interpret as background and color differently
     if use_system_background_list and os.getenv("SPATIOMIC_BG_CLUSTER_LIST", False):

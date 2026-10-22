@@ -1,7 +1,7 @@
-from typing import List, Literal, Optional, Union
+from typing import Iterable, List, Literal, Optional, Tuple, Union
 
+import networkx as nx
 import numpy as np
-from igraph import Graph
 from numpy.typing import NDArray
 
 from spatiomic._internal._get_neighbor_finder import get_neighbor_finder
@@ -23,8 +23,10 @@ class KnnGraph:
         distance_max: Optional[float] = None,
         job_count: int = -1,
         use_gpu: bool = True,
-    ) -> Graph:
+    ) -> nx.Graph:
         """Construct a k-nearest neighbor graph of the data.
+
+        The graph is undirected and has one integer node per data point, in the order of the flattened data.
 
         Args:
             data (Union[NDArray, Som]): A channel-last array of the data points to be used for graph construction.
@@ -48,7 +50,7 @@ class KnnGraph:
             NotImplementedError: Raised when the specified neighborhood identification method has not been implemented.
 
         Returns:
-            Graph: The neighborhood graph.
+            nx.Graph: The neighborhood graph.
         """
         if isinstance(data, Som):
             data = data.get_nodes()
@@ -95,7 +97,7 @@ class KnnGraph:
                 # filter the neighbor_idx array to only include the indices within the specified distance
                 neighbor_idx = np.array([np.where(distances[i] <= distance_max)[0] for i in range(0, len(distances))])
 
-            knn_graph = Graph(cls.get_edges(neighbor_idx))
+            knn_graph = cls.create_graph(cls.get_edges(neighbor_idx), node_count=data.shape[0])
 
         elif method == "batch_balanced" and batch is not None:
             if distance_max is not None:
@@ -151,7 +153,7 @@ class KnnGraph:
             )
 
             # deduplicate the edges and convert to a graph
-            knn_graph = Graph(list(set(edgelist)))
+            knn_graph = cls.create_graph(set(edgelist), node_count=data.shape[0])
 
         else:
             raise NotImplementedError(
@@ -159,6 +161,36 @@ class KnnGraph:
             )
 
         return knn_graph
+
+    @staticmethod
+    def create_graph(
+        edges: Iterable[Tuple[int, int]] | NDArray,
+        node_count: int,
+        weights: Optional[Iterable[float]] = None,
+    ) -> nx.Graph:
+        """Create an undirected graph with the nodes `0` to `node_count - 1` and the given edges.
+
+        Args:
+            edges (Iterable[Tuple[int, int]] | NDArray): The edges as pairs of node indices.
+            node_count (int): The number of nodes, including nodes without edges.
+            weights (Optional[Iterable[float]], optional): The weight of each edge, stored as the `weight` edge
+                attribute. Defaults to None.
+
+        Returns:
+            nx.Graph: The graph.
+        """
+        graph = nx.Graph()
+        graph.add_nodes_from(range(node_count))
+
+        if weights is None:
+            graph.add_edges_from((int(source), int(target)) for source, target in edges)
+        else:
+            graph.add_weighted_edges_from(
+                (int(source), int(target), float(weight))
+                for (source, target), weight in zip(edges, weights, strict=True)
+            )
+
+        return graph
 
     @staticmethod
     def get_edges(neighbor_idx: NDArray) -> NDArray:

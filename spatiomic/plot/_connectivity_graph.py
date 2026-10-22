@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
 import seaborn as sns
-from igraph import Graph as Graph
 from matplotlib.colors import ListedColormap
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from numpy.typing import NDArray
@@ -14,7 +13,7 @@ from ._colormap import colormap as create_colormap
 
 
 def connectivity_graph(
-    graph: Graph,
+    graph: nx.Graph,
     title: str = "Connectivity Graph",
     clusters: Optional[NDArray] = None,
     cluster_legend: bool = False,
@@ -27,7 +26,7 @@ def connectivity_graph(
     """Plot a connectivity graph.
 
     Args:
-        graph (Graph): The graph to be plotted.
+        graph (nx.Graph): The graph to be plotted.
         title (str, optional): Title for the figure. Defaults to "Connectivity Graph".
         clusters (Optional[NDArray], optional): clusters for each vertex of the graph to be displayed.
             Defaults to None.
@@ -56,18 +55,16 @@ def connectivity_graph(
         return_fig = False
         show_colorbar = False
 
-    graph_nx = graph.to_networkx()
-
     try:
         # get the positions of the nodes via graphviz with the Fruchterman-Reingold algorithm
         pos = nx.nx_agraph.graphviz_layout(
-            graph_nx,
+            graph,
             prog="fdp",
             args="-Goverlap=false -Gmaxiter=100000 -Gpenalty=0.75",
         )
     except ImportError:
         warn("Graphviz not installed, using spring layout from networkx.", ImportWarning, stacklevel=2)
-        pos = nx.spring_layout(graph_nx, k=0.5, iterations=100, seed=seed)
+        pos = nx.spring_layout(graph, k=0.5, iterations=100, seed=seed)
 
     cmap_raw: ListedColormap
     node_colors: Union[str, List[Any]]
@@ -83,7 +80,7 @@ def connectivity_graph(
 
     # draw the nodes
     nx.draw_networkx_nodes(
-        graph_nx,
+        graph,
         pos,
         node_size=node_size,
         node_color=node_colors,
@@ -96,7 +93,7 @@ def connectivity_graph(
 
     # draw the edges
     nx.draw_networkx_edges(
-        graph_nx,
+        graph,
         pos,
         node_size=node_size,
         width=1,

@@ -37,7 +37,9 @@ def vicinity_graph(
 
     # set the eye to zero if the identities should be ignored
     if ignore_identities:
-        np.fill_diagonal(data.to_numpy(), 0)
+        values = data.to_numpy(copy=True)
+        np.fill_diagonal(values, 0)
+        data = pd.DataFrame(values, index=data.index, columns=data.columns)
 
     # row normalize the dataframe if the counts should be normalized
     if normalize:

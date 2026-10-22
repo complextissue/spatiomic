@@ -1,9 +1,9 @@
 """Test the read class."""
 
 from pathlib import Path
-from zipfile import ZipFile
 
 import numpy as np
+import pytest
 
 import spatiomic as so
 
@@ -38,46 +38,37 @@ def test_read_tiff(example_tiff: Path) -> None:
         assert isinstance(image_with_channels, np.ndarray)
 
 
-def test_read_lif(example_lif_zip: Path) -> None:
+@pytest.mark.parametrize("image_idx", [0, 1])
+def test_read_lif(example_lif: Path, image_idx: int) -> None:
     """Test the read_lif function."""
-    assert example_lif_zip.exists()
+    lif_file_path = example_lif
 
-    # Extract the zip file
-    temp_dir = example_lif_zip.parent / "temp_lif"
-    temp_dir.mkdir(exist_ok=True)
+    # Test default behavior (no dtype conversion)
+    channels = so.data.read.read_lif(
+        lif_file_path,
+        image_idx=image_idx,
+    )
 
-    with ZipFile(example_lif_zip) as lif_zip_file:
-        lif_zip_file.extractall(temp_dir)
-    lif_file_path = temp_dir / "lif_example.lif"
-    assert lif_file_path.exists()
+    assert len(channels) == 3
+    assert channels.shape == (3, 2048, 2048)
+    assert isinstance(channels, np.ndarray)
+    original_dtype = channels.dtype
 
-    for image_idx in [0, 1]:
-        # Test default behavior (no dtype conversion)
-        channels = so.data.read.read_lif(
-            lif_file_path,
-            image_idx=image_idx,
-        )
+    # Test explicit dtype conversion
+    channels_float32 = so.data.read.read_lif(
+        lif_file_path,
+        image_idx=image_idx,
+        dtype=np.float32,
+    )
+    assert channels_float32.dtype == np.float32
 
-        assert len(channels) == 3
-        assert channels.shape == (3, 2048, 2048)
-        assert isinstance(channels, np.ndarray)
-        original_dtype = channels.dtype
-
-        # Test explicit dtype conversion
-        channels_float32 = so.data.read.read_lif(
-            lif_file_path,
-            image_idx=image_idx,
-            dtype=np.float32,
-        )
-        assert channels_float32.dtype == np.float32
-
-        # Test that original dtype is preserved when dtype=None
-        channels_none = so.data.read.read_lif(
-            lif_file_path,
-            image_idx=image_idx,
-            dtype=None,
-        )
-        assert channels_none.dtype == original_dtype
+    # Test that original dtype is preserved when dtype=None
+    channels_none = so.data.read.read_lif(
+        lif_file_path,
+        image_idx=image_idx,
+        dtype=None,
+    )
+    assert channels_none.dtype == original_dtype
 
 
 def test_read_czi(example_czi: Path) -> None:
@@ -97,3 +88,13 @@ def test_read_czi(example_czi: Path) -> None:
     # Test that original dtype is preserved when dtype=None
     channels_none = so.data.read.read_czi(example_czi, dtype=None)
     assert channels_none.dtype == original_dtype
+
+
+def test_read_czi_uint16(example_uint16_czi: Path) -> None:
+    """Test that 16-bit CZI files are read without truncation, independent of their dimension layout."""
+    channels_expected = np.random.default_rng(0).integers(0, 65535, size=(3, 48, 64), dtype=np.uint16)
+
+    channels = so.data.read.read_czi(example_uint16_czi)
+
+    assert channels.dtype == np.uint16
+    np.testing.assert_array_equal(channels, channels_expected)

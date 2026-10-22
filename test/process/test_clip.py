@@ -1,7 +1,5 @@
 """Test the Clip class."""
 
-from typing import List, Literal
-
 import numpy as np
 import pytest
 from numpy.typing import NDArray
@@ -9,103 +7,91 @@ from numpy.typing import NDArray
 import spatiomic as so
 
 
+def get_expected_clip(
+    data: NDArray,
+    min_value: float | NDArray | None,
+    max_value: float | NDArray | None,
+    fill_value: float | None,
+) -> NDArray:
+    """Clip the data or replace values outside of the range with the fill value."""
+    if fill_value is None:
+        return np.clip(data, a_min=min_value, a_max=max_value)
+
+    outside = np.zeros(data.shape, dtype=bool)
+    if min_value is not None:
+        outside |= data < min_value
+    if max_value is not None:
+        outside |= data > max_value
+    return np.where(outside, fill_value, data)
+
+
 @pytest.mark.cpu
-def test_clip_cpu(
+@pytest.mark.parametrize("fitting_reference_name", ["example_data_unclipped", "example_data_unclipped_flat"])
+@pytest.mark.parametrize("fraction", [0.1, 1.0])
+@pytest.mark.parametrize("fill_value", [None, -1.0, 0.0])
+def test_clip_percentile_cpu(
+    request: pytest.FixtureRequest,
     example_data_unclipped: NDArray,
-    example_data_unclipped_flat: NDArray,
+    fitting_reference_name: str,
+    fraction: float,
+    fill_value: float | None,
 ) -> None:
-    """Test the Clip class."""
-    example_data_unclipped = np.copy(example_data_unclipped)
+    """Test that percentile clipping learns the channel-wise percentiles of the reference and applies them."""
+    fitting_reference = request.getfixturevalue(fitting_reference_name)
+    reference_flat = fitting_reference.reshape(-1, fitting_reference.shape[-1])
 
-    methods: List[Literal["percentile", "minmax"]] = ["minmax", "percentile"]
+    clipper = so.process.clip(
+        method="percentile",
+        percentile_min=2,
+        percentile_max=98,
+        fill_value=fill_value,
+        use_gpu=False,
+    )
+    clipper.fit(fitting_reference, fraction=fraction)
 
-    min_values = np.random.rand(20) * 0.1
-    max_values = np.random.rand(20) * 0.1 + 0.8
+    min_value = np.percentile(reference_flat, 2, axis=0)
+    max_value = np.percentile(reference_flat, 98, axis=0)
+    # a subsample only estimates the percentiles, the data spans a range of 500
+    tolerance = 1e-3 if fraction == 1.0 else 50
+    np.testing.assert_allclose(clipper.percentile_min_absolute.ravel(), min_value, atol=tolerance)  # type: ignore
+    np.testing.assert_allclose(clipper.percentile_max_absolute.ravel(), max_value, atol=tolerance)  # type: ignore
 
-    combinations = [
-        (0.1, 0.8),
-        (None, 0.8),
-        (0.1, None),
-        (min_values, max_values),
-    ]
+    np.testing.assert_allclose(
+        clipper.transform(example_data_unclipped),
+        get_expected_clip(
+            example_data_unclipped,
+            min_value=clipper.percentile_min_absolute,
+            max_value=clipper.percentile_max_absolute,
+            fill_value=fill_value,
+        ),
+        atol=1e-3,
+    )
 
-    for method in methods:
-        for fitting_reference in [example_data_unclipped, example_data_unclipped_flat]:
-            for fraction in [0.1, 1.0]:
-                for fill_value in [None, -1.0]:
-                    for min_value, max_value in combinations:
-                        clipper = so.process.clip(
-                            method=method,
-                            percentile_min=2,
-                            percentile_max=98,
-                            use_gpu=False,
-                            fill_value=fill_value,
-                            min_value=min_value,  # type: ignore
-                            max_value=max_value,  # type: ignore
-                        )
 
-                        clipper.fit(
-                            fitting_reference,
-                            fraction=fraction,
-                        )
+@pytest.mark.cpu
+@pytest.mark.parametrize(
+    ("min_value", "max_value"),
+    [(0.1, 0.8), (None, 0.8), (0.1, None), (np.linspace(0.0, 0.1, 20), np.linspace(0.8, 0.9, 20))],
+    ids=["both", "max_only", "min_only", "per_channel"],
+)
+@pytest.mark.parametrize("fill_value", [None, -1.0, 0.0])
+def test_clip_minmax_cpu(
+    example_data_unclipped: NDArray,
+    min_value: float | NDArray | None,
+    max_value: float | NDArray | None,
+    fill_value: float | None,
+) -> None:
+    """Test that min-max clipping clips to or fills outside of the given channel-wise range."""
+    clipper = so.process.clip(
+        method="minmax",
+        min_value=min_value,
+        max_value=max_value,
+        fill_value=fill_value,
+        use_gpu=False,
+    )
 
-                        test_data_clipped = clipper.transform(
-                            example_data_unclipped,
-                        )
-
-                        if fraction == 1.0 and method == "percentile" and fill_value is None:
-                            np.testing.assert_array_almost_equal(
-                                test_data_clipped,
-                                np.clip(
-                                    example_data_unclipped,
-                                    a_min=np.expand_dims(
-                                        np.percentile(
-                                            fitting_reference.reshape(-1, fitting_reference.shape[-1]),
-                                            2,
-                                            axis=0,
-                                        ),
-                                        axis=0,
-                                    ),
-                                    a_max=np.expand_dims(
-                                        np.percentile(
-                                            fitting_reference.reshape(-1, fitting_reference.shape[-1]),
-                                            98,
-                                            axis=0,
-                                        ),
-                                        axis=0,
-                                    ),
-                                ),
-                                decimal=3,
-                            )
-                        elif method == "minmax" and fill_value is None:
-                            np.testing.assert_array_almost_equal(
-                                test_data_clipped,
-                                np.clip(
-                                    example_data_unclipped,
-                                    a_min=np.expand_dims(min_value, axis=0) if min_value is not None else None,
-                                    a_max=np.expand_dims(max_value, axis=0) if max_value is not None else None,
-                                ),
-                                decimal=3,
-                            )
-                        elif fill_value is not None and method == "percentile":
-                            # everywhere where we have the max or min value, we should have the fill value
-                            np.testing.assert_array_almost_equal(
-                                np.where(
-                                    test_data_clipped
-                                    <= np.min(fitting_reference.reshape(-1, fitting_reference.shape[-1]), axis=0),
-                                    fill_value,
-                                    test_data_clipped,
-                                ),
-                                test_data_clipped,
-                                decimal=3,
-                            )
-                            np.testing.assert_array_almost_equal(
-                                np.where(
-                                    test_data_clipped
-                                    >= np.max(fitting_reference.reshape(-1, fitting_reference.shape[-1]), axis=0),
-                                    fill_value,
-                                    test_data_clipped,
-                                ),
-                                test_data_clipped,
-                                decimal=3,
-                            )
+    np.testing.assert_allclose(
+        clipper.fit_transform(example_data_unclipped),
+        get_expected_clip(example_data_unclipped, min_value=min_value, max_value=max_value, fill_value=fill_value),
+        atol=1e-6,
+    )

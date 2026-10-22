@@ -1,5 +1,5 @@
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling>=1.27"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
@@ -7,48 +7,44 @@ packages = ["spatiomic"]
 
 [project]
 name = "spatiomic"
-version = "0.9.3"
+version = "0.10.0"
 description = "A python toolbox for spatial omics analysis."
-requires-python = ">=3.11"
-license = { file = "LICENSE" }
+requires-python = ">=3.12"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
 authors = [{ name = "Malte Kuehl", email = "malte.kuehl@clin.au.dk" }]
 readme = { file = "README.md", content-type = "text/markdown" }
 classifiers = [
     "Development Status :: 4 - Beta",
-    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
     "Intended Audience :: Science/Research",
     "Intended Audience :: Healthcare Industry",
     "Natural Language :: English",
     "Typing :: Typed",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Operating System :: OS Independent",
 ]
 dependencies = [
     "adjustText",
-    "anndata>=0.12.0",
+    "anndata>=0.12",
     "colorcet",
-    "esda>=2.7.0",
+    "esda>=2.7",
+    "fastersom>=0.3",
     "joblib",
     "lazy_loader",
-    "matplotlib",
-    "networkx",
+    "matplotlib>=3.9",
+    "libpysal>=4.12",
+    "networkx>=3.7",
     "numpy>=2",
-    "pandas>=2",
-    "pysal",
-    "python-igraph",
-    "scikit-image",
-    "scikit-learn",
-    "scipy>=0.16.1",
-    "scipy-stubs",
-    "seaborn",
-    "statsmodels",
-    "umap-learn",
-    "llvmlite>=0.39.0",
-    "xpysom==1.0.7",
-    "astroid==3.3.11",
+    "pandas>=2.2",
+    "scikit-image>=0.24",
+    "scikit-learn>=1.5",
+    "scipy>=1.13",
+    "seaborn>=0.13",
+    "statsmodels>=0.14",
+    "umap-learn>=0.5.7",
 ]
 
 [project.urls]
@@ -126,7 +122,7 @@ warn_return_any = true
 warn_unused_configs = true
 warn_redundant_casts = true
 disallow_untyped_defs = true
-python_version = "3.13"
+python_version = "3.12"
 ignore_missing_imports = true
 exclude = ["^docs/.*", "^test/.*"]
 
@@ -135,6 +131,7 @@ log_format = "%(asctime)s %(levelname)s %(message)s"
 log_date_format = "%Y-%m-%d %H:%M:%S"
 log_level = "WARNING"
 log_cli = true
+addopts = ["--strict-markers"]
 
 markers = [
     "slow: marks tests as slow (deselect with '-m \"not slow\"')",
@@ -171,62 +168,68 @@ ignore_errors = true
 directory = "docs/coverage_report"
 
 [dependency-groups]
-dev = [
+test = [
     "aicspylibczi",
-    "bandit>=1.8.6",
-    "certifi",
     "coverage",
+    "opencv-python-headless",
+    "pytest>=8",
+    "qptifffile",
+    "readlif",
+]
+lint = [
+    "bandit>=1.9.4",
+    "mypy==2.4.0",
+    "pandas-stubs",
+    "pre-commit>=4",
+    "ruff==0.17.2",
+    "scipy-stubs",
+]
+doc = [
     "furo",
     "ipykernel",
     "ipywidgets",
-    "jupyter-client",
-    "jupyter-core",
-    "mypy==1.18.2",
     "myst-parser",
     "nbsphinx",
-    "opencv-python-headless",
     "openpyxl",
-    "pandas-stubs",
     "pandoc",
-    "pre-commit",
-    "pygments",
-    "pytest",
-    "qptifffile",
-    "readlif",
-    "ruff==0.13.2",
     "session-info2",
     "sphinx",
-    "sphinx-autoapi",
+    "sphinx-autoapi>=3.8",
     "sphinx-autodoc-typehints",
-    "sphinxcontrib-mermaid",
     "sphinx-copybutton",
     "sphinx-design",
-    "sphinx-rtd-theme",
     "sphinx-llms-txt>=0.7.1",
+    "sphinx-rtd-theme",
+    "sphinxcontrib-mermaid",
+]
+dev = [
+    { include-group = "test" },
+    { include-group = "lint" },
+    { include-group = "doc" },
 ]
 
 [project.optional-dependencies]
 cellpose = ["cellpose>=4.0.1,<5"]
-spatialdata = ["spatialdata==0.6.1"]
+spatialdata = ["spatialdata>=0.8"]
 cuda-12 = [
-    "cuml-cu12>=24.10.0",
-    "cugraph-cu12>=24.10.0",
-    "nx-cugraph-cu12>=24.10.0",
-    "cucim-cu12>=24.10.0",
+    "cuml-cu12>=25.10",
+    "cugraph-cu12>=25.10",
+    "nx-cugraph-cu12>=25.10",
+    "cucim-cu12>=25.10",
 ]
-cuda-11 = [
-    "cuml-cu11>=24.10.0",
-    "cugraph-cu11>=24.10.0",
-    "nx-cugraph-cu11>=24.10.0",
-    "cucim-cu11>=24.10.0",
+cuda-13 = [
+    "cuml-cu13>=25.10",
+    "cugraph-cu13>=25.10",
+    "nx-cugraph-cu13>=25.10",
+    "cucim-cu13>=25.10",
 ]
 
 [tool.uv]
 default-groups = []
 extra-index-url = ["https://pypi.nvidia.com"]
 index-strategy = "unsafe-best-match"
-prerelease = "allow"
-conflicts = [[{ extra = "cuda-11" }, { extra = "cuda-12" }]]
+prerelease = "if-necessary-or-explicit"
+conflicts = [[{ extra = "cuda-12" }, { extra = "cuda-13" }]]
 
 [tool.uv.sources]
 spatiomic = { workspace = true }

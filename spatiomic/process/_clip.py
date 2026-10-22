@@ -191,7 +191,7 @@ class Clip(Processer):
                 )
         elif self.method == "minmax":
             if self.max_value is not None or self.min_value is not None:
-                if self.fill_value:
+                if self.fill_value is not None:
                     if self.min_value is not None:
                         data = self.xp.where(
                             data < self.min_value,
