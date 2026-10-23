@@ -33,7 +33,7 @@ def _leiden_cpu(
     """
 
     def leiden(starting_communities: dict[str, int] | None, iterations: int) -> tuple[float, dict[str, int]]:
-        return gn.leiden(
+        result: tuple[float, dict[str, int]] = gn.leiden(
             edges,
             starting_communities=starting_communities,
             resolution=resolution,
@@ -43,6 +43,7 @@ def _leiden_cpu(
             seed=seed,
             trials=1,
         )
+        return result
 
     # a single call avoids converting the edge list for every iteration
     if iteration_count is not None:
