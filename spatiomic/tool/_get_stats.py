@@ -70,7 +70,7 @@ def _permutation_test(
     dependent: bool,
     permutation_count: int,
     seed: int,
-    **kwargs: dict,  # noqa: ARG001
+    **kwargs: dict,
 ) -> PermutationTestResult:
     """Perform a permutation test to calculate the p-value for the statistical test.
 
@@ -91,17 +91,17 @@ def _permutation_test(
         data: NDArray,
         data_comparison: NDArray,
         axis: Optional[int] = None,
-        **kwargs: Dict[str, Any],
     ) -> float:
         """Apply the statistical test to the data."""
+        test_kwargs: Dict[str, Any] = dict(kwargs)
         if vectorized:
-            kwargs["axis"] = axis  # type: ignore
+            test_kwargs["axis"] = axis
 
         if "dependent" in test_function_parameters:
-            kwargs["dependent"] = dependent  # type: ignore
+            test_kwargs["dependent"] = dependent
 
         # Ensure we only pass arguments that the function expects
-        filtered_kwargs = {k: v for k, v in kwargs.items() if k in test_function_parameters}
+        filtered_kwargs = {k: v for k, v in test_kwargs.items() if k in test_function_parameters}
         result = test_function(data, data_comparison, **filtered_kwargs)
         return result.statistic if hasattr(result, "statistic") else result  # type: ignore
 
@@ -116,6 +116,112 @@ def _permutation_test(
     )
 
 
+def _t_statistics_one_versus_rest(
+    sums: NDArray,
+    sums_of_squares: NDArray,
+    group_sizes: NDArray,
+    total_sum: NDArray,
+    total_sum_of_squares: NDArray,
+    equal_variance: bool,
+) -> NDArray:
+    """Calculate the t-statistics of each group against all other groups from the group moments.
+
+    Args:
+        sums (NDArray): The sum of each marker per group, shape (group_count, marker_count).
+        sums_of_squares (NDArray): The sum of squares of each marker per group, shape (group_count, marker_count).
+        group_sizes (NDArray): The number of data points per group, shape (group_count, 1).
+        total_sum (NDArray): The sum of each marker over all data points, shape (marker_count,).
+        total_sum_of_squares (NDArray): The sum of squares of each marker over all data points, shape (marker_count,).
+        equal_variance (bool): Whether to use Student's t-test instead of Welch's t-test.
+
+    Returns:
+        NDArray: The t-statistics, shape (group_count, marker_count).
+    """
+    rest_sizes = group_sizes.sum() - group_sizes
+    rest_sums = total_sum - sums
+
+    mean = sums / group_sizes
+    rest_mean = rest_sums / rest_sizes
+    variance = (sums_of_squares - sums * mean) / (group_sizes - 1)
+    rest_variance = (total_sum_of_squares - sums_of_squares - rest_sums * rest_mean) / (rest_sizes - 1)
+
+    with np.errstate(divide="ignore", invalid="ignore"):
+        if equal_variance:
+            pooled_variance = ((group_sizes - 1) * variance + (rest_sizes - 1) * rest_variance) / (
+                group_sizes + rest_sizes - 2
+            )
+            standard_error = np.sqrt(pooled_variance * (1 / group_sizes + 1 / rest_sizes))
+        else:
+            standard_error = np.sqrt(variance / group_sizes + rest_variance / rest_sizes)
+
+        return (mean - rest_mean) / standard_error  # type: ignore[no-any-return]
+
+
+def _t_test_permutation_p_values(
+    data: NDArray,
+    group_idx: NDArray,
+    group_count: int,
+    equal_variance: bool,
+    permutation_count: int,
+    seed: int,
+) -> NDArray:
+    """Calculate two-sided permutation p-values of t-tests of each group against all other groups.
+
+    Instead of permuting the data of each group, marker and comparison separately, the group labels are permuted once
+    per resample for all of them, and the t-statistics are calculated from the group moments. Each p-value has the
+    same null distribution as with `scipy.stats.permutation_test`, which is followed for the p-value calculation.
+
+    Args:
+        data (NDArray): The data, shape (data_point_count, marker_count).
+        group_idx (NDArray): The group index of each data point, from 0 to `group_count` - 1.
+        group_count (int): The number of groups.
+        equal_variance (bool): Whether to use Student's t-test instead of Welch's t-test.
+        permutation_count (int): The number of permutations to perform.
+        seed (int): The random seed to use for the permutations.
+
+    Returns:
+        NDArray: The p-values, shape (group_count, marker_count).
+    """
+    # centering does not change the t-statistics but avoids cancellation when calculating variances from moments
+    order = np.argsort(group_idx, kind="stable")
+    data_sorted = data[order].astype(np.float64)
+    data_sorted -= data_sorted.mean(axis=0)
+    data_sorted_squared = data_sorted**2
+
+    group_sizes = np.bincount(group_idx, minlength=group_count)
+    group_starts = np.concatenate([[0], np.cumsum(group_sizes)[:-1]])
+    total_sum = data_sorted.sum(axis=0)
+    total_sum_of_squares = data_sorted_squared.sum(axis=0)
+
+    # permuting the data rows against the sorted labels is equivalent to permuting the labels
+    def t_statistics(permutation: NDArray | slice) -> NDArray:
+        return _t_statistics_one_versus_rest(
+            np.add.reduceat(data_sorted[permutation], group_starts, axis=0),
+            np.add.reduceat(data_sorted_squared[permutation], group_starts, axis=0),
+            group_sizes[:, np.newaxis],
+            total_sum,
+            total_sum_of_squares,
+            equal_variance,
+        )
+
+    observed = t_statistics(slice(None))
+    tolerance = np.abs(observed) * np.finfo(np.float64).eps * 100
+
+    rng = np.random.default_rng(seed)
+    less_count = np.zeros(observed.shape, dtype=np.int64)
+    greater_count = np.zeros(observed.shape, dtype=np.int64)
+
+    for _ in range(permutation_count):
+        null_statistics = t_statistics(rng.permutation(data_sorted.shape[0]))
+        less_count += null_statistics <= observed + tolerance
+        greater_count += null_statistics >= observed - tolerance
+
+    p_value_less = (less_count + 1) / (permutation_count + 1)
+    p_value_greater = (greater_count + 1) / (permutation_count + 1)
+
+    return np.clip(2 * np.minimum(p_value_less, p_value_greater), 0, 1)  # type: ignore[no-any-return]
+
+
 def _calculate_statistics(
     data: NDArray,
     data_comparison: NDArray,
@@ -123,6 +229,7 @@ def _calculate_statistics(
     dependent: bool,
     permutation_count: Optional[int] = None,
     seed: int = 0,
+    p_value: float | None = None,
     **test_kwargs: dict,
 ) -> dict:
     """Calculate statistics for a comparison between two datasets.
@@ -134,6 +241,8 @@ def _calculate_statistics(
         dependent (bool): Whether the data is dependent.
         permutation_count (Optional[int]): Number of permutations to perform.
         seed (int): Random seed for reproducibility.
+        p_value (float | None, optional): A precomputed p-value, in which case no test is performed.
+            Defaults to None.
         **test_kwargs: Additional keyword arguments for the test function.
 
     Returns:
@@ -148,7 +257,8 @@ def _calculate_statistics(
     result["mean_comparison"] = data_comparison_mean
 
     # Perform statistical test
-    if permutation_count is not None and permutation_count > 0:
+    ranksum = None
+    if p_value is None and permutation_count is not None and permutation_count > 0:
         test_result = _permutation_test(
             data,
             data_comparison,
@@ -160,7 +270,7 @@ def _calculate_statistics(
         )
         p_value = test_result.pvalue
         ranksum = test_result.statistic if test_func in [stats.wilcoxon, stats.ranksums, stats.mannwhitneyu] else None
-    else:
+    elif p_value is None:
         test_result = test_func(data, data_comparison, **test_kwargs)
         p_value = test_result.pvalue
         ranksum = test_result.statistic if test_func in [stats.wilcoxon, stats.ranksums, stats.mannwhitneyu] else None
@@ -260,8 +370,9 @@ def get_stats(
             be passed to the custom function.
             Defaults to "t".
         dependent (bool, optional): Whether the data is dependent. Defaults to False.
-        equal_variance (bool, optional): Whether to assume equal variance for the t-test. If False or None, the Welch's
-            t-test is used. Defaults to None.
+        equal_variance (bool, optional): Whether to assume equal variance for the independent t-test. If False,
+            Welch's t-test is used. If None, the default of `scipy.stats.ttest_ind` applies, which is Student's t-test.
+            Also applies to the permutation test. Defaults to None.
         correction (Union[Literal["holmsidak", "bonferroni", "fdr"], None], optional): The correction to apply to the
             p-values to control the family-wise error rate.
             Defaults to "holmsidak".
@@ -307,6 +418,23 @@ def get_stats(
         raise ValueError("The equal_variance argument can only be used with independent t-tests.")
 
     test_func = test if callable(test) else _get_test_function(test, dependent)  # type: ignore[arg-type]
+
+    permutation_p_values = None
+    if (
+        test == "t"
+        and not dependent
+        and comparison == "all"
+        and permutation_count
+        and set(test_kwargs).issubset({"equal_var"})
+    ):
+        permutation_p_values = _t_test_permutation_p_values(
+            data,
+            group_idx,
+            len(unique_groups),
+            equal_variance=test_kwargs.get("equal_var", True),  # the default of scipy.stats.ttest_ind
+            permutation_count=permutation_count,
+            seed=permutation_seed,
+        )
     comparisons: List[Tuple[int, int]] = []
 
     # get all possible comparisons
@@ -331,7 +459,7 @@ def get_stats(
     comparison_results: List[dict] = []
 
     for data_idx, comparison_idx in comparisons:
-        for marker_idx in range(0, data_shape[1]):
+        for marker_idx in range(0, data.shape[-1]):
             data_group = group_data[data_idx][:, marker_idx]
 
             if comparison_idx == -1:
@@ -352,6 +480,7 @@ def get_stats(
                 dependent,
                 permutation_count,
                 permutation_seed,
+                p_value=None if permutation_p_values is None else permutation_p_values[data_idx, marker_idx],
                 **test_kwargs,
             )
 

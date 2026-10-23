@@ -1,10 +1,9 @@
-from typing import Any, Literal, Tuple
+from typing import Literal, Tuple
 
 import numpy as np
-from libpysal.weights import W
+from libpysal.graph import Graph
 from numpy.typing import NDArray
 from scipy.sparse import coo_matrix
-from tqdm import tqdm
 
 
 def neighborhood_offset(
@@ -64,7 +63,7 @@ def neighborhood_offset(
 def spatial_weights(
     data_shape: Tuple[int, int],
     neighborhood_offset: NDArray,
-) -> Any:
+) -> Graph:
     """Create a spatial weights matrix from a given data shape and neighborhood offset.
 
     .. code-block:: python
@@ -87,7 +86,7 @@ def spatial_weights(
         neighborhood_offset (NDArray): The neighborhood offset array.
 
     Returns:
-        NDArray: The spatial weights matrix.
+        Graph: The spatial weights as a `libpysal.graph.Graph`, with the flattened pixel indices as ids.
     """
     rows, cols = data_shape
     cell_count = rows * cols
@@ -99,7 +98,7 @@ def spatial_weights(
     neighbors_list = []
     weight_list = []
 
-    for offset_x, offset_y in tqdm(neighborhood_offset, desc="Creating spatial weights for each offset"):
+    for offset_x, offset_y in neighborhood_offset:
         if offset_x >= 0:
             focal_range_x = slice(0, rows - offset_x) if offset_x > 0 else slice(0, rows)
             neighbor_range_x = slice(offset_x, rows)
@@ -133,4 +132,16 @@ def spatial_weights(
             shape=(cell_count, cell_count),
         )
 
-    return W.from_sparse(sparse_matrix)
+    return Graph.from_sparse(sparse_matrix)
+
+
+def queen_contiguity_weights(data_shape: tuple[int, ...]) -> Graph:
+    """Create the queen contiguity spatial weights of the eight direct neighbors of each pixel.
+
+    Args:
+        data_shape (tuple[int, ...]): The shape of the data, of which the first two dimensions are used.
+
+    Returns:
+        Graph: The spatial weights as a `libpysal.graph.Graph`.
+    """
+    return spatial_weights((data_shape[0], data_shape[1]), neighborhood_offset(neighborhood_type="queen", order=1))

@@ -1,14 +1,16 @@
-from typing import Any, Literal, Optional
+from typing import Any, Literal
 
 import numpy as np
 import pandas as pd
 from esda.geary import Geary
 from esda.moran import Moran
-from libpysal.weights import W, lat2W
+from libpysal.graph import Graph
+from libpysal.weights import W
 from numpy.typing import NDArray
 from tqdm import tqdm
 
 from spatiomic._internal._check_cluster_image import check_cluster_image
+from spatiomic.spatial._spatial_weights import queen_contiguity_weights
 
 
 class Autocorrelation:
@@ -17,7 +19,7 @@ class Autocorrelation:
     def predict(
         self,
         data: NDArray,
-        spatial_weights: Optional[W] = None,
+        spatial_weights: Graph | W | None = None,
         method: Literal["moran", "geary"] = "moran",
         permutation_count: int = 0,
         *args: Any,  # noqa: ARG002
@@ -30,8 +32,8 @@ class Autocorrelation:
         Args:
             data (NDArray): The 2D image of integer clusters or the XYC image to perform autocorrelation analysis on.
                 Unassigned pixels (-1) are not analysed as a cluster.
-            spatial_weights (Optional[W], optional): The spatial weights to use. If None, queen contiguity weights are
-                generated based on the data shape using `lat2W`. Defaults to None.
+            spatial_weights (Graph | W | None, optional): The spatial weights to use, e.g., from
+                `so.spatial.spatial_weights`. If None, queen contiguity weights are used. Defaults to None.
             method (Literal["moran", "geary"], optional): The method to use. Defaults to "moran".
             permutation_count (int, optional): The number of permutations to use for p-value calculation, 0 if no
                 simulation is to be performed.
@@ -52,9 +54,7 @@ class Autocorrelation:
         if not channel_image:
             check_cluster_image(data)
 
-        spatial_weights_matrix = (
-            lat2W(data_shape[0], data_shape[1], rook=False) if spatial_weights is None else spatial_weights
-        )
+        spatial_weights_matrix = queen_contiguity_weights(data_shape) if spatial_weights is None else spatial_weights
         unique_clusters = np.unique(data[data >= 0]) if not channel_image else np.arange(data_shape[-1])
 
         base_columns = [

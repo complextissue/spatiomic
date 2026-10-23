@@ -4,11 +4,13 @@ from warnings import warn
 import numpy as np
 import pandas as pd
 from esda.losh import LOSH
-from libpysal.weights import W, lat2SW
+from libpysal.graph import Graph
+from libpysal.weights import W
 from numpy.typing import NDArray
 
 from spatiomic._internal._check_channel_dimension import check_channel_dimension
 from spatiomic._internal._check_cluster_image import check_cluster_image
+from spatiomic.spatial._spatial_weights import queen_contiguity_weights
 
 
 class LocalHeteroskedasticity:
@@ -19,7 +21,7 @@ class LocalHeteroskedasticity:
         cls,
         data: NDArray,
         channel_names: Optional[List[str]] = None,
-        spatial_weights: Optional[W] = None,
+        spatial_weights: Graph | W | None = None,
         inference: Literal["chi-square", "permutation"] = "chi-square",
         **kwargs: Any,
     ) -> pd.DataFrame:
@@ -30,8 +32,8 @@ class LocalHeteroskedasticity:
                 value represents a cluster label (integer). If the data is a 3D array (XYC), it is assumed to be a
                 multi-channel image.
             channel_names (Optional[List[str]], optional): Names for each channel. Defaults to None.
-            spatial_weights (Optional[W], optional): The spatial weights to use. If None, queen contiguity weights are
-                generated based on the data shape using `lat2SW`. Defaults to None.
+            spatial_weights (Graph | W | None, optional): The spatial weights to use, e.g., from
+                `so.spatial.spatial_weights`. If None, queen contiguity weights are used. Defaults to None.
             inference (Literal["chi-square", "permutation"], optional):  Method for p-value inference in LOSH.
                 Defaults to "chi-square".
             **kwargs: Additional keyword arguments to be passed to the `esda.losh.LOSH` class.
@@ -68,11 +70,7 @@ class LocalHeteroskedasticity:
                     "The number of channel names must match the number of channels in the input data (XYC)."
                 )
 
-        w = (
-            lat2SW(data.shape[0], data.shape[1], criterion="queen").tocsr()
-            if spatial_weights is None
-            else spatial_weights
-        )
+        w = queen_contiguity_weights(data.shape) if spatial_weights is None else spatial_weights
         losh = LOSH(connectivity=w, inference=inference, **kwargs)
 
         losh_values: List[NDArray] = []
