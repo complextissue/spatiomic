@@ -44,3 +44,20 @@ def test_knn_graph(
         for batch_id in batch_ids:
             batch_neighbor_count = len(neighbor_batches) if batch_id is None else np.sum(neighbor_batches == batch_id)
             assert batch_neighbor_count >= neighbor_count
+
+
+@pytest.mark.cpu
+@pytest.mark.parametrize("distance_max", [0.5, 1.0, 2.0])
+def test_knn_graph_distance_max(distance_max: float) -> None:
+    """Test that the radius graph connects exactly the pairs of distinct points within `distance_max`."""
+    data = np.random.default_rng(0).normal(size=(100, 3))
+
+    knn_graph = so.neighbor.knn_graph.create(data, distance_max=distance_max, use_gpu=False)
+
+    distances = np.linalg.norm(data[:, None] - data[None], axis=-1)
+    expected_edges = {
+        (int(i), int(j)) for i, j in zip(*np.nonzero(np.triu(distances <= distance_max, k=1)), strict=True)
+    }
+
+    assert list(knn_graph.nodes) == list(range(data.shape[0]))
+    assert {tuple(sorted(edge)) for edge in knn_graph.edges} == expected_edges

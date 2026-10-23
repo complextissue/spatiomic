@@ -3,10 +3,12 @@ from typing import List, Optional
 import numpy as np
 import pandas as pd
 from anndata import AnnData
-from libpysal.weights import W, lat2SW
+from libpysal.graph import Graph
+from libpysal.weights import W
 from numpy.typing import NDArray
 
 from spatiomic._internal._check_channel_dimension import check_channel_dimension
+from spatiomic.spatial._spatial_weights import queen_contiguity_weights
 
 
 def anndata_from_array(
@@ -14,7 +16,7 @@ def anndata_from_array(
     channel_names: List[str],
     clusters: Optional[NDArray] = None,
     cluster_key: str = "clusters",
-    spatial_weights: Optional[W] = None,
+    spatial_weights: Graph | W | None = None,
 ) -> AnnData:
     """Create an AnnData object from an image data array.
 
@@ -23,7 +25,8 @@ def anndata_from_array(
         channel_names (List[str]): The channel names.
         clusters (Optional[NDArray], optional): The clusters. Defaults to None.
         cluster_key (str, optional): The cluster key. Defaults to "clusters".
-        spatial_weights (Optional[W], optional): The spatial weights. Defaults to None.
+        spatial_weights (Graph | W | None, optional): The spatial weights, e.g., from `so.spatial.spatial_weights`.
+            If None, queen contiguity weights are used. Defaults to None.
 
     Returns:
         AnnData: The AnnData object
@@ -35,10 +38,8 @@ def anndata_from_array(
     data_flat = data.reshape(-1, channels)
 
     spatial_weights = (
-        lat2SW(data_shape[0], data_shape[1], criterion="queen").tocsr()
-        if spatial_weights is None
-        else spatial_weights.to_sparse(fmt="csr")
-    )
+        queen_contiguity_weights(data_shape) if spatial_weights is None else spatial_weights
+    ).sparse.tocsr()
 
     # Create the AnnData object
     adata = AnnData(X=data_flat)

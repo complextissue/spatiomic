@@ -46,7 +46,7 @@ class KnnGraph:
                 Defaults to True.
 
         Raises:
-            ValueError: Raised when the `distance_max` parameter is used with the `batch_balanced` method.
+            ValueError: Raised when the `distance_max` parameter is used with the `batch_balanced` method or the GPU.
             NotImplementedError: Raised when the specified neighborhood identification method has not been implemented.
 
         Returns:
@@ -62,8 +62,6 @@ class KnnGraph:
         data_shape = data.shape
         data = data.reshape(-1, data_shape[-1])
 
-        edgelist: List = []
-
         # create the neighbor finder
         neighbor_finder = get_neighbor_finder(
             neighbor_count=neighbor_count,
@@ -75,7 +73,9 @@ class KnnGraph:
         )
 
         if method == "simple":
-            # use the NearestNeighbors class to find the nearest neighbors and construct the graph
+            if distance_max is not None and use_gpu:
+                raise ValueError("The `distance_max` parameter is not supported when using the GPU.")
+
             neighbor_finder.fit(data)
 
             if distance_max is None:
@@ -84,76 +84,52 @@ class KnnGraph:
                     n_neighbors=neighbor_count + 1,  # since we include the point itself
                     return_distance=False,
                 )
+                edges = cls.get_edges(neighbor_idx)
             else:
-                if use_gpu:
-                    raise ValueError("The `distance_max` parameter is not supported when using the GPU.")
-
-                neighbor_idx, distances = neighbor_finder.radius_neighbors(
-                    data,
-                    radius=distance_max,
-                    return_distance=True,
+                # radius_neighbors returns a ragged object array of the neighbors within the radius of each point
+                neighbor_idx = neighbor_finder.radius_neighbors(data, radius=distance_max, return_distance=False)
+                edges = _deduplicate_edges(
+                    np.repeat(np.arange(len(neighbor_idx)), [len(neighbors) for neighbors in neighbor_idx]),
+                    np.concatenate(neighbor_idx),
+                    node_count=data.shape[0],
                 )
 
-                # filter the neighbor_idx array to only include the indices within the specified distance
-                neighbor_idx = np.array([np.where(distances[i] <= distance_max)[0] for i in range(0, len(distances))])
-
-            knn_graph = cls.create_graph(cls.get_edges(neighbor_idx), node_count=data.shape[0])
+            knn_graph = cls.create_graph(edges, node_count=data.shape[0])
 
         elif method == "batch_balanced" and batch is not None:
             if distance_max is not None:
                 raise ValueError("The `distance_max` parameter is not supported for the `batch_balanced` method.")
 
-            # separate the data into batches
-            batch = np.array(batch) if isinstance(batch, list) else batch
-            batch_ids = np.unique(batch)
-            batch_data = [data[np.array(batch) == batch_id] for batch_id in batch_ids]
+            batch = np.asarray(batch)
+            batch_indices = [np.flatnonzero(batch == batch_id) for batch_id in np.unique(batch)]
 
-            # get the indices for each batch where data[batch == batch_id]
-            batch_indices = [np.where(batch == batch_ids[i])[0] for i in range(0, len(batch_data))]
+            # find the neighbors of the points of every batch within every batch, including their own
+            sources: list[NDArray] = []
+            targets: list[NDArray] = []
 
-            # calculate the nearest neighbors for each batch with each other batch
-            batch_edges = []
+            for fit_indices in batch_indices:
+                neighbor_finder.fit(data[fit_indices])
 
-            for i in range(0, len(batch_data)):
-                neighbor_finder.fit(batch_data[i])
-
-                for j in range(0, len(batch_data)):
-                    # will find k neighbors in all batches
+                for query_indices in batch_indices:
+                    is_own_batch = query_indices is fit_indices
                     nearest_neighbors = neighbor_finder.kneighbors(
-                        batch_data[j],
-                        n_neighbors=(
-                            neighbor_count + 1 if i == j else neighbor_count  # since we include the point itself
-                        ),
+                        data[query_indices],
+                        n_neighbors=neighbor_count + 1 if is_own_batch else neighbor_count,  # include the point itself
                         return_distance=False,
                     )
 
-                    for k in range(0, nearest_neighbors.shape[0]):
-                        for length_idx in range(0, nearest_neighbors.shape[1]):
-                            neighbor = nearest_neighbors[k, length_idx]
+                    if is_own_batch:
+                        edges = fit_indices[cls.get_edges(nearest_neighbors)]
+                        sources.append(edges[:, 0])
+                        targets.append(edges[:, 1])
+                    else:
+                        sources.append(np.repeat(query_indices, nearest_neighbors.shape[1]))
+                        targets.append(fit_indices[nearest_neighbors].ravel())
 
-                            # discard the connection to the same point
-                            if i == j and neighbor == k:
-                                continue
-
-                            batch_edges.append([[j, k], [i, neighbor]])
-
-            # combine the batch_edges into a singleedges
-            edgelist.extend(
-                [
-                    tuple(
-                        sorted(
-                            [
-                                batch_indices[edge[0][0]][edge[0][1]],
-                                batch_indices[edge[1][0]][edge[1][1]],
-                            ]
-                        )
-                    )
-                    for edge in batch_edges
-                ]
+            knn_graph = cls.create_graph(
+                _deduplicate_edges(np.concatenate(sources), np.concatenate(targets), node_count=data.shape[0]),
+                node_count=data.shape[0],
             )
-
-            # deduplicate the edges and convert to a graph
-            knn_graph = cls.create_graph(set(edgelist), node_count=data.shape[0])
 
         else:
             raise NotImplementedError(
@@ -182,7 +158,9 @@ class KnnGraph:
         graph = nx.Graph()
         graph.add_nodes_from(range(node_count))
 
-        if weights is None:
+        if weights is None and isinstance(edges, np.ndarray):
+            graph.add_edges_from(edges.tolist())
+        elif weights is None:
             graph.add_edges_from((int(source), int(target)) for source, target in edges)
         else:
             graph.add_weighted_edges_from(
@@ -199,8 +177,11 @@ class KnnGraph:
         Args:
             neighbor_idx (NDArray): The neighbor index array.
 
+        Raises:
+            ValueError: Raised when a row of `neighbor_idx` contains its own index more than once.
+
         Returns:
-            List: The edgelist.
+            NDArray: The unique undirected edges, each sorted as (lower, higher) node index.
         """
         # stack the n indices m times to get a matrix of shape (n, m)
         n = neighbor_idx.shape[0]
@@ -214,22 +195,28 @@ class KnnGraph:
         # neighborhood
         mask[np.sum(mask, axis=1) == m, -1] = False
 
-        assert np.all(np.sum(mask, axis=1) == m - 1, axis=0), (
-            "The neighbor_idx array must be a valid neighbor index array."
-        )
+        if np.any(np.sum(mask, axis=1) != m - 1):
+            raise ValueError("The neighbor_idx array must be a valid neighbor index array.")
 
-        # flatten the mask and the neighbor_idx array, then use the mask to filter the neighbor_idx array
-        mask = mask.flatten()
-        neighbor_idx = neighbor_idx.flatten()
-        neighbor_idx = neighbor_idx[mask]
+        return _deduplicate_edges(np.repeat(np.arange(n), m - 1), neighbor_idx[mask], node_count=n)
 
-        # convert neighborhood array into an array with [index, neighbor] pairs
-        edgelist = np.column_stack([np.repeat(np.arange(n), m - 1), neighbor_idx])
 
-        # only keep unique pairs
-        edgelist = np.sort(edgelist, axis=1)
+def _deduplicate_edges(sources: NDArray, targets: NDArray, node_count: int) -> NDArray:
+    """Turn directed (source, target) pairs into unique undirected edges without self-loops.
 
-        # only keep unique pairs
-        edgelist = np.unique(edgelist, axis=0)
+    Args:
+        sources (NDArray): The source node of each pair.
+        targets (NDArray): The target node of each pair.
+        node_count (int): The number of nodes, an exclusive upper bound of the node indices.
 
-        return edgelist  # type: ignore[no-any-return]
+    Returns:
+        NDArray: The unique edges as an array of shape (edge_count, 2), each sorted as (lower, higher) node index.
+    """
+    lower = np.minimum(sources, targets).astype(np.int64)
+    higher = np.maximum(sources, targets).astype(np.int64)
+    keep = lower != higher
+
+    # encode each pair as a single integer, as np.unique on 1D data is much faster than on rows
+    keys = np.unique(lower[keep] * node_count + higher[keep])
+
+    return np.column_stack(np.divmod(keys, node_count))

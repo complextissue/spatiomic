@@ -1,14 +1,16 @@
-from typing import Any, Literal, Optional
+from typing import Any, Literal
 from warnings import warn
 
 import numpy as np
 import pandas as pd
 from esda.getisord import G_Local
 from esda.moran import Moran_Local
-from libpysal.weights import W, lat2W
+from libpysal.graph import Graph
+from libpysal.weights import W
 from numpy.typing import NDArray
 
 from spatiomic._internal._check_cluster_image import check_cluster_image
+from spatiomic.spatial._spatial_weights import queen_contiguity_weights
 
 
 class LocalAutocorrelation:
@@ -18,7 +20,7 @@ class LocalAutocorrelation:
     def predict(
         cls,
         data: NDArray,
-        spatial_weights: Optional[W] = None,
+        spatial_weights: Graph | W | None = None,
         method: Literal["moran", "getisord"] = "moran",
         permutation_count: int = 0,
         *args: Any,  # noqa: ARG003
@@ -28,8 +30,8 @@ class LocalAutocorrelation:
 
         Args:
             data (NDArray): The data to calculate the local autocorrelation on.
-            spatial_weights (Optional[W], optional): The spatial weights to use. If None, queen contiguity weights are
-                generated based on the data shape using `lat2W`. Defaults to None.
+            spatial_weights (Graph | W | None, optional): The spatial weights to use, e.g., from
+                `so.spatial.spatial_weights`. If None, queen contiguity weights are used. Defaults to None.
             method (Literal["moran", "getisord"], optional): The method to use for local spatial autocorrelation
                 analysis. Defaults to "moran".
             permutation_count (int, optional): The number of permutations to use for the pseudo-p-value calculation.
@@ -58,7 +60,7 @@ class LocalAutocorrelation:
             )
             data = data.astype(np.float64)
 
-        w = lat2W(data.shape[0], data.shape[1], rook=False) if spatial_weights is None else spatial_weights
+        w = queen_contiguity_weights(data.shape) if spatial_weights is None else spatial_weights
 
         if method == "moran":
             if permutation_count == 0:

@@ -81,6 +81,32 @@ def test_som_cpu(
 
 
 @pytest.mark.cpu
+@pytest.mark.parametrize("verbose", [False, True])
+def test_som_verbose(example_data: NDArray, verbose: bool, capsys: pytest.CaptureFixture[str]) -> None:
+    """Test that fitting shows a progress bar over the epochs only when verbose."""
+    data_som = so.dimension.som(
+        node_count=NODE_COUNT, dimension_count=example_data.shape[-1], use_gpu=False, seed=0, verbose=verbose
+    )
+    data_som.fit(example_data, iteration_count=3)
+
+    assert ("3/3" in capsys.readouterr().err) == verbose
+
+
+def test_som_deterministic(example_data: NDArray) -> None:
+    """Test that deterministic fits give identical nodes, also on a GPU."""
+    nodes = []
+    for _ in range(3):
+        data_som = so.dimension.som(
+            node_count=NODE_COUNT, dimension_count=example_data.shape[-1], seed=0, deterministic=True
+        )
+        data_som.fit(example_data, iteration_count=5)
+        nodes.append(data_som.get_nodes())
+
+    for other_nodes in nodes[1:]:
+        np.testing.assert_array_equal(other_nodes, nodes[0])
+
+
+@pytest.mark.cpu
 @pytest.mark.parametrize("initialization", ["random", "sample", "pca"])
 def test_som_training_reduces_quantization_error(
     example_data: NDArray,

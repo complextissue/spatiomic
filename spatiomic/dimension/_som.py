@@ -25,6 +25,8 @@ class Som(LoadableDimensionReducer):
         batch_size: int | None = None,
         seed: int | None = None,
         use_gpu: bool = True,
+        verbose: bool = False,
+        deterministic: bool = False,
     ) -> None:
         """Initialise a self-organising map with the provided configuration.
 
@@ -62,6 +64,10 @@ class Som(LoadableDimensionReducer):
                 the free GPU memory.
             seed (int | None, optional): The random seed. Defaults to None.
             use_gpu (bool, optional): Whether to use a GPU (CUDA or MPS) if one is available. Defaults to True.
+            verbose (bool, optional): Whether `fit` shows a progress bar over the epochs. Defaults to False.
+            deterministic (bool, optional): Whether `fit` gives the same map in every run on the GPU, where it is
+                otherwise not fully deterministic. Up to about 1.8x slower on the GPU. The CPU is always deterministic.
+                Defaults to False.
         """
         self.set_config(
             node_count=node_count,
@@ -75,6 +81,8 @@ class Som(LoadableDimensionReducer):
         )
 
         self.use_gpu = use_gpu
+        self.verbose = verbose
+        self.deterministic = deterministic
         self.som: SOM | None = None
 
     def set_config(
@@ -148,6 +156,8 @@ class Som(LoadableDimensionReducer):
             "random_state": self.seed,
             "device": None if self.use_gpu else "cpu",
             "batch_size": self.batch_size,
+            "verbose": self.verbose,
+            "deterministic": self.deterministic,
         }
 
     def _get_fitted_som(

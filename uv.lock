@@ -1933,16 +1933,17 @@ wheels = [
 
 [[package]]
 name = "fastersom"
-version = "0.3.0"
+version = "0.3.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "numpy" },
     { name = "torch", version = "2.4.1", source = { registry = "https://pypi.org/simple" }, marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
     { name = "torch", version = "2.14.1", source = { registry = "https://pypi.org/simple" }, marker = "sys_platform == 'emscripten' or sys_platform == 'win32' or extra != 'extra-9-spatiomic-cuda-12' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "tqdm" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/a3/f3/7c2e7361c62b56e4c8d963ff1fbaab1c72ece16b703dd750c6cec8940c73/fastersom-0.3.0.tar.gz", hash = "sha256:b13e556625715869704714a935bf825461639994bbbf65f44491375a3011d94c", size = 15376, upload-time = "2026-10-22T18:14:55.791Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/a0/cb/fc507c8c35d58602028c3506b4d72cc9bc6582a0e44ee2fcff948d8c061e/fastersom-0.3.2.tar.gz", hash = "sha256:e41b0f507bffade28ec7e4abda6bbcb448ca8a15d03e2c88498904c4a3f0a701", size = 17033, upload-time = "2026-10-23T17:54:30.156Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/d0/ed/1f7bff8cb03eb082f3ef497729eb4797972c8637f6672a210f992150d201/fastersom-0.3.0-py3-none-any.whl", hash = "sha256:02c3b96667f58f4e9c62d6f86eaedcb2548634cc1df3799a849b3f77b05cb52b", size = 15725, upload-time = "2026-10-22T18:14:54.624Z" },
+    { url = "https://files.pythonhosted.org/packages/58/cf/6932b2badc6a3ac1317cb8210186d12da88b3f8cd17efffffb5894165c30/fastersom-0.3.2-py3-none-any.whl", hash = "sha256:843fe64be8c682fcbbabe23fb0efcd837501fca73d0c79dab18dae253f49bbf8", size = 17337, upload-time = "2026-10-23T17:54:28.776Z" },
 ]
 
 [[package]]
@@ -2298,6 +2299,25 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/c5/f8/7e33845d6b90ce1cf37cfabf25cb859277c7d3533ef1b6b1e1ca58581549/google_crc32c-1.9.0-cp315-cp315-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:f97c3806dcea41c29c04965347b0e12481561b75e0045dc7a4f69d75dec5d9b1", size = 38359, upload-time = "2026-09-24T21:38:14.983Z" },
     { url = "https://files.pythonhosted.org/packages/36/ff/556b2423f449a7515af6b8222a4d7833cbe09ff3e8d2f0b80471f5f6d02e/google_crc32c-1.9.0-cp315-cp315-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:0abe7e202c25909869c35672ab0f2fe748a7acf276eb78577332a7c38999740f", size = 36858, upload-time = "2026-09-24T21:38:15.799Z" },
     { url = "https://files.pythonhosted.org/packages/40/71/4733f1b7c921d04a2bb9b9916cf66498bf7ad0860a06289413830da83192/google_crc32c-1.9.0-cp315-cp315-win_amd64.whl", hash = "sha256:5695c8b9327e040b2aba12c6659b0acb5995314ef0af0192da66e662e011103b", size = 35534, upload-time = "2026-09-24T21:39:31.337Z" },
+]
+
+[[package]]
+name = "graspologic-native"
+version = "1.3.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "numpy" },
+    { name = "scipy" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/b1/25/607bcadd51954aa98892e44d1536560abb06a81ff48288982bd8303983ee/graspologic_native-1.3.1.tar.gz", hash = "sha256:fa6be9c292508b8a876d45ac98ee550534d9e33fcf7129a6df8a95573101be4c", size = 2655991, upload-time = "2026-06-14T01:01:51.23Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/01/f7/c3642c95d7c3f60ade4a7b1d583bb76e9410e9ffe4185701ac87b533ccf2/graspologic_native-1.3.1-cp39-abi3-macosx_10_12_x86_64.macosx_11_0_arm64.macosx_10_12_universal2.whl", hash = "sha256:72200aa468481d78d5b26735030c98f4a9e3388930c93043e1c01ef9fb2a0a62", size = 730640, upload-time = "2026-06-14T01:01:41.578Z" },
+    { url = "https://files.pythonhosted.org/packages/ee/d6/79475dec15daa002c066494283baac911b65d7956ed6a22c5f685c20987e/graspologic_native-1.3.1-cp39-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:7f4319b6d7f9e01d52986fbc13ffcf50e262351e9c78b0a3453c9130cdd1779c", size = 403084, upload-time = "2026-06-14T01:01:43.12Z" },
+    { url = "https://files.pythonhosted.org/packages/8d/73/5bcb4928f973996465cbd5dc1b33f9cbfbf1227d08fb3e0b8e82bb485a95/graspologic_native-1.3.1-cp39-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:1f622699db442f55fe754e44abef2586ce389a9e47e049208e4b324edbef9131", size = 417429, upload-time = "2026-06-14T01:01:44.423Z" },
+    { url = "https://files.pythonhosted.org/packages/c4/b7/0c2774a0f566bbb58f23ab450e4a3b89221b79e0c7aff5736c887c16d78b/graspologic_native-1.3.1-cp39-abi3-musllinux_1_2_aarch64.whl", hash = "sha256:7fc1fd3fb6ee65c940053774841f6c74d3b88a8ab7afb92d5ac8cc09241394ff", size = 471428, upload-time = "2026-06-14T01:01:45.664Z" },
+    { url = "https://files.pythonhosted.org/packages/5f/25/887e991b4466c6ca07d6670f94b1382df87b302c0c996bc4e0ddd05ddc43/graspologic_native-1.3.1-cp39-abi3-musllinux_1_2_x86_64.whl", hash = "sha256:279d922d977cd4a2cb70590a73fe589bb527e1171448d040b5e2b47e6aa58432", size = 619869, upload-time = "2026-06-14T01:01:47.045Z" },
+    { url = "https://files.pythonhosted.org/packages/64/61/f324b76d007eb765792acba95a39f9c0e749d2338049bc3a67b5adc75f65/graspologic_native-1.3.1-cp39-abi3-win_amd64.whl", hash = "sha256:85dfb19cedd7b9ca627b3d1f283d3270af0a3c2e8378c9e61fe1f56d09a2a1a0", size = 260864, upload-time = "2026-06-14T01:01:48.634Z" },
+    { url = "https://files.pythonhosted.org/packages/37/f6/c6fda035cb637e3fe205cc58c555ea68a091d519f7527b7d1351869cb0cd/graspologic_native-1.3.1-cp39-abi3-win_arm64.whl", hash = "sha256:8a631a522b597ff5cf1907efc9b03eb1bc268d8702cf0777efb85769dff29dab", size = 246883, upload-time = "2026-06-14T01:01:49.92Z" },
 ]
 
 [[package]]
@@ -7093,7 +7113,7 @@ wheels = [
 
 [[package]]
 name = "spatiomic"
-version = "0.10.1"
+version = "0.11.0"
 source = { editable = "." }
 dependencies = [
     { name = "adjusttext" },
@@ -7101,6 +7121,7 @@ dependencies = [
     { name = "colorcet" },
     { name = "esda" },
     { name = "fastersom" },
+    { name = "graspologic-native" },
     { name = "joblib" },
     { name = "lazy-loader" },
     { name = "libpysal" },
@@ -7217,7 +7238,8 @@ requires-dist = [
     { name = "cuml-cu12", marker = "extra == 'cuda-12'", specifier = ">=25.10" },
     { name = "cuml-cu13", marker = "extra == 'cuda-13'", specifier = ">=25.10" },
     { name = "esda", specifier = ">=2.7" },
-    { name = "fastersom", specifier = ">=0.3" },
+    { name = "fastersom", specifier = "==0.3.2" },
+    { name = "graspologic-native", specifier = ">=1.3.1" },
     { name = "joblib" },
     { name = "lazy-loader" },
     { name = "libpysal", specifier = ">=4.12" },
