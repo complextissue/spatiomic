@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 5
 requires-python = ">=3.12"
 resolution-markers = [
     "python_full_version >= '3.15' and sys_platform == 'win32'",
@@ -9,10 +9,10 @@ resolution-markers = [
     "python_full_version == '3.14.*' and sys_platform == 'emscripten'",
     "python_full_version == '3.14.*' and sys_platform != 'emscripten' and sys_platform != 'win32'",
     "python_full_version == '3.13.*' and sys_platform == 'win32'",
-    "python_full_version < '3.13' and sys_platform == 'win32'",
     "python_full_version == '3.13.*' and sys_platform == 'emscripten'",
-    "python_full_version < '3.13' and sys_platform == 'emscripten'",
     "python_full_version == '3.13.*' and sys_platform != 'emscripten' and sys_platform != 'win32'",
+    "python_full_version < '3.13' and sys_platform == 'win32'",
+    "python_full_version < '3.13' and sys_platform == 'emscripten'",
     "python_full_version < '3.13' and sys_platform != 'emscripten' and sys_platform != 'win32'",
 ]
 conflicts = [[
@@ -105,7 +105,7 @@ dependencies = [
     { name = "frozenlist" },
     { name = "multidict" },
     { name = "propcache" },
-    { name = "typing-extensions", marker = "python_full_version < '3.13' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "typing-extensions", marker = "python_full_version < '3.13'" },
     { name = "yarl" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/6c/4c/bdccd81e9ee225b69c60e7766c9a5b05364f118f4d383713b89a682d772d/aiohttp-3.14.5.tar.gz", hash = "sha256:5558a7f5a05af9ecf744af91e5baefc436f93c9333e656c27ec253f9a6bbe178", size = 8078052, upload-time = "2026-10-11T01:05:12.408Z" }
@@ -251,7 +251,7 @@ version = "1.4.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "frozenlist" },
-    { name = "typing-extensions", marker = "python_full_version < '3.13' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "typing-extensions", marker = "python_full_version < '3.13'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/61/62/06741b579156360248d1ec624842ad0edf697050bbaf7c3e46394e106ad1/aiosignal-1.4.0.tar.gz", hash = "sha256:f47eecd9468083c2029cc99945502cb7708b082c232f9aca65da147157b251c7", size = 25007, upload-time = "2025-07-03T22:54:43.528Z" }
 wheels = [
@@ -281,7 +281,7 @@ dependencies = [
     { name = "pandas" },
     { name = "scipy" },
     { name = "scverse-misc", extra = ["settings"] },
-    { name = "typing-extensions", marker = "python_full_version < '3.15' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "typing-extensions", marker = "python_full_version < '3.15'" },
     { name = "zarr" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/27/94/ded0e45490ad65d1232d3bc3bc618fb24d33d8e87653baca1553074261be/anndata-0.13.4.tar.gz", hash = "sha256:fadee3955b4b826dd23d9c0aa296147d8624f8222210b6c8abc3c115a111dce4", size = 2376085, upload-time = "2026-09-18T12:58:50.131Z" }
@@ -439,7 +439,7 @@ name = "bandit"
 version = "1.9.4"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "colorama", marker = "sys_platform == 'win32' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "colorama", marker = "sys_platform == 'win32'" },
     { name = "pyyaml" },
     { name = "rich" },
     { name = "stevedore" },
@@ -537,10 +537,10 @@ dependencies = [
     { name = "scipy" },
     { name = "segment-anything" },
     { name = "tifffile" },
-    { name = "torch", version = "2.4.1", source = { registry = "https://pypi.org/simple" }, marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "torch", version = "2.14.1", source = { registry = "https://pypi.org/simple" }, marker = "sys_platform == 'emscripten' or sys_platform == 'win32' or extra != 'extra-9-spatiomic-cuda-12' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "torchvision", version = "0.19.1", source = { registry = "https://pypi.org/simple" }, marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "torchvision", version = "0.29.1", source = { registry = "https://pypi.org/simple" }, marker = "sys_platform == 'emscripten' or sys_platform == 'win32' or extra != 'extra-9-spatiomic-cuda-12' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "torch", version = "2.4.1", source = { registry = "https://pypi.org/simple" }, marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "torch", version = "2.14.1", source = { registry = "https://pypi.org/simple" }, marker = "sys_platform == 'emscripten' or sys_platform == 'win32' or extra != 'extra-9-spatiomic-cuda-12' or extra == 'extra-9-spatiomic-cuda-13'" },
+    { name = "torchvision", version = "0.19.1", source = { registry = "https://pypi.org/simple" }, marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "torchvision", version = "0.29.1", source = { registry = "https://pypi.org/simple" }, marker = "sys_platform == 'emscripten' or sys_platform == 'win32' or extra != 'extra-9-spatiomic-cuda-12' or extra == 'extra-9-spatiomic-cuda-13'" },
     { name = "tqdm" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/0c/e4/3d4606883a5489b86fa6ab5f65b9d0a243810f64efb934033fe425089d5a/cellpose-4.2.1.1.tar.gz", hash = "sha256:229eedea3977184202b2c87b3bd41c609facd742c7203bb4ad3cebd7b6bc6839", size = 4441350, upload-time = "2026-06-14T14:25:15.082Z" }
@@ -562,7 +562,7 @@ name = "cffi"
 version = "2.1.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "pycparser", marker = "implementation_name != 'PyPy' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "pycparser" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/9e/ef/008a1939e372c06329a3fce4279c02f328488f3526744906eeec3da7ad5f/cffi-2.1.1.tar.gz", hash = "sha256:dd31f52ea1086513bb9df30f8fcee9b8918323ae067a3d5b78bc826a000712be", size = 530807, upload-time = "2026-08-03T21:21:18.939Z" }
 wheels = [
@@ -1074,10 +1074,10 @@ resolution-markers = [
     "python_full_version == '3.14.*' and sys_platform == 'emscripten'",
     "python_full_version == '3.14.*' and sys_platform != 'emscripten' and sys_platform != 'win32'",
     "python_full_version == '3.13.*' and sys_platform == 'win32'",
-    "python_full_version < '3.13' and sys_platform == 'win32'",
     "python_full_version == '3.13.*' and sys_platform == 'emscripten'",
-    "python_full_version < '3.13' and sys_platform == 'emscripten'",
     "python_full_version == '3.13.*' and sys_platform != 'emscripten' and sys_platform != 'win32'",
+    "python_full_version < '3.13' and sys_platform == 'win32'",
+    "python_full_version < '3.13' and sys_platform == 'emscripten'",
     "python_full_version < '3.13' and sys_platform != 'emscripten' and sys_platform != 'win32'",
 ]
 dependencies = [
@@ -1116,14 +1116,14 @@ resolution-markers = [
     "python_full_version == '3.14.*' and sys_platform == 'emscripten'",
     "python_full_version == '3.14.*' and sys_platform != 'emscripten' and sys_platform != 'win32'",
     "python_full_version == '3.13.*' and sys_platform == 'win32'",
-    "python_full_version < '3.13' and sys_platform == 'win32'",
     "python_full_version == '3.13.*' and sys_platform == 'emscripten'",
-    "python_full_version < '3.13' and sys_platform == 'emscripten'",
     "python_full_version == '3.13.*' and sys_platform != 'emscripten' and sys_platform != 'win32'",
+    "python_full_version < '3.13' and sys_platform == 'win32'",
+    "python_full_version < '3.13' and sys_platform == 'emscripten'",
     "python_full_version < '3.13' and sys_platform != 'emscripten' and sys_platform != 'win32'",
 ]
 dependencies = [
-    { name = "cuda-pathfinder", marker = "(python_full_version < '3.15' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra != 'extra-9-spatiomic-cuda-12') or (python_full_version >= '3.15' and extra == 'extra-9-spatiomic-cuda-13') or (python_full_version < '3.15' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "cuda-pathfinder", marker = "(python_full_version < '3.15' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra != 'extra-9-spatiomic-cuda-12') or extra == 'extra-9-spatiomic-cuda-13'" },
 ]
 wheels = [
     { url = "https://files.pythonhosted.org/packages/d7/38/87909f62598d02d9e5c536326aed1755f6bfa190285507b962bb601e0005/cuda_bindings-13.4.4-cp312-cp312-manylinux_2_24_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:b346bfe1dda49537537c06cc4727b2210d949d8aee883cb591bca46581629d00", size = 6488222, upload-time = "2026-10-14T12:35:20.703Z" },
@@ -1248,8 +1248,8 @@ resolution-markers = [
     "python_full_version == '3.14.*' and sys_platform == 'win32'",
     "python_full_version == '3.14.*' and sys_platform == 'emscripten'",
     "python_full_version == '3.13.*' and sys_platform == 'win32'",
-    "python_full_version < '3.13' and sys_platform == 'win32'",
     "python_full_version == '3.13.*' and sys_platform == 'emscripten'",
+    "python_full_version < '3.13' and sys_platform == 'win32'",
     "python_full_version < '3.13' and sys_platform == 'emscripten'",
 ]
 wheels = [
@@ -1309,34 +1309,34 @@ cccl = [
     { name = "nvidia-cuda-cccl", version = "13.0.85", source = { registry = "https://pypi.nvidia.com/" }, marker = "(platform_machine == 'aarch64' and sys_platform == 'linux') or (platform_machine == 'x86_64' and sys_platform == 'linux')" },
 ]
 cublas = [
-    { name = "nvidia-cublas", version = "13.1.1.3", source = { registry = "https://pypi.nvidia.com/" }, marker = "(platform_machine != 'aarch64' and platform_machine != 'x86_64' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (platform_machine == 'aarch64' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (platform_machine == 'x86_64' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform != 'linux' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "nvidia-cuda-nvrtc", version = "13.0.88", source = { registry = "https://pypi.nvidia.com/" }, marker = "(platform_machine != 'aarch64' and platform_machine != 'x86_64' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (platform_machine == 'aarch64' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (platform_machine == 'x86_64' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform != 'linux' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "nvidia-cublas", version = "13.1.1.3", source = { registry = "https://pypi.nvidia.com/" }, marker = "(platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "nvidia-cuda-nvrtc", version = "13.0.88", source = { registry = "https://pypi.nvidia.com/" }, marker = "(platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
 ]
 cudart = [
-    { name = "nvidia-cuda-runtime", version = "13.0.96", source = { registry = "https://pypi.nvidia.com/" }, marker = "(platform_machine != 'aarch64' and platform_machine != 'x86_64' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (platform_machine == 'aarch64' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (platform_machine == 'x86_64' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform != 'linux' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "nvidia-cuda-runtime", version = "13.0.96", source = { registry = "https://pypi.nvidia.com/" }, marker = "(platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
 ]
 cufft = [
-    { name = "nvidia-cufft", version = "12.0.0.61", source = { registry = "https://pypi.nvidia.com/" }, marker = "(platform_machine != 'aarch64' and platform_machine != 'x86_64' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (platform_machine == 'aarch64' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (platform_machine == 'x86_64' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform != 'linux' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "nvidia-nvjitlink", marker = "(platform_machine != 'aarch64' and platform_machine != 'x86_64' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (platform_machine == 'aarch64' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (platform_machine == 'x86_64' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform != 'linux' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "nvidia-cufft", version = "12.0.0.61", source = { registry = "https://pypi.nvidia.com/" }, marker = "(platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "nvidia-nvjitlink", marker = "(platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
 ]
 cufile = [
-    { name = "nvidia-cufile", marker = "(platform_machine != 'aarch64' and platform_machine != 'x86_64' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (platform_machine == 'aarch64' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (platform_machine == 'x86_64' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform != 'linux' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "nvidia-cufile", marker = "(platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
 ]
 cupti = [
-    { name = "nvidia-cuda-cupti", marker = "(platform_machine != 'aarch64' and platform_machine != 'x86_64' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (platform_machine == 'aarch64' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (platform_machine == 'x86_64' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform != 'linux' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "nvidia-cuda-cupti", marker = "(platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
 ]
 curand = [
-    { name = "nvidia-curand", version = "10.4.0.35", source = { registry = "https://pypi.nvidia.com/" }, marker = "(platform_machine != 'aarch64' and platform_machine != 'x86_64' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (platform_machine == 'aarch64' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (platform_machine == 'x86_64' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform != 'linux' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "nvidia-curand", version = "10.4.0.35", source = { registry = "https://pypi.nvidia.com/" }, marker = "(platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
 ]
 cusolver = [
-    { name = "nvidia-cublas", version = "13.1.1.3", source = { registry = "https://pypi.nvidia.com/" }, marker = "(platform_machine != 'aarch64' and platform_machine != 'x86_64' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (platform_machine == 'aarch64' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (platform_machine == 'x86_64' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform != 'linux' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "nvidia-cusolver", version = "12.0.4.66", source = { registry = "https://pypi.nvidia.com/" }, marker = "(platform_machine != 'aarch64' and platform_machine != 'x86_64' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (platform_machine == 'aarch64' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (platform_machine == 'x86_64' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform != 'linux' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "nvidia-cusparse", version = "12.6.3.3", source = { registry = "https://pypi.nvidia.com/" }, marker = "(platform_machine != 'aarch64' and platform_machine != 'x86_64' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (platform_machine == 'aarch64' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (platform_machine == 'x86_64' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform != 'linux' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "nvidia-nvjitlink", marker = "(platform_machine != 'aarch64' and platform_machine != 'x86_64' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (platform_machine == 'aarch64' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (platform_machine == 'x86_64' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform != 'linux' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "nvidia-cublas", version = "13.1.1.3", source = { registry = "https://pypi.nvidia.com/" }, marker = "(platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "nvidia-cusolver", version = "12.0.4.66", source = { registry = "https://pypi.nvidia.com/" }, marker = "(platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "nvidia-cusparse", version = "12.6.3.3", source = { registry = "https://pypi.nvidia.com/" }, marker = "(platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "nvidia-nvjitlink", marker = "(platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
 ]
 cusparse = [
-    { name = "nvidia-cusparse", version = "12.6.3.3", source = { registry = "https://pypi.nvidia.com/" }, marker = "(platform_machine != 'aarch64' and platform_machine != 'x86_64' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (platform_machine == 'aarch64' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (platform_machine == 'x86_64' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform != 'linux' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "nvidia-nvjitlink", marker = "(platform_machine != 'aarch64' and platform_machine != 'x86_64' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (platform_machine == 'aarch64' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (platform_machine == 'x86_64' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform != 'linux' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "nvidia-cusparse", version = "12.6.3.3", source = { registry = "https://pypi.nvidia.com/" }, marker = "(platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "nvidia-nvjitlink", marker = "(platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
 ]
 nvcc = [
     { name = "nvidia-cuda-crt", version = "13.0.88", source = { registry = "https://pypi.nvidia.com/" }, marker = "(platform_machine == 'aarch64' and sys_platform == 'linux') or (platform_machine == 'x86_64' and sys_platform == 'linux')" },
@@ -1345,13 +1345,13 @@ nvcc = [
     { name = "nvidia-nvvm", version = "13.0.88", source = { registry = "https://pypi.nvidia.com/" }, marker = "(platform_machine == 'aarch64' and sys_platform == 'linux') or (platform_machine == 'x86_64' and sys_platform == 'linux')" },
 ]
 nvjitlink = [
-    { name = "nvidia-nvjitlink", marker = "(platform_machine != 'aarch64' and platform_machine != 'x86_64' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (platform_machine == 'aarch64' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (platform_machine == 'x86_64' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform != 'linux' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "nvidia-nvjitlink", marker = "(platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
 ]
 nvrtc = [
-    { name = "nvidia-cuda-nvrtc", version = "13.0.88", source = { registry = "https://pypi.nvidia.com/" }, marker = "(platform_machine != 'aarch64' and platform_machine != 'x86_64' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (platform_machine == 'aarch64' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (platform_machine == 'x86_64' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform != 'linux' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "nvidia-cuda-nvrtc", version = "13.0.88", source = { registry = "https://pypi.nvidia.com/" }, marker = "(platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
 ]
 nvtx = [
-    { name = "nvidia-nvtx", marker = "(platform_machine != 'aarch64' and platform_machine != 'x86_64' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (platform_machine == 'aarch64' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (platform_machine == 'x86_64' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform != 'linux' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "nvidia-nvtx", marker = "(platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
 ]
 nvvm = [
     { name = "nvidia-nvvm", version = "13.0.88", source = { registry = "https://pypi.nvidia.com/" }, marker = "(platform_machine == 'aarch64' and sys_platform == 'linux') or (platform_machine == 'x86_64' and sys_platform == 'linux')" },
@@ -1367,8 +1367,8 @@ resolution-markers = [
     "python_full_version == '3.14.*' and sys_platform == 'win32'",
     "python_full_version == '3.14.*' and sys_platform == 'emscripten'",
     "python_full_version == '3.13.*' and sys_platform == 'win32'",
-    "python_full_version < '3.13' and sys_platform == 'win32'",
     "python_full_version == '3.13.*' and sys_platform == 'emscripten'",
+    "python_full_version < '3.13' and sys_platform == 'win32'",
     "python_full_version < '3.13' and sys_platform == 'emscripten'",
 ]
 wheels = [
@@ -1530,7 +1530,7 @@ version = "26.10.0"
 source = { registry = "https://pypi.nvidia.com/" }
 dependencies = [
     { name = "cuda-bindings", version = "12.9.10", source = { registry = "https://pypi.org/simple" } },
-    { name = "cuda-toolkit", version = "12.1.1", source = { registry = "https://pypi.nvidia.com/" }, extra = ["cublas", "cufft", "curand", "cusolver", "cusparse"], marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "cuda-toolkit", version = "12.1.1", source = { registry = "https://pypi.nvidia.com/" }, extra = ["cublas", "cufft", "curand", "cusolver", "cusparse"], marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
     { name = "cuda-toolkit", version = "12.9.2.0", source = { registry = "https://pypi.nvidia.com/" }, extra = ["cublas", "cufft", "curand", "cusolver", "cusparse"], marker = "(sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-12') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
     { name = "cudf-cu12" },
     { name = "cupy-cuda12x", extra = ["ctk"], marker = "extra == 'extra-9-spatiomic-cuda-12'" },
@@ -1560,7 +1560,7 @@ version = "26.10.0"
 source = { registry = "https://pypi.nvidia.com/" }
 dependencies = [
     { name = "cuda-bindings", version = "13.4.4", source = { registry = "https://pypi.org/simple" } },
-    { name = "cuda-toolkit", version = "13.0.3.0", source = { registry = "https://pypi.nvidia.com/" }, extra = ["cublas", "cufft", "curand", "cusolver", "cusparse"], marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "cuda-toolkit", version = "13.0.3.0", source = { registry = "https://pypi.nvidia.com/" }, extra = ["cublas", "cufft", "curand", "cusolver", "cusparse"], marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-13') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
     { name = "cuda-toolkit", version = "13.4.3", source = { registry = "https://pypi.nvidia.com/" }, extra = ["cublas", "cufft", "curand", "cusolver", "cusparse"], marker = "(sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-13') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
     { name = "cudf-cu13" },
     { name = "cupy-cuda13x", extra = ["ctk"], marker = "extra == 'extra-9-spatiomic-cuda-13'" },
@@ -1609,7 +1609,7 @@ wheels = [
 
 [package.optional-dependencies]
 ctk = [
-    { name = "cuda-toolkit", version = "12.1.1", source = { registry = "https://pypi.nvidia.com/" }, extra = ["cublas", "cudart", "cufft", "curand", "cusolver", "cusparse", "nvrtc"], marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "cuda-toolkit", version = "12.1.1", source = { registry = "https://pypi.nvidia.com/" }, extra = ["cublas", "cudart", "cufft", "curand", "cusolver", "cusparse", "nvrtc"], marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
     { name = "cuda-toolkit", version = "12.9.2.0", source = { registry = "https://pypi.nvidia.com/" }, extra = ["cublas", "cudart", "cufft", "curand", "cusolver", "cusparse", "nvrtc"], marker = "(sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-12') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
 ]
 
@@ -1642,7 +1642,7 @@ wheels = [
 
 [package.optional-dependencies]
 ctk = [
-    { name = "cuda-toolkit", version = "13.0.3.0", source = { registry = "https://pypi.nvidia.com/" }, extra = ["cublas", "cudart", "cufft", "curand", "cusolver", "cusparse", "nvrtc"], marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "cuda-toolkit", version = "13.0.3.0", source = { registry = "https://pypi.nvidia.com/" }, extra = ["cublas", "cudart", "cufft", "curand", "cusolver", "cusparse", "nvrtc"], marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-13') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
     { name = "cuda-toolkit", version = "13.4.3", source = { registry = "https://pypi.nvidia.com/" }, extra = ["cublas", "cudart", "cufft", "curand", "cusolver", "cusparse", "nvrtc"], marker = "(sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-13') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
 ]
 
@@ -1933,17 +1933,17 @@ wheels = [
 
 [[package]]
 name = "fastersom"
-version = "0.3.2"
+version = "0.5.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "numpy" },
-    { name = "torch", version = "2.4.1", source = { registry = "https://pypi.org/simple" }, marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "torch", version = "2.14.1", source = { registry = "https://pypi.org/simple" }, marker = "sys_platform == 'emscripten' or sys_platform == 'win32' or extra != 'extra-9-spatiomic-cuda-12' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "torch", version = "2.4.1", source = { registry = "https://pypi.org/simple" }, marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "torch", version = "2.14.1", source = { registry = "https://pypi.org/simple" }, marker = "sys_platform == 'emscripten' or sys_platform == 'win32' or extra != 'extra-9-spatiomic-cuda-12' or extra == 'extra-9-spatiomic-cuda-13'" },
     { name = "tqdm" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/a0/cb/fc507c8c35d58602028c3506b4d72cc9bc6582a0e44ee2fcff948d8c061e/fastersom-0.3.2.tar.gz", hash = "sha256:e41b0f507bffade28ec7e4abda6bbcb448ca8a15d03e2c88498904c4a3f0a701", size = 17033, upload-time = "2026-10-23T17:54:30.156Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/cb/27/de88219b5828e8300aec5e508544dafdd69fd8b916d88435504932c27cd5/fastersom-0.5.0.tar.gz", hash = "sha256:fd4e777490327285683323d55990075d648c78a197bb56cd8dc1b03dc67d419f", size = 46449, upload-time = "2026-10-24T16:19:08.371Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/58/cf/6932b2badc6a3ac1317cb8210186d12da88b3f8cd17efffffb5894165c30/fastersom-0.3.2-py3-none-any.whl", hash = "sha256:843fe64be8c682fcbbabe23fb0efcd837501fca73d0c79dab18dae253f49bbf8", size = 17337, upload-time = "2026-10-23T17:54:28.776Z" },
+    { url = "https://files.pythonhosted.org/packages/f5/ba/2a1a91eba4843bbe17ab5bc045bf4dbbd2906ac693603ed229dba766c128/fastersom-0.5.0-py3-none-any.whl", hash = "sha256:c29545eb7ff9ef0d33b816e4eeea7e17e2d3776d10e89d9731ec88fa3185644e", size = 43760, upload-time = "2026-10-24T16:19:06.912Z" },
 ]
 
 [[package]]
@@ -2247,8 +2247,8 @@ dependencies = [
     { name = "accessible-pygments" },
     { name = "beautifulsoup4" },
     { name = "pygments" },
-    { name = "sphinx", version = "9.1.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.13' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "sphinx", version = "9.2.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.13' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "sphinx", version = "9.1.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.13'" },
+    { name = "sphinx", version = "9.2.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.13'" },
     { name = "sphinx-basic-ng" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/ec/20/5f5ad4da6a5a27c80f2ed2ee9aee3f9e36c66e56e21c00fde467b2f8f88f/furo-2025.12.19.tar.gz", hash = "sha256:188d1f942037d8b37cd3985b955839fea62baa1730087dc29d157677c857e2a7", size = 1661473, upload-time = "2025-12-19T17:34:40.889Z" }
@@ -2444,7 +2444,7 @@ name = "ipykernel"
 version = "7.4.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "appnope", marker = "sys_platform == 'darwin' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "appnope", marker = "sys_platform == 'darwin'" },
     { name = "comm" },
     { name = "debugpy" },
     { name = "ipython" },
@@ -2467,13 +2467,13 @@ name = "ipython"
 version = "9.17.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "colorama", marker = "sys_platform == 'win32' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "colorama", marker = "sys_platform == 'win32'" },
     { name = "ipython-pygments-lexers" },
     { name = "jedi" },
     { name = "matplotlib-inline" },
-    { name = "pexpect", marker = "(sys_platform != 'emscripten' and sys_platform != 'win32') or (sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "pexpect", marker = "sys_platform != 'emscripten' and sys_platform != 'win32'" },
     { name = "prompt-toolkit" },
-    { name = "psutil", marker = "(sys_platform != 'cygwin' and sys_platform != 'emscripten') or (sys_platform == 'cygwin' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "psutil", marker = "sys_platform != 'cygwin' and sys_platform != 'emscripten'" },
     { name = "pygments" },
     { name = "stack-data" },
     { name = "traitlets" },
@@ -2768,7 +2768,7 @@ version = "26.10.2"
 source = { registry = "https://pypi.nvidia.com/" }
 dependencies = [
     { name = "cuda-pathfinder" },
-    { name = "cuda-toolkit", version = "12.1.1", source = { registry = "https://pypi.nvidia.com/" }, extra = ["nvrtc"], marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "cuda-toolkit", version = "12.1.1", source = { registry = "https://pypi.nvidia.com/" }, extra = ["nvrtc"], marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
     { name = "cuda-toolkit", version = "12.9.2.0", source = { registry = "https://pypi.nvidia.com/" }, extra = ["nvrtc"], marker = "(sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-12') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
     { name = "libkvikio-cu12" },
     { name = "librmm-cu12" },
@@ -2787,7 +2787,7 @@ version = "26.10.2"
 source = { registry = "https://pypi.nvidia.com/" }
 dependencies = [
     { name = "cuda-pathfinder" },
-    { name = "cuda-toolkit", version = "13.0.3.0", source = { registry = "https://pypi.nvidia.com/" }, extra = ["nvrtc"], marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "cuda-toolkit", version = "13.0.3.0", source = { registry = "https://pypi.nvidia.com/" }, extra = ["nvrtc"], marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-13') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
     { name = "cuda-toolkit", version = "13.4.3", source = { registry = "https://pypi.nvidia.com/" }, extra = ["nvrtc"], marker = "(sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-13') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
     { name = "libkvikio-cu13" },
     { name = "librmm-cu13" },
@@ -2805,7 +2805,7 @@ name = "libcugraph-cu12"
 version = "26.10.0"
 source = { registry = "https://pypi.nvidia.com/" }
 dependencies = [
-    { name = "cuda-toolkit", version = "12.1.1", source = { registry = "https://pypi.nvidia.com/" }, extra = ["cublas", "curand", "cusolver", "cusparse"], marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "cuda-toolkit", version = "12.1.1", source = { registry = "https://pypi.nvidia.com/" }, extra = ["cublas", "curand", "cusolver", "cusparse"], marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
     { name = "cuda-toolkit", version = "12.9.2.0", source = { registry = "https://pypi.nvidia.com/" }, extra = ["cublas", "curand", "cusolver", "cusparse"], marker = "(sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-12') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
     { name = "libcuvs-cu12" },
     { name = "libraft-cu12" },
@@ -2821,7 +2821,7 @@ name = "libcugraph-cu13"
 version = "26.10.0"
 source = { registry = "https://pypi.nvidia.com/" }
 dependencies = [
-    { name = "cuda-toolkit", version = "13.0.3.0", source = { registry = "https://pypi.nvidia.com/" }, extra = ["cublas", "curand", "cusolver", "cusparse"], marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "cuda-toolkit", version = "13.0.3.0", source = { registry = "https://pypi.nvidia.com/" }, extra = ["cublas", "curand", "cusolver", "cusparse"], marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-13') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
     { name = "cuda-toolkit", version = "13.4.3", source = { registry = "https://pypi.nvidia.com/" }, extra = ["cublas", "curand", "cusolver", "cusparse"], marker = "(sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-13') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
     { name = "libcuvs-cu13" },
     { name = "libraft-cu13" },
@@ -2837,7 +2837,7 @@ name = "libcuml-cu12"
 version = "26.10.0"
 source = { registry = "https://pypi.nvidia.com/" }
 dependencies = [
-    { name = "cuda-toolkit", version = "12.1.1", source = { registry = "https://pypi.nvidia.com/" }, extra = ["cublas", "cufft", "curand", "cusolver", "cusparse"], marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "cuda-toolkit", version = "12.1.1", source = { registry = "https://pypi.nvidia.com/" }, extra = ["cublas", "cufft", "curand", "cusolver", "cusparse"], marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
     { name = "cuda-toolkit", version = "12.9.2.0", source = { registry = "https://pypi.nvidia.com/" }, extra = ["cublas", "cufft", "curand", "cusolver", "cusparse"], marker = "(sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-12') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
     { name = "libcuvs-cu12" },
     { name = "libnvforest-cu12" },
@@ -2856,7 +2856,7 @@ name = "libcuml-cu13"
 version = "26.10.0"
 source = { registry = "https://pypi.nvidia.com/" }
 dependencies = [
-    { name = "cuda-toolkit", version = "13.0.3.0", source = { registry = "https://pypi.nvidia.com/" }, extra = ["cublas", "cufft", "curand", "cusolver", "cusparse"], marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "cuda-toolkit", version = "13.0.3.0", source = { registry = "https://pypi.nvidia.com/" }, extra = ["cublas", "cufft", "curand", "cusolver", "cusparse"], marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-13') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
     { name = "cuda-toolkit", version = "13.4.3", source = { registry = "https://pypi.nvidia.com/" }, extra = ["cublas", "cufft", "curand", "cusolver", "cusparse"], marker = "(sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-13') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
     { name = "libcuvs-cu13" },
     { name = "libnvforest-cu13" },
@@ -2876,12 +2876,12 @@ version = "26.10.0"
 source = { registry = "https://pypi.nvidia.com/" }
 dependencies = [
     { name = "cuda-pathfinder" },
-    { name = "cuda-toolkit", version = "12.1.1", source = { registry = "https://pypi.nvidia.com/" }, extra = ["cublas", "curand", "cusolver", "cusparse", "nvrtc"], marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "cuda-toolkit", version = "12.1.1", source = { registry = "https://pypi.nvidia.com/" }, extra = ["cublas", "curand", "cusolver", "cusparse", "nvrtc"], marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
     { name = "cuda-toolkit", version = "12.9.2.0", source = { registry = "https://pypi.nvidia.com/" }, extra = ["cublas", "curand", "cusolver", "cusparse", "nvrtc"], marker = "(sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-12') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
     { name = "libkvikio-cu12" },
     { name = "libraft-cu12" },
     { name = "librmm-cu12" },
-    { name = "nvidia-nccl-cu12", version = "2.20.5", source = { registry = "https://pypi.nvidia.com/" }, marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "nvidia-nccl-cu12", version = "2.20.5", source = { registry = "https://pypi.nvidia.com/" }, marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
     { name = "nvidia-nccl-cu12", version = "2.32.3", source = { registry = "https://pypi.org/simple" }, marker = "(sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-12') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
     { name = "nvidia-nvjitlink-cu12" },
 ]
@@ -2896,12 +2896,12 @@ version = "26.10.0"
 source = { registry = "https://pypi.nvidia.com/" }
 dependencies = [
     { name = "cuda-pathfinder" },
-    { name = "cuda-toolkit", version = "13.0.3.0", source = { registry = "https://pypi.nvidia.com/" }, extra = ["cublas", "curand", "cusolver", "cusparse", "nvrtc"], marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "cuda-toolkit", version = "13.0.3.0", source = { registry = "https://pypi.nvidia.com/" }, extra = ["cublas", "curand", "cusolver", "cusparse", "nvrtc"], marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-13') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
     { name = "cuda-toolkit", version = "13.4.3", source = { registry = "https://pypi.nvidia.com/" }, extra = ["cublas", "curand", "cusolver", "cusparse", "nvrtc"], marker = "(sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-13') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
     { name = "libkvikio-cu13" },
     { name = "libraft-cu13" },
     { name = "librmm-cu13" },
-    { name = "nvidia-nccl-cu13", version = "2.30.7", source = { registry = "https://pypi.nvidia.com/" }, marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "nvidia-nccl-cu13", version = "2.30.7", source = { registry = "https://pypi.nvidia.com/" }, marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-13') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
     { name = "nvidia-nccl-cu13", version = "2.32.3", source = { registry = "https://pypi.org/simple" }, marker = "(sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-13') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
     { name = "nvidia-nvjitlink" },
 ]
@@ -2916,7 +2916,7 @@ version = "26.10.0"
 source = { registry = "https://pypi.nvidia.com/" }
 dependencies = [
     { name = "cuda-pathfinder" },
-    { name = "cuda-toolkit", version = "12.1.1", source = { registry = "https://pypi.nvidia.com/" }, marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "cuda-toolkit", version = "12.1.1", source = { registry = "https://pypi.nvidia.com/" }, marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
     { name = "cuda-toolkit", version = "12.9.2.0", source = { registry = "https://pypi.nvidia.com/" }, marker = "(sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-12') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
     { name = "nvidia-cufile-cu12" },
     { name = "rapids-logger" },
@@ -2932,7 +2932,7 @@ version = "26.10.0"
 source = { registry = "https://pypi.nvidia.com/" }
 dependencies = [
     { name = "cuda-pathfinder" },
-    { name = "cuda-toolkit", version = "13.0.3.0", source = { registry = "https://pypi.nvidia.com/" }, extra = ["cufile"], marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "cuda-toolkit", version = "13.0.3.0", source = { registry = "https://pypi.nvidia.com/" }, extra = ["cufile"], marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-13') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
     { name = "cuda-toolkit", version = "13.4.3", source = { registry = "https://pypi.nvidia.com/" }, marker = "(sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-13') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
     { name = "rapids-logger" },
 ]
@@ -2996,7 +2996,7 @@ name = "libraft-cu12"
 version = "26.10.0"
 source = { registry = "https://pypi.nvidia.com/" }
 dependencies = [
-    { name = "cuda-toolkit", version = "12.1.1", source = { registry = "https://pypi.nvidia.com/" }, extra = ["cublas", "curand", "cusolver", "cusparse"], marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "cuda-toolkit", version = "12.1.1", source = { registry = "https://pypi.nvidia.com/" }, extra = ["cublas", "curand", "cusolver", "cusparse"], marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
     { name = "cuda-toolkit", version = "12.9.2.0", source = { registry = "https://pypi.nvidia.com/" }, extra = ["cublas", "curand", "cusolver", "cusparse"], marker = "(sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-12') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
     { name = "librmm-cu12" },
     { name = "nvidia-nvjitlink-cu12" },
@@ -3012,7 +3012,7 @@ name = "libraft-cu13"
 version = "26.10.0"
 source = { registry = "https://pypi.nvidia.com/" }
 dependencies = [
-    { name = "cuda-toolkit", version = "13.0.3.0", source = { registry = "https://pypi.nvidia.com/" }, extra = ["cublas", "curand", "cusolver", "cusparse"], marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "cuda-toolkit", version = "13.0.3.0", source = { registry = "https://pypi.nvidia.com/" }, extra = ["cublas", "curand", "cusolver", "cusparse"], marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-13') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
     { name = "cuda-toolkit", version = "13.4.3", source = { registry = "https://pypi.nvidia.com/" }, extra = ["cublas", "curand", "cusolver", "cusparse"], marker = "(sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-13') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
     { name = "librmm-cu13" },
     { name = "nvidia-nvjitlink" },
@@ -3784,7 +3784,7 @@ version = "2.4.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "ast-serialize" },
-    { name = "librt", marker = "platform_python_implementation != 'PyPy' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "librt", marker = "platform_python_implementation != 'PyPy'" },
     { name = "mypy-extensions" },
     { name = "pathspec" },
     { name = "typing-extensions" },
@@ -3851,8 +3851,8 @@ dependencies = [
     { name = "markdown-it-py" },
     { name = "mdit-py-plugins" },
     { name = "pyyaml" },
-    { name = "sphinx", version = "9.1.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.13' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "sphinx", version = "9.2.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.13' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "sphinx", version = "9.1.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.13'" },
+    { name = "sphinx", version = "9.2.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.13'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/21/dc/603751677fff302f34396e206b610f556a59d7fe58b9a2145f54e96b48e8/myst_parser-5.1.0.tar.gz", hash = "sha256:ab69322dc6719dcc7f296479dbb70181b66df6ed315064f92dbc85c0e1bf2f02", size = 101182, upload-time = "2026-05-13T09:38:19.361Z" }
 wheels = [
@@ -3946,8 +3946,8 @@ dependencies = [
     { name = "jinja2" },
     { name = "nbconvert" },
     { name = "nbformat" },
-    { name = "sphinx", version = "9.1.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.13' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "sphinx", version = "9.2.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.13' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "sphinx", version = "9.1.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.13'" },
+    { name = "sphinx", version = "9.2.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.13'" },
     { name = "traitlets" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/e7/d1/82081750f8a78ad0399c6ed831d42623b891904e8e7b8a75878225cf1dce/nbsphinx-0.9.8.tar.gz", hash = "sha256:d0765908399a8ee2b57be7ae881cf2ea58d66db3af7bbf33e6eb48f83bea5495", size = 417469, upload-time = "2025-11-28T17:41:02.336Z" }
@@ -4033,13 +4033,13 @@ wheels = [
 [package.optional-dependencies]
 cu12 = [
     { name = "cuda-bindings", version = "12.9.10", source = { registry = "https://pypi.org/simple" } },
-    { name = "cuda-toolkit", version = "12.1.1", source = { registry = "https://pypi.nvidia.com/" }, extra = ["cccl", "cudart", "nvcc", "nvrtc"], marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "cuda-toolkit", version = "12.1.1", source = { registry = "https://pypi.nvidia.com/" }, extra = ["cccl", "cudart", "nvcc", "nvrtc"], marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
     { name = "cuda-toolkit", version = "12.9.2.0", source = { registry = "https://pypi.nvidia.com/" }, extra = ["cccl", "cudart", "nvcc", "nvrtc"], marker = "(sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-12') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
     { name = "nvidia-nvjitlink-cu12" },
 ]
 cu13 = [
     { name = "cuda-bindings", version = "13.4.4", source = { registry = "https://pypi.org/simple" } },
-    { name = "cuda-toolkit", version = "13.0.3.0", source = { registry = "https://pypi.nvidia.com/" }, extra = ["cccl", "cudart", "nvrtc", "nvvm"], marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "cuda-toolkit", version = "13.0.3.0", source = { registry = "https://pypi.nvidia.com/" }, extra = ["cccl", "cudart", "nvrtc", "nvvm"], marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-13') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
     { name = "cuda-toolkit", version = "13.4.3", source = { registry = "https://pypi.nvidia.com/" }, extra = ["cccl", "cudart", "nvrtc", "nvvm"], marker = "(sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-13') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
     { name = "nvidia-nvjitlink" },
 ]
@@ -4084,13 +4084,13 @@ wheels = [
 [package.optional-dependencies]
 cu12 = [
     { name = "cuda-bindings", version = "12.9.10", source = { registry = "https://pypi.org/simple" } },
-    { name = "cuda-toolkit", version = "12.1.1", source = { registry = "https://pypi.nvidia.com/" }, extra = ["cudart", "nvcc", "nvrtc"], marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "cuda-toolkit", version = "12.1.1", source = { registry = "https://pypi.nvidia.com/" }, extra = ["cudart", "nvcc", "nvrtc"], marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
     { name = "cuda-toolkit", version = "12.9.2.0", source = { registry = "https://pypi.nvidia.com/" }, extra = ["cudart", "nvcc", "nvrtc"], marker = "(sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-12') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
     { name = "nvidia-nvjitlink-cu12" },
 ]
 cu13 = [
     { name = "cuda-bindings", version = "13.4.4", source = { registry = "https://pypi.org/simple" } },
-    { name = "cuda-toolkit", version = "13.0.3.0", source = { registry = "https://pypi.nvidia.com/" }, extra = ["cudart", "nvcc", "nvrtc"], marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "cuda-toolkit", version = "13.0.3.0", source = { registry = "https://pypi.nvidia.com/" }, extra = ["cudart", "nvcc", "nvrtc"], marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-13') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
     { name = "cuda-toolkit", version = "13.4.3", source = { registry = "https://pypi.nvidia.com/" }, extra = ["cudart", "nvcc", "nvrtc"], marker = "(sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-13') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
     { name = "nvidia-nvjitlink" },
 ]
@@ -4632,7 +4632,7 @@ name = "nvidia-cudnn-cu12"
 version = "9.1.0.70"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "nvidia-cublas-cu12", version = "12.1.3.1", source = { registry = "https://pypi.nvidia.com/" }, marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "nvidia-cublas-cu12", version = "12.1.3.1", source = { registry = "https://pypi.nvidia.com/" }, marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
 ]
 wheels = [
     { url = "https://files.pythonhosted.org/packages/9f/fd/713452cd72343f682b1c7b9321e23829f00b842ceaedcda96e742ea0b0b3/nvidia_cudnn_cu12-9.1.0.70-py3-none-manylinux2014_x86_64.whl", hash = "sha256:165764f44ef8c61fcdfdfdbe769d687e06374059fbb388b6c89ecb0e28793a6f", size = 664752741, upload-time = "2024-04-22T15:24:15.253Z" },
@@ -4861,9 +4861,9 @@ resolution-markers = [
     "python_full_version < '3.13' and sys_platform != 'emscripten' and sys_platform != 'win32'",
 ]
 dependencies = [
-    { name = "nvidia-cublas-cu12", version = "12.1.3.1", source = { registry = "https://pypi.nvidia.com/" }, marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "nvidia-cusparse-cu12", version = "12.1.0.106", source = { registry = "https://pypi.nvidia.com/" }, marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "nvidia-nvjitlink-cu12", marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "nvidia-cublas-cu12", version = "12.1.3.1", source = { registry = "https://pypi.nvidia.com/" }, marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "nvidia-cusparse-cu12", version = "12.1.0.106", source = { registry = "https://pypi.nvidia.com/" }, marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "nvidia-nvjitlink-cu12", marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
 ]
 wheels = [
     { url = "https://pypi.nvidia.com/nvidia-cusolver-cu12/nvidia_cusolver_cu12-11.4.5.107-py3-none-manylinux1_x86_64.whl", hash = "sha256:8a7ec542f0412294b15072fa7dab71d31334014a69f953004ea7a118206fe0dd" },
@@ -4941,7 +4941,7 @@ resolution-markers = [
     "python_full_version < '3.13' and sys_platform != 'emscripten' and sys_platform != 'win32'",
 ]
 dependencies = [
-    { name = "nvidia-nvjitlink-cu12", marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "nvidia-nvjitlink-cu12", marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
 ]
 wheels = [
     { url = "https://pypi.nvidia.com/nvidia-cusparse-cu12/nvidia_cusparse_cu12-12.1.0.106-py3-none-manylinux1_x86_64.whl", hash = "sha256:f3b50f42cf363f86ab21f720998517a659a48131e8d538dc02f8768237bd884c" },
@@ -5031,8 +5031,8 @@ resolution-markers = [
     "python_full_version == '3.14.*' and sys_platform == 'win32'",
     "python_full_version == '3.14.*' and sys_platform == 'emscripten'",
     "python_full_version == '3.13.*' and sys_platform == 'win32'",
-    "python_full_version < '3.13' and sys_platform == 'win32'",
     "python_full_version == '3.13.*' and sys_platform == 'emscripten'",
+    "python_full_version < '3.13' and sys_platform == 'win32'",
     "python_full_version < '3.13' and sys_platform == 'emscripten'",
 ]
 wheels = [
@@ -5065,8 +5065,8 @@ resolution-markers = [
     "python_full_version == '3.14.*' and sys_platform == 'win32'",
     "python_full_version == '3.14.*' and sys_platform == 'emscripten'",
     "python_full_version == '3.13.*' and sys_platform == 'win32'",
-    "python_full_version < '3.13' and sys_platform == 'win32'",
     "python_full_version == '3.13.*' and sys_platform == 'emscripten'",
+    "python_full_version < '3.13' and sys_platform == 'win32'",
     "python_full_version < '3.13' and sys_platform == 'emscripten'",
 ]
 wheels = [
@@ -5302,7 +5302,7 @@ name = "optype"
 version = "0.19.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "typing-extensions", marker = "python_full_version < '3.13' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "typing-extensions", marker = "python_full_version < '3.13'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/51/cc/ab0d908a4fd70493628cde3ce0f809c2b0d69b645af52202da4f1b0aeea3/optype-0.19.0.tar.gz", hash = "sha256:50ce4c0ca419026eeae4130dc90c6a0b9a0b54ffe1d940fc26e8d0058903de4c", size = 116633, upload-time = "2026-10-02T23:14:27.141Z" }
 wheels = [
@@ -5331,7 +5331,7 @@ source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "numpy" },
     { name = "python-dateutil" },
-    { name = "tzdata", marker = "sys_platform == 'emscripten' or sys_platform == 'win32' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "tzdata", marker = "sys_platform == 'emscripten' or sys_platform == 'win32'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/e2/17/d7b106e05bfa642e8694451e7d3d759c6a241c5386a5d962e4f66c047e06/pandas-3.0.6.tar.gz", hash = "sha256:66b07ef7315a31bfe1089cd3d71a7de781c9dca986762d0b4fe7c0ef17465d10", size = 4667686, upload-time = "2026-09-17T23:23:18.345Z" }
 wheels = [
@@ -5484,7 +5484,7 @@ name = "pexpect"
 version = "4.9.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "ptyprocess", marker = "(sys_platform != 'emscripten' and sys_platform != 'win32') or (sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "ptyprocess" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/42/92/cc564bf6381ff43ce1f4d06852fc19a2f11d180f23dc32d9588bee2f149d/pexpect-4.9.0.tar.gz", hash = "sha256:ee7d41123f3c9911050ea2c2dac107568dc43b2d3b0c7557a33212c398ead30f", size = 166450, upload-time = "2023-11-25T09:07:26.339Z" }
 wheels = [
@@ -5603,7 +5603,7 @@ name = "plumbum"
 version = "2.0.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "typing-extensions", marker = "python_full_version < '3.13' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "typing-extensions", marker = "python_full_version < '3.13'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/6c/d2/578712a979a50e9aba08ea173a38e7598461130d3c9899f176373bc03280/plumbum-2.0.2.tar.gz", hash = "sha256:233751d7819c9e6743ec1c2405927eb4fa52a284c7b894bd10e28106a9309a92", size = 390799, upload-time = "2026-07-22T04:13:12.157Z" }
 wheels = [
@@ -6225,7 +6225,7 @@ name = "pytest"
 version = "9.1.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "colorama", marker = "sys_platform == 'win32' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "colorama", marker = "sys_platform == 'win32'" },
     { name = "iniconfig" },
     { name = "packaging" },
     { name = "pluggy" },
@@ -6320,7 +6320,7 @@ name = "pyzmq"
 version = "27.2.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "cffi", marker = "implementation_name == 'pypy' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "cffi", marker = "implementation_name == 'pypy'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/e7/8d/5b3d5631c2f4b4b8862f64cd0c9eb777b5710eeb5125b4be8dd0a200a4c0/pyzmq-27.2.0.tar.gz", hash = "sha256:54d4259d1bfae24ecdb5ca79f7acc2eac6c286a02d6a0ae617797cb45f0726d3", size = 292316, upload-time = "2026-08-20T19:08:21.19Z" }
 wheels = [
@@ -6385,7 +6385,7 @@ dependencies = [
     { name = "dask-cuda" },
     { name = "distributed-ucxx-cu12" },
     { name = "libraft-cu12" },
-    { name = "nvidia-nccl-cu12", version = "2.20.5", source = { registry = "https://pypi.nvidia.com/" }, marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "nvidia-nccl-cu12", version = "2.20.5", source = { registry = "https://pypi.nvidia.com/" }, marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
     { name = "nvidia-nccl-cu12", version = "2.32.3", source = { registry = "https://pypi.org/simple" }, marker = "(sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-12') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
     { name = "pylibraft-cu12" },
     { name = "rapids-dask-dependency" },
@@ -6403,7 +6403,7 @@ dependencies = [
     { name = "dask-cuda" },
     { name = "distributed-ucxx-cu13" },
     { name = "libraft-cu13" },
-    { name = "nvidia-nccl-cu13", version = "2.30.7", source = { registry = "https://pypi.nvidia.com/" }, marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "nvidia-nccl-cu13", version = "2.30.7", source = { registry = "https://pypi.nvidia.com/" }, marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-13') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
     { name = "nvidia-nccl-cu13", version = "2.32.3", source = { registry = "https://pypi.org/simple" }, marker = "(sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-13') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
     { name = "pylibraft-cu13" },
     { name = "rapids-dask-dependency" },
@@ -6465,7 +6465,7 @@ source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "attrs" },
     { name = "rpds-py" },
-    { name = "typing-extensions", marker = "python_full_version < '3.13' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "typing-extensions", marker = "python_full_version < '3.13'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/22/f5/df4e9027acead3ecc63e50fe1e36aca1523e1719559c499951bb4b53188f/referencing-0.37.0.tar.gz", hash = "sha256:44aefc3142c5b842538163acb373e24cce6632bd54bdb01b21ad5863489f50d8", size = 78036, upload-time = "2025-10-13T15:30:48.871Z" }
 wheels = [
@@ -6894,7 +6894,7 @@ version = "0.1.7"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "session-info2" },
-    { name = "typing-extensions", marker = "python_full_version < '3.13' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "typing-extensions", marker = "python_full_version < '3.13'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/3b/3f/beabd0ed59483d1f65dc9e23db74449c7f4cd998f6cfaafb32c8e93364f7/scverse_misc-0.1.7.tar.gz", hash = "sha256:c39413f53debc6c0dc2ba0d7fb5bceeff75a5a89eb7f64fcb8a172b80d0ce12b", size = 49862, upload-time = "2026-10-14T08:12:14.853Z" }
 wheels = [
@@ -7115,6 +7115,7 @@ wheels = [
 name = "spatiomic"
 version = "0.11.0"
 source = { editable = "." }
+default-groups = []
 dependencies = [
     { name = "adjusttext" },
     { name = "anndata" },
@@ -7179,8 +7180,8 @@ dev = [
     { name = "ruff" },
     { name = "scipy-stubs" },
     { name = "session-info2" },
-    { name = "sphinx", version = "9.1.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.13' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "sphinx", version = "9.2.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.13' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "sphinx", version = "9.1.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.13'" },
+    { name = "sphinx", version = "9.2.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.13'" },
     { name = "sphinx-autoapi" },
     { name = "sphinx-autodoc-typehints" },
     { name = "sphinx-copybutton" },
@@ -7198,8 +7199,8 @@ doc = [
     { name = "openpyxl" },
     { name = "pandoc" },
     { name = "session-info2" },
-    { name = "sphinx", version = "9.1.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.13' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "sphinx", version = "9.2.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.13' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "sphinx", version = "9.1.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.13'" },
+    { name = "sphinx", version = "9.2.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.13'" },
     { name = "sphinx-autoapi" },
     { name = "sphinx-autodoc-typehints" },
     { name = "sphinx-copybutton" },
@@ -7238,7 +7239,7 @@ requires-dist = [
     { name = "cuml-cu12", marker = "extra == 'cuda-12'", specifier = ">=25.10" },
     { name = "cuml-cu13", marker = "extra == 'cuda-13'", specifier = ">=25.10" },
     { name = "esda", specifier = ">=2.7" },
-    { name = "fastersom", specifier = "==0.3.2" },
+    { name = "fastersom", specifier = "==0.5.0" },
     { name = "graspologic-native", specifier = ">=1.3.1" },
     { name = "joblib" },
     { name = "lazy-loader" },
@@ -7335,23 +7336,23 @@ resolution-markers = [
     "python_full_version < '3.13' and sys_platform != 'emscripten' and sys_platform != 'win32'",
 ]
 dependencies = [
-    { name = "alabaster", marker = "python_full_version < '3.13' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "babel", marker = "python_full_version < '3.13' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "colorama", marker = "(python_full_version < '3.13' and sys_platform == 'win32') or (python_full_version >= '3.13' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "docutils", marker = "python_full_version < '3.13' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "imagesize", marker = "python_full_version < '3.13' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "jinja2", marker = "python_full_version < '3.13' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "packaging", marker = "python_full_version < '3.13' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "pygments", marker = "python_full_version < '3.13' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "requests", marker = "python_full_version < '3.13' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "roman-numerals", marker = "python_full_version < '3.13' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "snowballstemmer", marker = "python_full_version < '3.13' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "sphinxcontrib-applehelp", marker = "python_full_version < '3.13' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "sphinxcontrib-devhelp", marker = "python_full_version < '3.13' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "sphinxcontrib-htmlhelp", marker = "python_full_version < '3.13' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "sphinxcontrib-jsmath", marker = "python_full_version < '3.13' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "sphinxcontrib-qthelp", marker = "python_full_version < '3.13' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "sphinxcontrib-serializinghtml", marker = "python_full_version < '3.13' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "alabaster" },
+    { name = "babel" },
+    { name = "colorama", marker = "sys_platform == 'win32'" },
+    { name = "docutils" },
+    { name = "imagesize" },
+    { name = "jinja2" },
+    { name = "packaging" },
+    { name = "pygments" },
+    { name = "requests" },
+    { name = "roman-numerals" },
+    { name = "snowballstemmer" },
+    { name = "sphinxcontrib-applehelp" },
+    { name = "sphinxcontrib-devhelp" },
+    { name = "sphinxcontrib-htmlhelp" },
+    { name = "sphinxcontrib-jsmath" },
+    { name = "sphinxcontrib-qthelp" },
+    { name = "sphinxcontrib-serializinghtml" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/fc/73/567727fc8c8d85bc3adc88a246e12937cfda8d565cf1d80e85bceaa61fe5/sphinx-9.1.1.tar.gz", hash = "sha256:48b627f02908f22c601b3ba9c7b17265b4f315dd05c8bc64cd4da41183f44fbc", size = 8725638, upload-time = "2026-10-20T00:41:13.96Z" }
 wheels = [
@@ -7374,23 +7375,23 @@ resolution-markers = [
     "python_full_version == '3.13.*' and sys_platform != 'emscripten' and sys_platform != 'win32'",
 ]
 dependencies = [
-    { name = "alabaster", marker = "python_full_version >= '3.13' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "babel", marker = "python_full_version >= '3.13' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "colorama", marker = "(python_full_version >= '3.13' and sys_platform == 'win32') or (python_full_version < '3.13' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "docutils", marker = "python_full_version >= '3.13' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "imagesize", marker = "python_full_version >= '3.13' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "jinja2", marker = "python_full_version >= '3.13' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "packaging", marker = "python_full_version >= '3.13' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "pygments", marker = "python_full_version >= '3.13' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "requests", marker = "python_full_version >= '3.13' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "roman-numerals", marker = "python_full_version >= '3.13' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "snowballstemmer", marker = "python_full_version >= '3.13' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "sphinxcontrib-applehelp", marker = "python_full_version >= '3.13' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "sphinxcontrib-devhelp", marker = "python_full_version >= '3.13' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "sphinxcontrib-htmlhelp", marker = "python_full_version >= '3.13' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "sphinxcontrib-jsmath", marker = "python_full_version >= '3.13' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "sphinxcontrib-qthelp", marker = "python_full_version >= '3.13' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "sphinxcontrib-serializinghtml", marker = "python_full_version >= '3.13' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "alabaster" },
+    { name = "babel" },
+    { name = "colorama", marker = "sys_platform == 'win32'" },
+    { name = "docutils" },
+    { name = "imagesize" },
+    { name = "jinja2" },
+    { name = "packaging" },
+    { name = "pygments" },
+    { name = "requests" },
+    { name = "roman-numerals" },
+    { name = "snowballstemmer" },
+    { name = "sphinxcontrib-applehelp" },
+    { name = "sphinxcontrib-devhelp" },
+    { name = "sphinxcontrib-htmlhelp" },
+    { name = "sphinxcontrib-jsmath" },
+    { name = "sphinxcontrib-qthelp" },
+    { name = "sphinxcontrib-serializinghtml" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/64/d4/413466f0be8b1cb0e3e43893a148b96d7462d0923d82b4166b21afc5f30c/sphinx-9.2.0.tar.gz", hash = "sha256:90470459f3cab15d9dfed146c71cf77694b0445df17b2e0e69059cb9f7fc9ee4", size = 8782438, upload-time = "2026-10-21T00:05:15.019Z" }
 wheels = [
@@ -7405,8 +7406,8 @@ dependencies = [
     { name = "astroid" },
     { name = "jinja2" },
     { name = "pyyaml" },
-    { name = "sphinx", version = "9.1.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.13' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "sphinx", version = "9.2.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.13' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "sphinx", version = "9.1.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.13'" },
+    { name = "sphinx", version = "9.2.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.13'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/09/5e/7b42f3f774aa116741b8031b740c854612ed7dd7d616695e934a2b7fb94f/sphinx_autoapi-3.8.1.tar.gz", hash = "sha256:04643fc50485039294ace8b660d0d1b821a1686824a975725a5106e8cf1fb30b", size = 58898, upload-time = "2026-08-23T17:04:25.612Z" }
 wheels = [
@@ -7418,9 +7419,9 @@ name = "sphinx-autodoc-typehints"
 version = "3.17.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "sphinx", version = "9.1.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.13' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "sphinx", version = "9.2.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.13' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "typing-extensions", marker = "python_full_version < '3.15' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "sphinx", version = "9.1.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.13'" },
+    { name = "sphinx", version = "9.2.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.13'" },
+    { name = "typing-extensions", marker = "python_full_version < '3.15'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/9c/fa/c967fd665cc102c90338a90292aba336f852ee6f9b3477ffe4da565edb11/sphinx_autodoc_typehints-3.17.2.tar.gz", hash = "sha256:de41ed4001f4818bb6d37c22fd10ee44a93e6c8e945c6c7e3984e28a9df87d1c", size = 570767, upload-time = "2026-10-17T18:30:30.923Z" }
 wheels = [
@@ -7432,8 +7433,8 @@ name = "sphinx-basic-ng"
 version = "1.0.0b2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "sphinx", version = "9.1.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.13' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "sphinx", version = "9.2.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.13' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "sphinx", version = "9.1.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.13'" },
+    { name = "sphinx", version = "9.2.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.13'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/98/0b/a866924ded68efec7a1759587a4e478aec7559d8165fac8b2ad1c0e774d6/sphinx_basic_ng-1.0.0b2.tar.gz", hash = "sha256:9ec55a47c90c8c002b5960c57492ec3021f5193cb26cebc2dc4ea226848651c9", size = 20736, upload-time = "2023-07-08T18:40:54.166Z" }
 wheels = [
@@ -7445,8 +7446,8 @@ name = "sphinx-copybutton"
 version = "0.5.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "sphinx", version = "9.1.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.13' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "sphinx", version = "9.2.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.13' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "sphinx", version = "9.1.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.13'" },
+    { name = "sphinx", version = "9.2.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.13'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/fc/2b/a964715e7f5295f77509e59309959f4125122d648f86b4fe7d70ca1d882c/sphinx-copybutton-0.5.2.tar.gz", hash = "sha256:4cf17c82fb9646d1bc9ca92ac280813a3b605d8c421225fd9913154103ee1fbd", size = 23039, upload-time = "2023-04-14T08:10:22.998Z" }
 wheels = [
@@ -7458,8 +7459,8 @@ name = "sphinx-design"
 version = "0.7.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "sphinx", version = "9.1.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.13' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "sphinx", version = "9.2.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.13' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "sphinx", version = "9.1.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.13'" },
+    { name = "sphinx", version = "9.2.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.13'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/13/7b/804f311da4663a4aecc6cf7abd83443f3d4ded970826d0c958edc77d4527/sphinx_design-0.7.0.tar.gz", hash = "sha256:d2a3f5b19c24b916adb52f97c5f00efab4009ca337812001109084a740ec9b7a", size = 2203582, upload-time = "2026-01-19T13:12:53.297Z" }
 wheels = [
@@ -7471,8 +7472,8 @@ name = "sphinx-llms-txt"
 version = "0.7.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "sphinx", version = "9.1.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.13' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "sphinx", version = "9.2.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.13' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "sphinx", version = "9.1.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.13'" },
+    { name = "sphinx", version = "9.2.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.13'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/d3/dd/6d7fa7d6f51ee20959f1734cdbd62e99880dcd87576ce554d4bb8aaabdd7/sphinx_llms_txt-0.7.1.tar.gz", hash = "sha256:b5cefec19d3fd56670aa4a28917d17d32b22c61a9feadbab8564ad11e932f5c0", size = 32464, upload-time = "2025-12-16T22:31:26.379Z" }
 wheels = [
@@ -7485,8 +7486,8 @@ version = "3.1.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "docutils" },
-    { name = "sphinx", version = "9.1.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.13' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "sphinx", version = "9.2.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.13' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "sphinx", version = "9.1.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.13'" },
+    { name = "sphinx", version = "9.2.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.13'" },
     { name = "sphinxcontrib-jquery" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/84/68/a1bfbf38c0f7bccc9b10bbf76b94606f64acb1552ae394f0b8285bfaea25/sphinx_rtd_theme-3.1.0.tar.gz", hash = "sha256:b44276f2c276e909239a4f6c955aa667aaafeb78597923b1c60babc76db78e4c", size = 7620915, upload-time = "2026-01-12T16:03:31.17Z" }
@@ -7526,8 +7527,8 @@ name = "sphinxcontrib-jquery"
 version = "4.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "sphinx", version = "9.1.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.13' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "sphinx", version = "9.2.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.13' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "sphinx", version = "9.1.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.13'" },
+    { name = "sphinx", version = "9.2.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.13'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/de/f3/aa67467e051df70a6330fe7770894b3e4f09436dea6881ae0b4f3d87cad8/sphinxcontrib-jquery-4.1.tar.gz", hash = "sha256:1620739f04e36a2c779f1a131a2dfd49b2fd07351bf1968ced074365933abc7a", size = 122331, upload-time = "2023-03-14T15:01:01.944Z" }
 wheels = [
@@ -7550,8 +7551,8 @@ source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "jinja2" },
     { name = "pyyaml" },
-    { name = "sphinx", version = "9.1.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.13' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "sphinx", version = "9.2.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.13' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "sphinx", version = "9.1.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.13'" },
+    { name = "sphinx", version = "9.2.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.13'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/8c/87/06537dff20aa57df2d0f2afa87edff4afa85dec6f57f03f7acc24f83ff88/sphinxcontrib_mermaid-2.1.1.tar.gz", hash = "sha256:f8d7f1b2f0ad69b7ebdd5cbf532fb4ee107893b5373bc2d0e9634089c0b2cfee", size = 22353, upload-time = "2026-09-01T16:10:23.671Z" }
 wheels = [
@@ -7731,25 +7732,25 @@ resolution-markers = [
     "python_full_version < '3.13' and sys_platform != 'emscripten' and sys_platform != 'win32'",
 ]
 dependencies = [
-    { name = "filelock", marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "fsspec", marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "jinja2", marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "networkx", marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "nvidia-cublas-cu12", version = "12.1.3.1", source = { registry = "https://pypi.nvidia.com/" }, marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra == 'extra-9-spatiomic-cuda-12') or (platform_machine != 'x86_64' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform != 'linux' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "nvidia-cuda-cupti-cu12", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra == 'extra-9-spatiomic-cuda-12') or (platform_machine != 'x86_64' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform != 'linux' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "nvidia-cuda-nvrtc-cu12", version = "12.1.105", source = { registry = "https://pypi.nvidia.com/" }, marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra == 'extra-9-spatiomic-cuda-12') or (platform_machine != 'x86_64' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform != 'linux' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "nvidia-cuda-runtime-cu12", version = "12.1.105", source = { registry = "https://pypi.nvidia.com/" }, marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra == 'extra-9-spatiomic-cuda-12') or (platform_machine != 'x86_64' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform != 'linux' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "nvidia-cudnn-cu12", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra == 'extra-9-spatiomic-cuda-12') or (platform_machine != 'x86_64' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform != 'linux' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "nvidia-cufft-cu12", version = "11.0.2.54", source = { registry = "https://pypi.nvidia.com/" }, marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra == 'extra-9-spatiomic-cuda-12') or (platform_machine != 'x86_64' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform != 'linux' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "nvidia-curand-cu12", version = "10.3.2.106", source = { registry = "https://pypi.nvidia.com/" }, marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra == 'extra-9-spatiomic-cuda-12') or (platform_machine != 'x86_64' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform != 'linux' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "nvidia-cusolver-cu12", version = "11.4.5.107", source = { registry = "https://pypi.nvidia.com/" }, marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra == 'extra-9-spatiomic-cuda-12') or (platform_machine != 'x86_64' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform != 'linux' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "nvidia-cusparse-cu12", version = "12.1.0.106", source = { registry = "https://pypi.nvidia.com/" }, marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra == 'extra-9-spatiomic-cuda-12') or (platform_machine != 'x86_64' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform != 'linux' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "nvidia-nccl-cu12", version = "2.20.5", source = { registry = "https://pypi.nvidia.com/" }, marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra == 'extra-9-spatiomic-cuda-12') or (platform_machine != 'x86_64' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform != 'linux' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "nvidia-nvtx-cu12", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra == 'extra-9-spatiomic-cuda-12') or (platform_machine != 'x86_64' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform != 'linux' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "setuptools", marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "sympy", marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "triton", version = "3.0.0", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.13' and platform_machine == 'x86_64' and sys_platform == 'linux' and extra == 'extra-9-spatiomic-cuda-12') or (python_full_version >= '3.13' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (platform_machine != 'x86_64' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform != 'linux' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "typing-extensions", marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "filelock", marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "fsspec", marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "jinja2", marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "networkx", marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "nvidia-cublas-cu12", version = "12.1.3.1", source = { registry = "https://pypi.nvidia.com/" }, marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra == 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "nvidia-cuda-cupti-cu12", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra == 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "nvidia-cuda-nvrtc-cu12", version = "12.1.105", source = { registry = "https://pypi.nvidia.com/" }, marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra == 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "nvidia-cuda-runtime-cu12", version = "12.1.105", source = { registry = "https://pypi.nvidia.com/" }, marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra == 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "nvidia-cudnn-cu12", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra == 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "nvidia-cufft-cu12", version = "11.0.2.54", source = { registry = "https://pypi.nvidia.com/" }, marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra == 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "nvidia-curand-cu12", version = "10.3.2.106", source = { registry = "https://pypi.nvidia.com/" }, marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra == 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "nvidia-cusolver-cu12", version = "11.4.5.107", source = { registry = "https://pypi.nvidia.com/" }, marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra == 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "nvidia-cusparse-cu12", version = "12.1.0.106", source = { registry = "https://pypi.nvidia.com/" }, marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra == 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "nvidia-nccl-cu12", version = "2.20.5", source = { registry = "https://pypi.nvidia.com/" }, marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra == 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "nvidia-nvtx-cu12", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra == 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "setuptools", marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "sympy", marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "triton", version = "3.0.0", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.13' and platform_machine == 'x86_64' and sys_platform == 'linux' and extra == 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "typing-extensions", marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
 ]
 wheels = [
     { url = "https://files.pythonhosted.org/packages/cc/df/5204a13a7a973c23c7ade615bafb1a3112b5d0ec258d8390f078fa4ab0f7/torch-2.4.1-cp312-cp312-manylinux1_x86_64.whl", hash = "sha256:fdc4fe11db3eb93c1115d3e973a27ac7c1a8318af8934ffa36b0370efe28e042", size = 797019590, upload-time = "2024-09-04T19:10:42.948Z" },
@@ -7770,27 +7771,27 @@ resolution-markers = [
     "python_full_version == '3.14.*' and sys_platform == 'emscripten'",
     "python_full_version == '3.14.*' and sys_platform != 'emscripten' and sys_platform != 'win32'",
     "python_full_version == '3.13.*' and sys_platform == 'win32'",
-    "python_full_version < '3.13' and sys_platform == 'win32'",
     "python_full_version == '3.13.*' and sys_platform == 'emscripten'",
-    "python_full_version < '3.13' and sys_platform == 'emscripten'",
     "python_full_version == '3.13.*' and sys_platform != 'emscripten' and sys_platform != 'win32'",
+    "python_full_version < '3.13' and sys_platform == 'win32'",
+    "python_full_version < '3.13' and sys_platform == 'emscripten'",
     "python_full_version < '3.13' and sys_platform != 'emscripten' and sys_platform != 'win32'",
 ]
 dependencies = [
     { name = "cuda-bindings", version = "13.4.4", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.15' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
     { name = "cuda-toolkit", version = "13.0.3.0", source = { registry = "https://pypi.nvidia.com/" }, extra = ["cublas", "cudart", "cufft", "cufile", "cupti", "curand", "cusolver", "cusparse", "nvjitlink", "nvrtc", "nvtx"], marker = "(sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "filelock", marker = "sys_platform == 'emscripten' or sys_platform == 'win32' or extra != 'extra-9-spatiomic-cuda-12' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "fsspec", marker = "sys_platform == 'emscripten' or sys_platform == 'win32' or extra != 'extra-9-spatiomic-cuda-12' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "jinja2", marker = "sys_platform == 'emscripten' or sys_platform == 'win32' or extra != 'extra-9-spatiomic-cuda-12' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "networkx", marker = "sys_platform == 'emscripten' or sys_platform == 'win32' or extra != 'extra-9-spatiomic-cuda-12' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "filelock", marker = "sys_platform == 'emscripten' or sys_platform == 'win32' or extra != 'extra-9-spatiomic-cuda-12' or extra == 'extra-9-spatiomic-cuda-13'" },
+    { name = "fsspec", marker = "sys_platform == 'emscripten' or sys_platform == 'win32' or extra != 'extra-9-spatiomic-cuda-12' or extra == 'extra-9-spatiomic-cuda-13'" },
+    { name = "jinja2", marker = "sys_platform == 'emscripten' or sys_platform == 'win32' or extra != 'extra-9-spatiomic-cuda-12' or extra == 'extra-9-spatiomic-cuda-13'" },
+    { name = "networkx", marker = "sys_platform == 'emscripten' or sys_platform == 'win32' or extra != 'extra-9-spatiomic-cuda-12' or extra == 'extra-9-spatiomic-cuda-13'" },
     { name = "nvidia-cudnn-cu13", marker = "(sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
     { name = "nvidia-cusparselt-cu13", marker = "(sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
     { name = "nvidia-nccl-cu13", version = "2.30.7", source = { registry = "https://pypi.nvidia.com/" }, marker = "(sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
     { name = "nvidia-nvshmem-cu13", marker = "(sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "setuptools", marker = "sys_platform == 'emscripten' or sys_platform == 'win32' or extra != 'extra-9-spatiomic-cuda-12' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "sympy", marker = "sys_platform == 'emscripten' or sys_platform == 'win32' or extra != 'extra-9-spatiomic-cuda-12' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "setuptools", marker = "sys_platform == 'emscripten' or sys_platform == 'win32' or extra != 'extra-9-spatiomic-cuda-12' or extra == 'extra-9-spatiomic-cuda-13'" },
+    { name = "sympy", marker = "sys_platform == 'emscripten' or sys_platform == 'win32' or extra != 'extra-9-spatiomic-cuda-12' or extra == 'extra-9-spatiomic-cuda-13'" },
     { name = "triton", version = "3.8.0", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.15' and sys_platform == 'linux' and extra != 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "typing-extensions", marker = "sys_platform == 'emscripten' or sys_platform == 'win32' or extra != 'extra-9-spatiomic-cuda-12' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "typing-extensions", marker = "sys_platform == 'emscripten' or sys_platform == 'win32' or extra != 'extra-9-spatiomic-cuda-12' or extra == 'extra-9-spatiomic-cuda-13'" },
 ]
 wheels = [
     { url = "https://files.pythonhosted.org/packages/4b/3c/379349820e9a6e713826de3d0b88f07728541bdcabe2a3afd128871cdc4b/torch-2.14.1-cp312-cp312-macosx_14_0_arm64.whl", hash = "sha256:420dbf314c180ee4b86e9bc00aee5746a7d6e5bacdd7df925af671ed393f0b2e", size = 127307099, upload-time = "2026-09-30T17:44:10.421Z" },
@@ -7822,9 +7823,9 @@ resolution-markers = [
     "python_full_version < '3.13' and sys_platform != 'emscripten' and sys_platform != 'win32'",
 ]
 dependencies = [
-    { name = "numpy", marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "pillow", marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "torch", version = "2.4.1", source = { registry = "https://pypi.org/simple" }, marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "numpy", marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "pillow", marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "torch", version = "2.4.1", source = { registry = "https://pypi.org/simple" }, marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
 ]
 wheels = [
     { url = "https://files.pythonhosted.org/packages/a4/d0/b1029ab95d9219cac2dfc0d835e9ab4cebb01f5cb6b48e736778020fb995/torchvision-0.19.1-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:27ece277ff0f6cdc7fed0627279c632dcb2e58187da771eca24b0fbcf3f8590d", size = 1660230, upload-time = "2024-09-04T19:15:10.799Z" },
@@ -7845,16 +7846,16 @@ resolution-markers = [
     "python_full_version == '3.14.*' and sys_platform == 'emscripten'",
     "python_full_version == '3.14.*' and sys_platform != 'emscripten' and sys_platform != 'win32'",
     "python_full_version == '3.13.*' and sys_platform == 'win32'",
-    "python_full_version < '3.13' and sys_platform == 'win32'",
     "python_full_version == '3.13.*' and sys_platform == 'emscripten'",
-    "python_full_version < '3.13' and sys_platform == 'emscripten'",
     "python_full_version == '3.13.*' and sys_platform != 'emscripten' and sys_platform != 'win32'",
+    "python_full_version < '3.13' and sys_platform == 'win32'",
+    "python_full_version < '3.13' and sys_platform == 'emscripten'",
     "python_full_version < '3.13' and sys_platform != 'emscripten' and sys_platform != 'win32'",
 ]
 dependencies = [
-    { name = "numpy", marker = "sys_platform == 'emscripten' or sys_platform == 'win32' or extra != 'extra-9-spatiomic-cuda-12' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "pillow", marker = "sys_platform == 'emscripten' or sys_platform == 'win32' or extra != 'extra-9-spatiomic-cuda-12' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
-    { name = "torch", version = "2.14.1", source = { registry = "https://pypi.org/simple" }, marker = "sys_platform == 'emscripten' or sys_platform == 'win32' or extra != 'extra-9-spatiomic-cuda-12' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "numpy", marker = "sys_platform == 'emscripten' or sys_platform == 'win32' or extra != 'extra-9-spatiomic-cuda-12' or extra == 'extra-9-spatiomic-cuda-13'" },
+    { name = "pillow", marker = "sys_platform == 'emscripten' or sys_platform == 'win32' or extra != 'extra-9-spatiomic-cuda-12' or extra == 'extra-9-spatiomic-cuda-13'" },
+    { name = "torch", version = "2.14.1", source = { registry = "https://pypi.org/simple" }, marker = "sys_platform == 'emscripten' or sys_platform == 'win32' or extra != 'extra-9-spatiomic-cuda-12' or extra == 'extra-9-spatiomic-cuda-13'" },
 ]
 wheels = [
     { url = "https://files.pythonhosted.org/packages/f3/f8/855c7b326ed17a8dac4a03e8e6fec33ef6728e4baa00d816cf1227bb6681/torchvision-0.29.1-cp312-cp312-macosx_14_0_arm64.whl", hash = "sha256:3b6eb9d2f8fe9b93d9d37637749df361efeed133d96ddd503184a1b5b12bb27f", size = 1813847, upload-time = "2026-09-30T17:57:01.009Z" },
@@ -7930,7 +7931,7 @@ name = "tqdm"
 version = "4.70.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "colorama", marker = "sys_platform == 'win32' or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "colorama", marker = "sys_platform == 'win32'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/0d/ea/b2a5bd54b28a324dae8211928b2d730b6547500342c7e6c6dea08bd0a485/tqdm-4.70.1.tar.gz", hash = "sha256:cefd0eca11b2a37a3aee776544d4f4ae913f02688135b5556b8788dfa474afc4", size = 171846, upload-time = "2026-09-11T07:25:16.601Z" }
 wheels = [
@@ -7987,7 +7988,7 @@ resolution-markers = [
     "python_full_version < '3.13' and sys_platform != 'emscripten' and sys_platform != 'win32'",
 ]
 dependencies = [
-    { name = "filelock", marker = "(python_full_version < '3.13' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (python_full_version >= '3.13' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'emscripten' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13') or (sys_platform == 'win32' and extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
+    { name = "filelock", marker = "(python_full_version < '3.13' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-spatiomic-cuda-12') or (extra == 'extra-9-spatiomic-cuda-12' and extra == 'extra-9-spatiomic-cuda-13')" },
 ]
 wheels = [
     { url = "https://files.pythonhosted.org/packages/fe/7b/7757205dee3628f75e7991021d15cd1bd0c9b044ca9affe99b50879fc0e1/triton-3.0.0-1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:34e509deb77f1c067d8640725ef00c5cbfcb2052a1a3cb6a6d343841f92624eb", size = 209464695, upload-time = "2024-07-19T20:57:22.532Z" },
