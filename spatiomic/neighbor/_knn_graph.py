@@ -183,22 +183,45 @@ class KnnGraph:
         Returns:
             NDArray: The unique undirected edges, each sorted as (lower, higher) node index.
         """
-        # stack the n indices m times to get a matrix of shape (n, m)
-        n = neighbor_idx.shape[0]
-        m = neighbor_idx.shape[1]
-        indices = np.repeat(np.arange(n), m).reshape(n, m)
+        neighbors = _exclude_self(neighbor_idx)
+        node_count = neighbors.shape[0]
 
-        # only keep values where the indices are not equal to the neighbor_idx
-        mask = indices != neighbor_idx
+        return _deduplicate_edges(
+            np.repeat(np.arange(node_count), neighbors.shape[1]), neighbors.ravel(), node_count=node_count
+        )
 
-        # set the last column to False for mask rows where the sum is equal to m in case the index is not part of the
-        # neighborhood
-        mask[np.sum(mask, axis=1) == m, -1] = False
 
-        if np.any(np.sum(mask, axis=1) != m - 1):
-            raise ValueError("The neighbor_idx array must be a valid neighbor index array.")
+def _exclude_self(neighbor_idx: NDArray) -> NDArray:
+    """Remove each data point from its own row of a neighbor index array.
 
-        return _deduplicate_edges(np.repeat(np.arange(n), m - 1), neighbor_idx[mask], node_count=n)
+    If a data point is not part of its own row, e.g., because duplicates displaced it, its last neighbor is removed.
+
+    Args:
+        neighbor_idx (NDArray): The neighbor index array of shape (n, m), including each data point itself.
+
+    Raises:
+        ValueError: Raised when a row of `neighbor_idx` contains its own index more than once.
+
+    Returns:
+        NDArray: The neighbor index array of shape (n, m - 1) without the data points themselves, in the original order.
+    """
+    # stack the n indices m times to get a matrix of shape (n, m)
+    n = neighbor_idx.shape[0]
+    m = neighbor_idx.shape[1]
+    indices = np.repeat(np.arange(n), m).reshape(n, m)
+
+    # only keep values where the indices are not equal to the neighbor_idx
+    mask = indices != neighbor_idx
+
+    # set the last column to False for mask rows where the sum is equal to m in case the index is not part of the
+    # neighborhood
+    mask[np.sum(mask, axis=1) == m, -1] = False
+
+    if np.any(np.sum(mask, axis=1) != m - 1):
+        raise ValueError("The neighbor_idx array must be a valid neighbor index array.")
+
+    neighbors: NDArray = np.asarray(neighbor_idx)[mask].reshape(n, m - 1)
+    return neighbors
 
 
 def _deduplicate_edges(sources: NDArray, targets: NDArray, node_count: int) -> NDArray:
